@@ -1,0 +1,54 @@
+import os
+from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from app.rag.vectorstore import get_vectorstore
+from app.config import settings
+
+def ingest_data():
+    kb_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "knowledge_base")
+    os.makedirs(kb_dir, exist_ok=True)
+    
+    print(f"Loading documents from {kb_dir}...")
+    
+    # Load markdown and text files
+    text_loader = DirectoryLoader(kb_dir, glob="**/*.txt", loader_cls=TextLoader)
+    md_loader = DirectoryLoader(kb_dir, glob="**/*.md", loader_cls=TextLoader)
+    pdf_loader = DirectoryLoader(kb_dir, glob="**/*.pdf", loader_cls=PyPDFLoader)
+    
+    docs = []
+    try:
+        docs.extend(text_loader.load())
+    except Exception as e:
+        print(f"No text files or error: {e}")
+        
+    try:
+        docs.extend(md_loader.load())
+    except Exception as e:
+        print(f"No markdown files or error: {e}")
+        
+    try:
+        docs.extend(pdf_loader.load())
+    except Exception as e:
+        print(f"No PDF files or error: {e}")
+        
+    if not docs:
+        print("No documents found to ingest. Please place files in backend/knowledge_base/")
+        return
+        
+    print(f"Loaded {len(docs)} documents.")
+    
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
+    
+    splits = text_splitter.split_documents(docs)
+    print(f"Split into {len(splits)} chunks.")
+    
+    vectorstore = get_vectorstore()
+    print("Adding to vectorstore...")
+    vectorstore.add_documents(splits)
+    print("Ingestion complete!")
+
+if __name__ == "__main__":
+    ingest_data()
