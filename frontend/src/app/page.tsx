@@ -17,6 +17,21 @@ export default function Home() {
       <div className="flex-1 w-full relative">
         <ChatInterface />
       </div>
+
+      <footer className="w-full text-center py-4 mt-2 border-t border-white/5">
+        <p className="text-xs text-slate-500">
+          Built with ❤️ by{" "}
+          <a
+            href="https://github.com/rishabhh0001"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-snu-yellow hover:text-yellow-300 transition-colors font-medium"
+          >
+            Rishabh Joshi
+          </a>
+          {" · "}Not affiliated with Shiv Nadar University
+        </p>
+      </footer>
     </main>
   );
 }
