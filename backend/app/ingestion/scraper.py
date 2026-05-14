@@ -64,7 +64,7 @@ def scrape_snu():
         except Exception as e:
             print(f"Error scraping {url}: {e}")
 
-    print(f"✅ Scraping complete! Saved {count} pages to {scraped_dir}")
+    print(f"[DONE] Scraping complete! Saved {count} pages to {scraped_dir}")
 
 if __name__ == "__main__":
     scrape_snu()
