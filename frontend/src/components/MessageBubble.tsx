@@ -43,7 +43,7 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
 
       <div
         className={cn(
-          "max-w-[88%] md:max-w-[80%] rounded-2xl px-5 py-4 text-sm md:text-base leading-relaxed transition-all duration-300",
+          "max-w-[90%] md:max-w-[82%] rounded-2xl px-4 py-3 text-[13px] md:text-sm leading-relaxed transition-all duration-300",
           isUser
             ? "bg-gradient-to-br from-snu-blue to-snu-blue-light text-white rounded-br-none shadow-[0_10px_25px_-5px_rgba(0,46,91,0.4)]"
             : "glass-panel rounded-bl-none hover:border-white/20"
@@ -85,7 +85,11 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
                     >
                       <div className="font-bold text-snu-yellow mb-1.5 flex items-center gap-1.5">
                         <div className="w-1 h-1 bg-snu-yellow rounded-full"></div>
-                        {source.metadata?.source?.split('/').pop() || "Document Source"}
+                        {source.metadata?.source
+                          ? source.metadata.source === "Web Search"
+                            ? "🌐 Web Search"
+                            : source.metadata.source.split(/[\\/]/).pop()?.replace(/_/g, ' ').replace('.md', '') || source.metadata.source
+                          : "Document Source"}
                       </div>
                       <div className="text-slate-400 leading-relaxed italic">
                         "{source.content}"

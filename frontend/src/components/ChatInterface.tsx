@@ -133,7 +133,7 @@ export default function ChatInterface() {
   const clearChat = () => setMessages([]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-180px)]">
+    <div className="flex flex-col h-full">
       {/* Messages Area */}
       <div 
         ref={scrollContainerRef}
