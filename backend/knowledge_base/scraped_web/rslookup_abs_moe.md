@@ -1,7 +1,0 @@
-# rslookup | SNU
-
-Source URL: https://rslookup.abs.moe/
-
-rslookup | SNU
- rslookup Simplify your college experience by effortlessly accessing professor info, lab locations,
- campus amenities, and much more! What's there for you? Professors Locate your professors on campus hassle-free. Say goodbye to wandering through hallways or frantically searching for room numbers.Labs Finding your designated lab spaces with ease. No more wandering around campus, feeling lost and bewildered.Documents Essential Resources at Your Fingertips: Access Crucial DocumentsAcademic Helpdesk Find all the Academic POCs in one place. Get your academic queries resolved in no time.Student Council Meet the Faces Behind Your Voice: Get to Know the Members of the Student Council!GPA Calculator Estimate your academic growth with ease. No more manual calculations.Attendance Calculator Missed a few classes? Calculate your attendance to know where you stand.Amenities Find every amenity on campus, from Academic Blocks to Cafeterias, all in one place.Events Stay Updated with the Latest Campus Events: Never Miss Out on the Fun!Clubs Discover the Heartbeat of Campus Life: Explore All University Clubs and Their Core Members at a Glance!

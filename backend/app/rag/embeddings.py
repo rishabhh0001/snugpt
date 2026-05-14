@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
 import os
 

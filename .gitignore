@@ -40,6 +40,11 @@ MANIFEST
 # ChromaDB
 backend/chroma_db/
 
+# Knowledge Base & Scraped Data
+knowledge_base/
+backend/knowledge_base/
+scraped_web/
+
 # OS generated files
 .DS_Store
 .DS_Store?
