@@ -4,6 +4,8 @@ import { User, Sparkles, BookOpen, ExternalLink } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -49,8 +51,34 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
             : "glass-panel rounded-bl-none hover:border-white/20"
         )}
       >
-        <div className="whitespace-pre-wrap font-medium tracking-tight">
-          {message.content || (
+        <div className="min-w-0">
+          {isUser ? (
+            <p className="whitespace-pre-wrap">{message.content}</p>
+          ) : message.content ? (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-snu-yellow underline underline-offset-2 hover:text-yellow-300 transition-colors font-medium break-all"
+                  >
+                    {children}
+                  </a>
+                ),
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                li: ({ children }) => <li className="text-[13px] md:text-sm">{children}</li>,
+                strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
+                code: ({ children }) => <code className="bg-white/10 rounded px-1 py-0.5 text-xs font-mono">{children}</code>,
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          ) : (
             <div className="flex gap-1 py-1">
               <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
               <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
