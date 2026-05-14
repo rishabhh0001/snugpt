@@ -206,9 +206,9 @@ export default function ChatInterface() {
 
           {/* Mobile logo (visible when sidebar hidden) */}
           <div className="md:hidden flex items-center gap-2">
-            <div className="w-6 h-6 rounded overflow-hidden border" style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
+            <div className="w-6 h-6 rounded-full overflow-hidden border" style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://snu.edu.in/favicon.ico" alt="SNU" className="w-full h-full object-contain" />
+              <img src="/avatar.png" alt="SnuGPT" className="w-full h-full object-cover" />
             </div>
             <span className="text-sm font-semibold text-white">SnuGPT</span>
           </div>
@@ -237,17 +237,13 @@ export default function ChatInterface() {
                   className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4"
                 >
                   {/* SNU Logo large */}
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden mb-6 border-2 shadow-xl"
+                  <div className="w-16 h-16 rounded-full overflow-hidden mb-6 border-2 shadow-xl"
                     style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="https://snu.edu.in/favicon.ico"
-                      alt="SNU logo"
-                      className="w-full h-full object-contain p-1"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                        e.currentTarget.parentElement!.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:800;font-size:18px;color:#002e5b">SNU</div>`;
-                      }}
+                      src="/avatar.png"
+                      alt="SnuGPT logo"
+                      className="w-full h-full object-cover"
                     />
                   </div>
 

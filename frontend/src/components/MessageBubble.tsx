@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export interface SourceDocument {
   content: string;
-  metadata: { source?: string; [key: string]: unknown };
+  metadata: { source?: string;[key: string]: unknown };
 }
 
 export interface MessageProps {
@@ -38,7 +38,7 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://github.com/rishabhh0001.png"
-            alt="SnuGPT"
+            alt="SNUGPT"
             width={28}
             height={28}
             className="w-full h-full object-cover"
@@ -50,11 +50,10 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
 
         {/* Message content */}
         <div
-          className={`rounded-2xl px-4 py-3 text-[13.5px] leading-[1.7] ${
-            isUser
-              ? "rounded-br-sm text-white"
-              : "rounded-bl-sm"
-          }`}
+          className={`rounded-2xl px-4 py-3 text-[13.5px] leading-[1.7] ${isUser
+            ? "rounded-br-sm text-white"
+            : "rounded-bl-sm"
+            }`}
           style={isUser
             ? { background: "var(--color-surface-hover)", color: "var(--color-text)" }
             : { color: "var(--color-text)" }
