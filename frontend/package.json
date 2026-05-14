@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.184",
+    "@vercel/analytics": "^2.0.1",
     "ai": "^6.0.182",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
