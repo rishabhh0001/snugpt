@@ -56,9 +56,14 @@
 .prose-chat strong     { font-weight: 600; color: #fff; }
 .prose-chat a          { color: var(--color-snu-yellow); text-underline-offset: 3px; }
 .prose-chat a:hover    { color: #ffc233; }
-.prose-chat table      { width: 100%; border-collapse: collapse; font-size: 0.88em; margin-bottom: 0.65em; }
-.prose-chat th, .prose-chat td { border: 1px solid rgba(255,255,255,0.1); padding: 0.4em 0.75em; text-align: left; }
+.prose-chat table      { width: 100%; border-collapse: collapse; font-size: 0.88em; margin-bottom: 0.65em; display: block; overflow-x: auto; }
+.prose-chat th, .prose-chat td { border: 1px solid rgba(255,255,255,0.1); padding: 0.4em 0.75em; text-align: left; min-width: 100px; }
 .prose-chat th         { background: rgba(255,255,255,0.05); font-weight: 600; }
+
+@media (max-width: 640px) {
+  .prose-chat { font-size: 0.95em; }
+  .prose-chat table { font-size: 0.82em; }
+}
 
 /* ── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes fadeUp {

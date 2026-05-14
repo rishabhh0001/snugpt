@@ -31,13 +31,13 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
       transition={{ duration: 0.25, ease: "easeOut" }}
       className={`flex w-full gap-3 py-4 ${isUser ? "justify-end" : "justify-start"}`}
     >
-      {/* Assistant avatar — Rishabh's avatar */}
+      {/* Assistant avatar — user uploaded avatar */}
       {!isUser && (
         <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden mt-0.5 border"
-          style={{ borderColor: "rgba(242,169,0,0.3)", background: "#1a1a1a" }}>
+          style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://github.com/rishabhh0001.png"
+            src="/avatar.png"
             alt="SNUGPT"
             width={28}
             height={28}
