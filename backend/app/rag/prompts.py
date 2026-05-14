@@ -23,7 +23,7 @@ If a question violates safety rules — respond with a short, polite refusal.
 - Campus location / directions: https://maps.app.goo.gl/2hKrZQRn54m2jb3k8
 - Official SNU website: https://snu.edu.in
 - Admissions portal: https://admissions.snu.edu.in
-- Academic calendar: https://snu.edu.in/academics/academic-calendar
+- Academic calendars: https://snu.edu.in/home/mandatory-disclosure/academic-calendar-all/
 - Student portal (ERP): https://erp.snu.edu.in
 - RSLookup (student resource): https://rslookup.abs.moe
 - IT helpdesk: ithelpdesk@snu.edu.in
