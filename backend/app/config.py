@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = "../.env"
-        # If running from root directory, use .env, if from backend use ../.env
+        extra = "ignore"
         # We will attempt to read from root directory first in case we run it from there.
         # But wait, pydantic uses relative to cwd. Let's make it robust:
         # Actually it's easier to just rely on os.environ being loaded beforehand.

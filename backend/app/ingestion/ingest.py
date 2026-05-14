@@ -1,4 +1,5 @@
 import os
+# pyrefly: ignore [missing-import]
 from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.rag.vectorstore import get_vectorstore
@@ -10,9 +11,9 @@ def ingest_data():
     
     print(f"Loading documents from {kb_dir}...")
     
-    # Load markdown and text files
-    text_loader = DirectoryLoader(kb_dir, glob="**/*.txt", loader_cls=TextLoader)
-    md_loader = DirectoryLoader(kb_dir, glob="**/*.md", loader_cls=TextLoader)
+    # Load markdown and text files with explicit utf-8 encoding (which we used in the scraper)
+    text_loader = DirectoryLoader(kb_dir, glob="**/*.txt", loader_cls=TextLoader, loader_kwargs={'encoding': 'utf-8'})
+    md_loader = DirectoryLoader(kb_dir, glob="**/*.md", loader_cls=TextLoader, loader_kwargs={'encoding': 'utf-8'})
     pdf_loader = DirectoryLoader(kb_dir, glob="**/*.pdf", loader_cls=PyPDFLoader)
     
     docs = []

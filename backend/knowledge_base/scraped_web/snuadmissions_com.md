@@ -1,6 +1,6 @@
 # Shiv Nadar University, Delhi NCR: Admissions Open for Engineering, Natural Sciences, Humanities & Management Programs
 
-Source URL: https://snuadmissions.com/
+Source URL: https://snuadmissions.com
 
 Shiv Nadar University, Delhi NCR: Admissions Open for Engineering, Natural Sciences, Humanities & Management Programs
  

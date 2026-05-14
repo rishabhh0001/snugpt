@@ -1,0 +1,20 @@
+# Shiv Nadar IoE: Founder of HCL Group & Shiv Nadar Foundation
+
+Source URL: https://snu.edu.in/about/shiv-nadar/
+
+Shiv Nadar IoE: Founder of HCL Group & Shiv Nadar Foundation
+ 
+Shiv Nadar
+
+ Founder – HCL
+Chairman Emeritus & Strategic Advisor to the Board – HCLTech
+Founder & Chairman – Shiv Nadar Foundation 
+Shiv Nadar
+Shiv Nadar is the Founder of HCL Group and the Shiv Nadar Foundation. He is also the Chairman Emeritus & Strategic Advisor to the Board of HCLTech, a $13.4 billion global organization with 219,000 professionals operating from 60 countries.
+Nadar is credited with being one of the pioneers of the computing and IT industry in India. Under his guidance, HCL has continued to ride the waves of the changing IT landscape for over 45 years and has remained at the forefront of every technological revolution since 1976. While HCL started as a hardware organization, manufacturing the country’s first indigenous computers and introducing them to the Indian consumer, it eventually evolved into a more comprehensive software services organization. HCL is one of the few global IT companies founded in the 1970s that remains in existence to date. 
+Throughout his career, Nadar always acknowledged that successful institution-building depends on forging result-oriented partnerships and creating new knowledge. He steered HCL to create several valuable joint ventures and alliances that aided the organization’s emergence as a global technology enterprise. His pioneering spirit and belief in engineering and research shaped the course of the organization and is the reason that today HCLTech boasts one of the largest IT Engineering and R&D divisions in the world. 
+Nadar started his career as part of the elite DCM management trainee system. It was at DCM that he met the people with whom he later started HCL in a Delhi Barsati “akin to a garage startup” with a compelling vision that the microprocessor would change the world.
+Nadar credits his success to the education and scholarships that he received during his early years. He has always maintained that access to quality education is the most potent tool of transformation and therefore, in 1994, he established the philanthropic - Shiv Nadar Foundation. The Foundation draws heavily on Nadar’s experience of building a world-class organization like HCL. It endeavors to create institutions of transformational education that will continue to influence and nurture the country’s youth for decades to come. To this effect, the Shiv Nadar Foundation has established six institutions covering the entire spectrum of education, which aim to address the issue of quality in education, create lasting partnerships, and have a strong research orientation. 
+As of June 2024, Nadar has invested US$1.5 billion through the Foundation, impacting over 39,000 students and alumni directly. However, the Foundation’s ultimate aim is to nurture the next generation of leaders in the ideologies of symbiotic growth so that each of them may in turn aspire to affect a small change, creating a large multiplier effect. The impact of the Shiv Nadar Foundation institutions is today reflected in the aspirations of meritorious students who started their journeys from humble, geographically, remote backgrounds but are today pursuing their dreams in India as well as other countries. 
+In recognition of his pioneering role in business and philanthropy in India and across the globe, Nadar has received several honors and accolades, notable being the Padma Bhushan from the President of India in 2008.
+Nadar is married to Kiran, an Asian Games medalist and internationally renowned bridge player. She is also one of the largest Indian Art collectors in the world and was honored with the prestigious Padma Shri in the Art category, which stands as one of the highest accolades for Indian civilians dedicated to making a positive impact in their respective fields.
