@@ -1,22 +1,13 @@
 "use client";
 
-import { User, Sparkles, BookOpen, ExternalLink } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { BookOpen } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface SourceDocument {
   content: string;
-  metadata: {
-    source?: string;
-    [key: string]: any;
-  };
+  metadata: { source?: string; [key: string]: unknown };
 }
 
 export interface MessageProps {
@@ -25,115 +16,114 @@ export interface MessageProps {
   sources?: SourceDocument[];
 }
 
+function getFilename(src: string): string {
+  return src.split(/[/\\]/).pop()?.replace(/_/g, " ").replace(/\.md$/i, "") ?? src;
+}
+
 export default function MessageBubble({ message }: { message: MessageProps }) {
   const isUser = message.role === "user";
-
   if (message.role === "system" || message.role === "data") return null;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className={cn("flex w-full gap-3 md:gap-4 py-4", isUser ? "justify-end" : "justify-start")}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className={`flex w-full gap-3 py-4 ${isUser ? "justify-end" : "justify-start"}`}
     >
+      {/* Assistant avatar — Rishabh's avatar */}
       {!isUser && (
-        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-snu-yellow/30 to-snu-yellow/10 border border-snu-yellow/20 flex-shrink-0 flex items-center justify-center mt-1 shadow-lg">
-          <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-snu-yellow animate-pulse" />
+        <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden mt-0.5 border"
+          style={{ borderColor: "rgba(242,169,0,0.3)", background: "#1a1a1a" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://github.com/rishabhh0001.png"
+            alt="SnuGPT"
+            width={28}
+            height={28}
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
 
-      <div
-        className={cn(
-          "max-w-[90%] md:max-w-[82%] rounded-2xl px-4 py-3 text-[13px] md:text-sm leading-relaxed transition-all duration-300",
-          isUser
-            ? "bg-gradient-to-br from-snu-blue to-snu-blue-light text-white rounded-br-none shadow-[0_10px_25px_-5px_rgba(0,46,91,0.4)]"
-            : "glass-panel rounded-bl-none hover:border-white/20"
-        )}
-      >
-        <div className="min-w-0">
+      <div className={`max-w-[85%] md:max-w-[78%] ${isUser ? "items-end" : "items-start"} flex flex-col`}>
+
+        {/* Message content */}
+        <div
+          className={`rounded-2xl px-4 py-3 text-[13.5px] leading-[1.7] ${
+            isUser
+              ? "rounded-br-sm text-white"
+              : "rounded-bl-sm"
+          }`}
+          style={isUser
+            ? { background: "var(--color-surface-hover)", color: "var(--color-text)" }
+            : { color: "var(--color-text)" }
+          }
+        >
           {isUser ? (
             <p className="whitespace-pre-wrap">{message.content}</p>
           ) : message.content ? (
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                a: ({ href, children }) => (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-snu-yellow underline underline-offset-2 hover:text-yellow-300 transition-colors font-medium break-all"
-                  >
-                    {children}
-                  </a>
-                ),
-                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                li: ({ children }) => <li className="text-[13px] md:text-sm">{children}</li>,
-                strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
-                code: ({ children }) => <code className="bg-white/10 rounded px-1 py-0.5 text-xs font-mono">{children}</code>,
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
+            <div className="prose-chat">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: ({ href, children }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+                  ),
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            </div>
           ) : (
+            /* Typing indicator */
             <div className="flex gap-1 py-1">
-              <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-              <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-              <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce"></span>
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full animate-blink"
+                  style={{ background: "var(--color-snu-yellow)", animationDelay: `${i * 0.2}s` }}
+                />
+              ))}
             </div>
           )}
         </div>
 
+        {/* Sources */}
         <AnimatePresence>
-          {!isUser && message.sources && message.sources.length > 0 && (
+          {!isUser && message.sources && message.sources.length > 0 && message.content && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="mt-4 pt-3 border-t border-white/5"
+              className="mt-2 w-full"
             >
               <details className="group">
-                <summary className="flex items-center gap-2 cursor-pointer text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-snu-yellow transition-colors list-none">
-                  <BookOpen className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>References ({message.sources.length})</span>
-                  <div className="ml-auto w-4 h-4 rounded-full border border-white/10 flex items-center justify-center group-open:rotate-180 transition-transform">
-                    <ExternalLink className="w-2 h-2" />
-                  </div>
+                <summary className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold uppercase tracking-widest transition-colors list-none select-none"
+                  style={{ color: "var(--color-muted)" }}>
+                  <BookOpen className="w-3 h-3" />
+                  <span className="group-hover:text-white transition-colors">
+                    {message.sources.length} source{message.sources.length !== 1 ? "s" : ""}
+                  </span>
                 </summary>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {message.sources.map((source, idx) => {
-                    const isWeb = source.metadata?.source === "Web Search";
-                    const filename = isWeb
-                      ? "Web Search"
-                      : (source.metadata?.source?.split(/[\\/]/).pop() ?? "Source")
-                        .replace(/_/g, " ")
-                        .replace(/\.md$/i, "")
-                        .slice(0, 40);
-                    const preview = source.content?.slice(0, 80).trim();
-
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {message.sources.map((src, i) => {
+                    const isWeb = src.metadata?.source === "Web Search";
+                    const name = isWeb ? "Web Search" : getFilename(src.metadata?.source ?? "Source");
+                    const preview = src.content?.slice(0, 60).trim();
                     return (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.07] rounded-lg px-2.5 py-1.5 max-w-full"
+                      <span
+                        key={i}
                         title={preview}
+                        className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border transition-colors cursor-default"
+                        style={{
+                          background: "var(--color-surface)",
+                          borderColor: "var(--color-border)",
+                          color: "var(--color-muted)"
+                        }}
                       >
-                        <span className="text-snu-yellow text-[10px] shrink-0">
-                          {isWeb ? "🌐" : "📄"}
-                        </span>
-                        <span className="text-[11px] text-slate-300 truncate font-medium" style={{ maxWidth: "180px" }}>
-                          {filename}
-                        </span>
-                        {preview && (
-                          <span className="text-[10px] text-slate-500 truncate hidden sm:block" style={{ maxWidth: "120px" }}>
-                            — {preview}…
-                          </span>
-                        )}
-                      </motion.div>
+                        <span>{isWeb ? "🌐" : "📄"}</span>
+                        <span className="truncate font-medium" style={{ maxWidth: "140px" }}>{name}</span>
+                      </span>
                     );
                   })}
                 </div>
@@ -142,12 +132,6 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
           )}
         </AnimatePresence>
       </div>
-
-      {isUser && (
-        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-slate-800/50 border border-slate-700 flex-shrink-0 flex items-center justify-center mt-1">
-          <User className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
-        </div>
-      )}
     </motion.div>
   );
 }
