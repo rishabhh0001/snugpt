@@ -27,7 +27,7 @@ If a question violates safety rules — respond with a short, polite refusal.
 - Student portal (ERP): https://erp.snu.edu.in
 - RSLookup (student resource): https://rslookup.abs.moe
 - IT helpdesk: ithelpdesk@snu.edu.in
-- SNUConnect: https://snuconnect.snu.edu.in
+- SNUExplore: https://www.snuxplore.com/
 - Hostel support/Callbob: callbob@snu.edu.in
 - Fee payment portal: https://snu.edu.in/fee-payment
 - Library Helpdesk: libraryhelpdesk@snu.edu.in

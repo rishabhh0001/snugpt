@@ -224,9 +224,9 @@ export default function ChatInterface() {
           <div className="md:hidden flex items-center gap-2">
             <div className="w-6 h-6 rounded-full overflow-hidden border" style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/avatar.png" alt="SnuGPT" className="w-full h-full object-cover" />
+              <img src="/avatar.png" alt="SNUGPT" className="w-full h-full object-cover" />
             </div>
-            <span className="text-sm font-semibold text-white">SnuGPT</span>
+            <span className="text-sm font-semibold text-white">SNUGPT</span>
           </div>
 
           <div className="flex-1" />
@@ -304,7 +304,7 @@ export default function ChatInterface() {
         <div className="flex-shrink-0 px-4 pb-4 pt-2 relative"
           style={{ background: "linear-gradient(to top, var(--color-bg) 70%, transparent)" }}>
           <div className="max-w-3xl mx-auto relative">
-            
+
             {/* Stop Generating Button */}
             <AnimatePresence>
               {isLoading && (
@@ -332,7 +332,7 @@ export default function ChatInterface() {
                 background: "var(--color-surface)",
                 borderColor: "var(--color-border)",
               }}
-              onFocus={() => {}}
+              onFocus={() => { }}
             >
               <textarea
                 ref={textareaRef}

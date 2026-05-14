@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, MessageSquare, Trash2, GraduationCap, X, ChevronRight } from "lucide-react";
+import { Plus, MessageSquare, Trash2, X, ChevronRight, Mail } from "lucide-react";
 import { Conversation } from "./useConversations";
 
 interface SidebarProps {
@@ -107,16 +107,24 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t" style={{ borderColor: "var(--color-border)" }}>
+      <div className="px-4 py-3 border-t space-y-2" style={{ borderColor: "var(--color-border)" }}>
         <a
           href="https://github.com/rishabhh0001"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-[10px] transition-colors"
+          className="flex items-center gap-2 text-[10px] transition-colors hover:text-white"
           style={{ color: "var(--color-muted)" }}
         >
           <ChevronRight className="w-3 h-3" />
           Built by Rishabh Joshi
+        </a>
+        <a
+          href="mailto:rj910@snu.edu.in"
+          className="flex items-center gap-2 text-[10px] transition-colors hover:text-white"
+          style={{ color: "var(--color-muted)" }}
+        >
+          <Mail className="w-3 h-3" />
+          Support
         </a>
       </div>
     </aside>
