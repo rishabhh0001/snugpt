@@ -10,7 +10,7 @@ from app.config import settings
 # Initialize NVIDIA NIM Chat Model
 api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
 if not api_key:
-    raise ValueError("NVIDIA_API_KEY is not set. Please set it in .env")
+    raise ValueError("API allotment is not set. Please contact the AI admin for help.")
 
 llm = ChatNVIDIA(
     model="meta/llama-3.3-70b-instruct",
@@ -52,19 +52,7 @@ def check_safety(query: str) -> str | None:
     return None
 
 
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
-
-
 async def generate_streaming_response(query: str):
-    # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
-    blocked = check_safety(query)
-    if blocked:
-        yield f'data: {{"type": "sources", "data": []}}\n\n'
-        yield f'data: {{"type": "chunk", "text": {json.dumps(blocked)}}}\n\n'
-        yield f'data: {{"type": "done"}}\n\n'
-        return
-
     try:
         # Get relevant documents from DB
         try:
