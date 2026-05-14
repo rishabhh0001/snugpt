@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-snu-blue: #002e5b;
+  --color-snu-blue-light: #00468c;
+  --color-snu-yellow: #f2a900;
+  --color-snu-yellow-dark: #cc8e00;
+  
+  --color-background: #0a0e1a;
+  --color-foreground: #e2e8f0;
+  --color-card: rgba(30, 41, 59, 0.7);
+  --color-card-border: rgba(56, 189, 248, 0.1);
+  --color-user-bubble: #00468c;
+  --color-ai-bubble: rgba(30, 41, 59, 0.8);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(0, 46, 91, 0.3) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(242, 169, 0, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .glass-panel {
+    @apply bg-[var(--color-card)] backdrop-blur-xl border border-[var(--color-card-border)] shadow-xl;
+  }
+  
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
