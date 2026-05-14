@@ -3,6 +3,7 @@ import json
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain_community.tools import DuckDuckGoSearchRun
 from app.rag.prompts import qa_prompt
 from app.rag.vectorstore import get_retriever
 from app.config import settings
@@ -26,12 +27,22 @@ def format_docs(docs):
 
 async def generate_streaming_response(query: str):
     retriever = get_retriever()
+    search_tool = DuckDuckGoSearchRun()
     
-    # Get relevant documents first so we can include them in the metadata
+    # Get relevant documents from DB
     docs = retriever.invoke(query)
     
-    # Format docs for the prompt
-    context_str = format_docs(docs)
+    # Format DB docs for the prompt
+    context_str = "--- DATABASE DOCUMENTS ---\n"
+    context_str += format_docs(docs)
+    
+    # Run web search as fallback/supplement
+    try:
+        web_results = search_tool.invoke(query)
+        context_str += "\n\n--- WEB SEARCH RESULTS ---\n"
+        context_str += web_results
+    except Exception as e:
+        print(f"Web search failed: {e}")
     
     # Prepare the prompt
     messages = qa_prompt.format_messages(context=context_str, question=query)
@@ -43,6 +54,11 @@ async def generate_streaming_response(query: str):
             "content": doc.page_content[:200] + "...", # Preview
             "metadata": doc.metadata
         })
+        
+    sources_data.append({
+        "content": "Real-time web search via DuckDuckGo",
+        "metadata": {"source": "Web Search"}
+    })
     
     # We yield sources as a custom JSON event string first
     yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
@@ -50,7 +66,6 @@ async def generate_streaming_response(query: str):
     # Stream the LLM response
     async for chunk in llm.astream(messages):
         # We yield chunks as standard SSE
-        # Escape newlines or handle via json
         yield f'data: {{"type": "chunk", "text": {json.dumps(chunk.content)}}}\n\n'
         
     yield f'data: {{"type": "done"}}\n\n'
