@@ -5,10 +5,10 @@ from urllib.parse import urljoin, urlparse
 import time
 
 def scrape_snu():
-    base_urls = ["https://snu.edu.in", "https://snuadmissions.com"]
+    base_urls = ["https://snu.edu.in", "https://snuadmissions.com", "https://rslookup.abs.moe/", "https://snulinks.snu.edu.in/application/student-policy", "https://wiki.snu.edu.in/index.php?title=Main_Page", "https://snu.edu.in/admissions", "https://snu.edu.in/academics", "https://snu.edu.in/campus-life", "https://snu.edu.in/it-services"]
     visited = set()
     to_visit = set(base_urls)
-    max_pages = 300
+    max_pages = 500
     count = 0
     
     # Create directory for scraped content
