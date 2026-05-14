@@ -41,9 +41,10 @@ MANIFEST
 backend/chroma_db/
 
 # Knowledge Base & Scraped Data
-knowledge_base/
-backend/knowledge_base/
-scraped_web/
+**/knowledge_base/**
+**/scraped_web/**
+**/*.md
+**/chroma_db/**
 
 # OS generated files
 .DS_Store

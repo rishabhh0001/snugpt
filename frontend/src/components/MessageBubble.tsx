@@ -1,8 +1,9 @@
 "use client";
 
-import { User, Sparkles, BookOpen } from "lucide-react";
+import { User, Sparkles, BookOpen, ExternalLink } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { motion, AnimatePresence } from "framer-motion";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -28,52 +29,81 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
   if (message.role === "system" || message.role === "data") return null;
 
   return (
-    <div className={cn("flex w-full gap-4 py-4", isUser ? "justify-end" : "justify-start")}>
+    <motion.div 
+      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className={cn("flex w-full gap-3 md:gap-4 py-4", isUser ? "justify-end" : "justify-start")}
+    >
       {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-snu-yellow/20 border border-snu-yellow/30 flex-shrink-0 flex items-center justify-center mt-1">
-          <Sparkles className="w-4 h-4 text-snu-yellow" />
+        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-snu-yellow/30 to-snu-yellow/10 border border-snu-yellow/20 flex-shrink-0 flex items-center justify-center mt-1 shadow-lg">
+          <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-snu-yellow animate-pulse" />
         </div>
       )}
 
       <div
         className={cn(
-          "max-w-[85%] rounded-2xl px-5 py-4 text-sm leading-relaxed",
+          "max-w-[88%] md:max-w-[80%] rounded-2xl px-5 py-4 text-sm md:text-base leading-relaxed transition-all duration-300",
           isUser
-            ? "bg-snu-blue text-white rounded-br-sm shadow-md"
-            : "glass-panel rounded-bl-sm"
+            ? "bg-gradient-to-br from-snu-blue to-snu-blue-light text-white rounded-br-none shadow-[0_10px_25px_-5px_rgba(0,46,91,0.4)]"
+            : "glass-panel rounded-bl-none hover:border-white/20"
         )}
       >
-        {/* Basic text rendering. In a full app, use react-markdown here */}
-        <div className="whitespace-pre-wrap">{message.content}</div>
+        <div className="whitespace-pre-wrap font-medium tracking-tight">
+          {message.content || (
+            <div className="flex gap-1 py-1">
+              <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-1.5 h-1.5 bg-snu-yellow/50 rounded-full animate-bounce"></span>
+            </div>
+          )}
+        </div>
 
-        {/* Sources Citation Accordion */}
-        {!isUser && message.sources && message.sources.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-white/10">
-            <details className="group">
-              <summary className="flex items-center gap-2 cursor-pointer text-xs text-slate-400 hover:text-slate-200 transition-colors list-none">
-                <BookOpen className="w-3 h-3" />
-                <span>View {message.sources.length} sources</span>
-              </summary>
-              <div className="mt-3 space-y-2">
-                {message.sources.map((source, idx) => (
-                  <div key={idx} className="bg-black/30 rounded-md p-3 text-xs border border-white/5">
-                    <div className="font-medium text-snu-yellow mb-1">
-                      {source.metadata?.source?.split('/').pop() || "Unknown Source"}
-                    </div>
-                    <div className="text-slate-400 line-clamp-2">"{source.content}"</div>
+        <AnimatePresence>
+          {!isUser && message.sources && message.sources.length > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mt-4 pt-3 border-t border-white/5"
+            >
+              <details className="group">
+                <summary className="flex items-center gap-2 cursor-pointer text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-snu-yellow transition-colors list-none">
+                  <BookOpen className="w-3 h-3 md:w-4 md:h-4" />
+                  <span>References ({message.sources.length})</span>
+                  <div className="ml-auto w-4 h-4 rounded-full border border-white/10 flex items-center justify-center group-open:rotate-180 transition-transform">
+                    <ExternalLink className="w-2 h-2" />
                   </div>
-                ))}
-              </div>
-            </details>
-          </div>
-        )}
+                </summary>
+                <div className="mt-4 space-y-3">
+                  {message.sources.map((source, idx) => (
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="bg-white/[0.03] rounded-xl p-3 text-xs border border-white/5 hover:bg-white/[0.05] transition-all"
+                    >
+                      <div className="font-bold text-snu-yellow mb-1.5 flex items-center gap-1.5">
+                        <div className="w-1 h-1 bg-snu-yellow rounded-full"></div>
+                        {source.metadata?.source?.split('/').pop() || "Document Source"}
+                      </div>
+                      <div className="text-slate-400 leading-relaxed italic">
+                        "{source.content}"
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </details>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {isUser && (
-        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex-shrink-0 flex items-center justify-center mt-1">
-          <User className="w-4 h-4 text-slate-400" />
+        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-slate-800/50 border border-slate-700 flex-shrink-0 flex items-center justify-center mt-1">
+          <User className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

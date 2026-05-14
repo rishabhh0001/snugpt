@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2 } from "lucide-react";
-import MessageBubble, { SourceDocument, MessageProps } from "./MessageBubble";
+import { Send, Loader2, Sparkles, PlusCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import MessageBubble, { MessageProps } from "./MessageBubble";
 import QuickActions from "./QuickActions";
 
 export default function ChatInterface() {
@@ -10,11 +11,13 @@ export default function ChatInterface() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
   };
 
+  // Auto-scroll on new messages or during streaming
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -34,10 +37,13 @@ export default function ChatInterface() {
       // Add a temporary assistant message to stream into
       setMessages((prev) => [...prev, { role: "assistant", content: "", sources: [] }]);
 
-      const res = await fetch("/api/chat", {
+      // Fetch from the backend service prefix configured in vercel.json
+      const endpoint = process.env.NODE_ENV === "production" ? "/_/backend/api/chat" : "/api/chat";
+      
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [userMsg] }),
+        body: JSON.stringify({ query: queryText }), // Backend expects { "query": "..." }
       });
 
       if (!res.body) throw new Error("No response body");
@@ -51,7 +57,6 @@ export default function ChatInterface() {
         done = doneReading;
         if (value) {
           const chunkStr = decoder.decode(value, { stream: true });
-          // Parse SSE events. Very basic parsing.
           const lines = chunkStr.split('\n');
           
           for (const line of lines) {
@@ -85,67 +90,92 @@ export default function ChatInterface() {
       console.error("Chat error:", error);
       setMessages((prev) => [
         ...prev.slice(0, -1),
-        { role: "assistant", content: "Sorry, I encountered an error connecting to the knowledge base." }
+        { role: "assistant", content: "I encountered an error connecting to the SNU servers. Please try again in a moment." }
       ]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const clearChat = () => setMessages([]);
+
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)]">
+    <div className="flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-180px)]">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto pb-24 px-2">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto pt-10">
-            <h2 className="text-3xl font-bold mb-3 text-white">How can I help you?</h2>
-            <p className="text-slate-400 mb-8">
-              I'm SnuGPT, trained on Shiv Nadar University's official documents. Ask me about admissions, academics, campus facilities, or IT support.
-            </p>
-            <QuickActions onSelect={(q) => handleSubmit(undefined, q)} />
-          </div>
-        ) : (
-          <div className="space-y-2 max-w-3xl mx-auto">
-            {messages.map((msg, i) => (
-              <MessageBubble key={i} message={msg} />
-            ))}
-            {isLoading && messages[messages.length - 1].role === "user" && (
-              <div className="flex justify-start py-4 pl-12">
-                <div className="glass-panel px-5 py-3 rounded-2xl rounded-bl-sm shimmer w-32 h-10"></div>
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto pb-32 px-2 scroll-smooth"
+      >
+        <AnimatePresence mode="popLayout">
+          {messages.length === 0 ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex flex-col items-center justify-center min-h-full text-center max-w-2xl mx-auto pt-4 md:pt-10 px-4 pb-40"
+            >
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-snu-yellow to-snu-yellow-dark flex items-center justify-center shadow-[0_0_30px_rgba(242,169,0,0.3)] mb-8 animate-float">
+                <Sparkles className="w-8 h-8 text-snu-blue" />
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
+              <h2 className="text-3xl md:text-5xl font-extrabold mb-4 snu-gradient-text">
+                Welcome to SnuGPT
+              </h2>
+              <p className="text-slate-400 text-base md:text-lg mb-10 leading-relaxed">
+                Your intelligent companion for all things Shiv Nadar University. 
+                Ask about courses, admissions, hostel life, or campus services.
+              </p>
+              <QuickActions onSelect={(q) => handleSubmit(undefined, q)} />
+            </motion.div>
+          ) : (
+            <div className="space-y-2 max-w-4xl mx-auto w-full">
+              {messages.map((msg, i) => (
+                <MessageBubble key={i} message={msg} />
+              ))}
+              <div ref={messagesEndRef} className="h-4" />
+            </div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Input Area */}
-      <div className="absolute bottom-4 left-0 right-0 px-4 md:px-8">
-        <div className="max-w-3xl mx-auto relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-snu-yellow/50 to-snu-blue-light/50 rounded-2xl blur opacity-30 group-focus-within:opacity-100 transition duration-500"></div>
-          <form
-            onSubmit={handleSubmit}
-            className="relative flex items-end gap-2 bg-slate-900 border border-slate-700 rounded-2xl p-2 pl-4 shadow-2xl"
-          >
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask anything about SNU..."
-              className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 py-3 text-sm md:text-base resize-none"
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className="p-3 mb-0.5 rounded-xl bg-snu-blue hover:bg-snu-blue-light disabled:bg-slate-800 disabled:text-slate-500 text-white transition-colors flex-shrink-0"
+      <div className="fixed bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-background via-background/90 to-transparent pt-12">
+        <div className="max-w-4xl mx-auto relative">
+          {messages.length > 0 && (
+            <button 
+              onClick={clearChat}
+              className="absolute -top-12 left-0 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors flex items-center gap-1.5"
             >
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+              <PlusCircle className="w-3 h-3" />
+              New Conversation
             </button>
-          </form>
-          <div className="text-center mt-2">
-            <span className="text-[10px] text-slate-500">
-              SnuGPT can make mistakes. Check important deadlines on the official SNU website.
+          )}
+          
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-snu-yellow/20 via-snu-blue-light/20 to-snu-yellow/20 rounded-2xl blur-lg opacity-50 group-focus-within:opacity-100 transition duration-1000 group-focus-within:duration-200"></div>
+            <form
+              onSubmit={handleSubmit}
+              className="relative flex items-center gap-2 glass-panel p-2 pl-5 rounded-2xl shadow-2xl border-white/10 group-focus-within:border-snu-yellow/30 transition-all"
+            >
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask SnuGPT anything..."
+                className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 py-4 text-sm md:text-base placeholder:text-slate-500"
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={!input.trim() || isLoading}
+                className="p-3.5 rounded-xl bg-snu-yellow hover:bg-snu-yellow-dark disabled:bg-slate-800 disabled:text-slate-500 text-snu-blue transition-all active:scale-95 flex-shrink-0 shadow-lg shadow-snu-yellow/10"
+              >
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+              </button>
+            </form>
+          </div>
+          <div className="text-center mt-3">
+            <span className="text-[10px] md:text-xs text-slate-500 font-medium">
+              SnuGPT is an AI assistant. Verify critical information on <a href="https://snu.edu.in" className="text-snu-yellow/80 hover:text-snu-yellow underline underline-offset-2">snu.edu.in</a>
             </span>
           </div>
         </div>
