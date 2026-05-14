@@ -44,8 +44,8 @@ def ingest_data():
     print(f"Loaded {len(docs)} documents.")
     
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1200, # Increased from 500 to halve the total chunks (faster + better context)
-        chunk_overlap=150
+        chunk_size=750, # Decreased from 1200 to stay under NVIDIA's 512-token limit
+        chunk_overlap=100
     )
     
     splits = text_splitter.split_documents(docs)
