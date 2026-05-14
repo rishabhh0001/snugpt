@@ -33,9 +33,10 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: "var(--color-border)" }}>
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-lg"
-            style={{ background: "var(--color-snu-yellow)" }}>
-            <GraduationCap className="w-4 h-4" style={{ color: "var(--color-snu-blue)" }} />
+          <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shadow-lg border"
+            style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/avatar.png" alt="SnuGPT" className="w-full h-full object-cover" />
           </div>
           <span className="font-bold text-sm tracking-tight text-white">SnuGPT</span>
         </div>

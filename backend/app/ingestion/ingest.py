@@ -44,8 +44,8 @@ def ingest_data():
     print(f"Loaded {len(docs)} documents.")
     
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50
+        chunk_size=1200, # Increased from 500 to halve the total chunks (faster + better context)
+        chunk_overlap=150
     )
     
     splits = text_splitter.split_documents(docs)
@@ -54,20 +54,42 @@ def ingest_data():
     vectorstore = get_vectorstore()
     print("Adding to vectorstore in batches...")
     
-    batch_size = 100
-    for i in range(0, len(splits), batch_size):
-        batch = splits[i:i+batch_size]
-        print(f"Processing batch {i//batch_size + 1}/{(len(splits)-1)//batch_size + 1} (Chunks {i} to {i+len(batch)})...")
+    # Increase batch size and use a ThreadPool to upload concurrently
+    batch_size = 200 
+    
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    
+    def upload_batch(b_idx, batch):
         try:
             vectorstore.add_documents(batch)
+            return b_idx, True, None
         except Exception as e:
-            print(f"Error in batch {i//batch_size + 1}: {e}")
-            print("Retrying with smaller sub-batches...")
-            for doc in batch:
-                try:
-                    vectorstore.add_documents([doc])
-                except Exception as inner_e:
-                    print(f"Failed to add document snippet: {inner_e}")
+            return b_idx, False, str(e)
+
+    batches = [splits[i:i+batch_size] for i in range(0, len(splits), batch_size)]
+    total_batches = len(batches)
+    
+    # Use 5 concurrent workers (adjust if you hit NVIDIA rate limits)
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {executor.submit(upload_batch, i, batch): i for i, batch in enumerate(batches)}
+        
+        completed = 0
+        for future in as_completed(futures):
+            b_idx = futures[future]
+            completed += 1
+            idx, success, error = future.result()
+            
+            if success:
+                print(f"Processed batch {completed}/{total_batches}...")
+            else:
+                print(f"Error in batch {completed}/{total_batches}: {error}")
+                print("Retrying sequentially...")
+                # Fallback sequential retry
+                for doc in batches[b_idx]:
+                    try:
+                        vectorstore.add_documents([doc])
+                    except Exception as inner_e:
+                        pass
                     
     print("Ingestion complete!")
 

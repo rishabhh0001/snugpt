@@ -25,6 +25,7 @@ export default function ChatInterface() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const messages: MessageProps[] = activeConversation?.messages ?? [];
 
@@ -55,6 +56,9 @@ export default function ChatInterface() {
     setInput("");
     setIsLoading(true);
 
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     try {
       const endpoint =
         process.env.NODE_ENV === "production" ? "/_/backend/api/chat" : "/api/chat";
@@ -62,6 +66,7 @@ export default function ChatInterface() {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: abortController.signal,
         body: JSON.stringify({
           query: queryText,
           history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
@@ -116,15 +121,26 @@ export default function ChatInterface() {
         last.content = "I'm having trouble generating a response right now. Please try again.";
         updateMessages(convId!, finalMsgs);
       }
-    } catch (err) {
-      console.error("Chat error:", err);
-      const errMsgs = [...messages, userMsg, {
-        role: "assistant" as const,
-        content: "I encountered a connection error. Please try again.",
-      }];
-      updateMessages(convId!, errMsgs);
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        console.log("Generation stopped by user.");
+      } else {
+        console.error("Chat error:", err);
+        const errMsgs = [...messages, userMsg, {
+          role: "assistant" as const,
+          content: "I encountered a connection error. Please try again.",
+        }];
+        updateMessages(convId!, errMsgs);
+      }
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
   };
 
@@ -285,11 +301,33 @@ export default function ChatInterface() {
         </div>
 
         {/* ── Input bar ── */}
-        <div className="flex-shrink-0 px-4 pb-4 pt-2"
+        <div className="flex-shrink-0 px-4 pb-4 pt-2 relative"
           style={{ background: "linear-gradient(to top, var(--color-bg) 70%, transparent)" }}>
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto relative">
+            
+            {/* Stop Generating Button */}
+            <AnimatePresence>
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute -top-12 left-0 right-0 flex justify-center z-10"
+                >
+                  <button
+                    onClick={handleStop}
+                    className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium border shadow-lg transition-all hover:bg-white/[0.05]"
+                    style={{ background: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text)" }}
+                  >
+                    <div className="w-2 h-2 rounded-sm bg-gray-400" />
+                    Stop generating
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div
-              className="flex items-end gap-2 rounded-2xl border px-4 py-3 transition-all"
+              className="relative flex items-end gap-2 rounded-2xl border pl-1 pr-2 py-2 transition-all"
               style={{
                 background: "var(--color-surface)",
                 borderColor: "var(--color-border)",
@@ -304,13 +342,13 @@ export default function ChatInterface() {
                 onKeyDown={handleKeyDown}
                 placeholder="Message SnuGPT..."
                 disabled={isLoading}
-                className="flex-1 resize-none bg-transparent border-none text-sm text-white placeholder:text-gray-500 focus:outline-none leading-relaxed"
+                className="flex-1 resize-none bg-transparent border-none text-sm text-white placeholder:text-gray-500 focus:outline-none leading-relaxed px-3 py-1.5"
                 style={{ maxHeight: "180px" }}
               />
               <button
                 onClick={() => handleSubmit()}
                 disabled={!input.trim() || isLoading}
-                className="p-2 rounded-xl flex-shrink-0 transition-all disabled:opacity-30"
+                className="p-2 mb-0.5 rounded-xl flex-shrink-0 transition-all disabled:opacity-30"
                 style={{ background: "var(--color-snu-yellow)" }}
               >
                 {isLoading

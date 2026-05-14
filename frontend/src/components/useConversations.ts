@@ -78,7 +78,13 @@ export function useConversations() {
           ? { ...c, messages, title: titleFromMessages(messages), updatedAt: Date.now() }
           : c
       );
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next.slice(0, MAX_CONVERSATIONS)));
+      
+      // Debounce the localStorage save to prevent lag during fast token streaming
+      if ((window as any)._saveTimeout) clearTimeout((window as any)._saveTimeout);
+      (window as any)._saveTimeout = setTimeout(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next.slice(0, MAX_CONVERSATIONS)));
+      }, 500);
+      
       return next;
     });
   }, []);
