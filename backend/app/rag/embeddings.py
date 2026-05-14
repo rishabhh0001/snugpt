@@ -1,7 +1,12 @@
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
+import os
 
-# Initialize local embeddings (singleton)
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+# Initialize NVIDIA embeddings (singleton)
+# We use the NV-Embed-QA model which is optimized for RAG
+embeddings = NVIDIAEmbeddings(
+    model="nvidia/nv-embedqa-e5-v5", 
+    api_key=os.getenv("NVIDIA_API_KEY")
+)
 
 def get_embeddings():
     return embeddings

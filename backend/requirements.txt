@@ -3,9 +3,7 @@ uvicorn
 langchain
 langchain-community
 langchain-nvidia-ai-endpoints
-langchain-huggingface
 chromadb
-sentence-transformers
 pydantic
 pydantic-settings
 python-dotenv
