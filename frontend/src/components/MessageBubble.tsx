@@ -31,7 +31,7 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
   if (message.role === "system" || message.role === "data") return null;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
@@ -89,7 +89,7 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
 
         <AnimatePresence>
           {!isUser && message.sources && message.sources.length > 0 && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               className="mt-4 pt-3 border-t border-white/5"
@@ -108,9 +108,9 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
                     const filename = isWeb
                       ? "Web Search"
                       : (source.metadata?.source?.split(/[\\/]/).pop() ?? "Source")
-                          .replace(/_/g, " ")
-                          .replace(/\.md$/i, "")
-                          .slice(0, 40);
+                        .replace(/_/g, " ")
+                        .replace(/\.md$/i, "")
+                        .slice(0, 40);
                     const preview = source.content?.slice(0, 80).trim();
 
                     return (
