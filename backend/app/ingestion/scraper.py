@@ -53,8 +53,8 @@ def scrape_snu():
                 next_url = urljoin(url, link['href']).split('#')[0].rstrip('/')
                 parsed_next = urlparse(next_url)
                 
-                # Stay within the SNU domains
-                if any(domain in parsed_next.netloc for domain in ["snu.edu.in", "snuadmissions.com"]):
+                # Stay within the allowed SNU/Education domains
+                if any(domain in parsed_next.netloc for domain in ["snu.edu.in", "snuadmissions.com", "rslookup.abs.moe", "snulinks.snu.edu.in", "wiki.snu.edu.in"]):
                     if next_url not in visited:
                         to_visit.add(next_url)
                         

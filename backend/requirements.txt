@@ -12,3 +12,7 @@ python-dotenv
 python-multipart
 PyPDF2
 duckduckgo-search
+requests
+beautifulsoup4
+chardet
+
