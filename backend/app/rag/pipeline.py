@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.tools import DuckDuckGoSearchRun
@@ -18,10 +19,52 @@ llm = ChatNVIDIA(
     max_tokens=1024
 )
 
+# ── Safety Guardrail ─────────────────────────────────────────────────────────
+JAILBREAK_PATTERNS = [
+    r"ignore (all |previous |your )?(instructions|rules|guidelines|constraints)",
+    r"(pretend|act|behave|roleplay|play).{0,30}(you are|as if|like you.re|you.re now)",
+    r"(your true self|your real personality|without restrictions|no limits)",
+    r"(dan|do anything now|jailbreak|bypass|override).{0,20}(mode|prompt|system)",
+    r"forget (everything|all|your|that).{0,20}(told|said|instructions|rules)",
+    r"you are (now|actually|really|secretly) (a|an|the)",
+    r"(disregard|ignore|override).{0,20}(safety|rules|guidelines|training)",
+]
+
+TOXIC_PATTERNS = [
+    r"\b(fuck|shit|bitch|asshole|bastard|cunt|dick|pussy|whore|slut|retard)\b",
+    r"\b(kill yourself|kys|go die|end yourself)\b",
+    r"\b(rape|molest|sexually|naked|nude|porn|xxx)\b",
+    r"\b(bomb|terrorist|attack|weapon|explosive|gun|shoot)\b",
+    r"\bhate (you|this|them|all)\b",
+]
+
+COMPILED_JAILBREAK = [re.compile(p, re.IGNORECASE) for p in JAILBREAK_PATTERNS]
+COMPILED_TOXIC    = [re.compile(p, re.IGNORECASE) for p in TOXIC_PATTERNS]
+
+def check_safety(query: str) -> str | None:
+    """Returns a refusal message if the query is unsafe, else None."""
+    for pattern in COMPILED_JAILBREAK:
+        if pattern.search(query):
+            return "I'm here to help with Shiv Nadar University questions only. I can't follow instructions that ask me to change my role or ignore my guidelines. How can I help you with something SNU-related? 🎓"
+    for pattern in COMPILED_TOXIC:
+        if pattern.search(query):
+            return "I'm not able to respond to messages with inappropriate language. Please keep our conversation respectful and I'll be happy to help with any SNU-related questions! 😊"
+    return None
+
+
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
+
 async def generate_streaming_response(query: str):
+    # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
+    blocked = check_safety(query)
+    if blocked:
+        yield f'data: {{"type": "sources", "data": []}}\n\n'
+        yield f'data: {{"type": "chunk", "text": {json.dumps(blocked)}}}\n\n'
+        yield f'data: {{"type": "done"}}\n\n'
+        return
+
     try:
         # Get relevant documents from DB
         try:
