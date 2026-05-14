@@ -4,7 +4,7 @@ import json
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.tools import DuckDuckGoSearchRun
 from app.rag.prompts import qa_prompt
-from app.rag.vectorstore import get_retriever
+from app.rag.vectorstore import get_retriever, get_vectorstore
 from app.config import settings
 
 # Initialize NVIDIA NIM Chat Model
@@ -56,7 +56,22 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-async def generate_streaming_response(query: str):
+def save_qa_to_vectorstore(query: str, answer: str):
+    """Persist a Q&A pair back into ChromaDB so the bot learns from real conversations."""
+    try:
+        from langchain_core.documents import Document
+        vs = get_vectorstore()
+        doc = Document(
+            page_content=f"Q: {query}\nA: {answer}",
+            metadata={"source": "chat_learning", "type": "learned_qa"}
+        )
+        vs.add_documents([doc])
+        print(f"[Learning] Saved Q&A to vectorstore.")
+    except Exception as e:
+        print(f"[Learning] Failed to save Q&A: {e}")
+
+
+async def generate_streaming_response(query: str, history: list = []):
     # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
     blocked = check_safety(query)
     if blocked:
@@ -87,6 +102,18 @@ async def generate_streaming_response(query: str):
         except Exception as e:
             print(f"Web search failed: {e}")
 
+        # Build conversation history string (last 6 turns max to stay within token limits)
+        history_str = ""
+        if history:
+            recent = history[-6:]
+            history_str = "\n--- CONVERSATION HISTORY ---\n"
+            for msg in recent:
+                role_label = "User" if msg.get("role") == "user" else "Assistant"
+                history_str += f"{role_label}: {msg.get('content', '')}\n"
+            history_str += "---\n"
+
+        full_context = context_str + history_str
+
         # Yield sources metadata
         sources_data = []
         for doc in docs:
@@ -101,17 +128,25 @@ async def generate_streaming_response(query: str):
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 
         # Prepare and stream LLM response
-        messages = qa_prompt.format_messages(context=context_str, question=query)
-        
+        messages = qa_prompt.format_messages(context=full_context, question=query)
+
         got_content = False
+        full_response = ""
         async for chunk in llm.astream(messages):
             text = chunk.content
             if text:
                 got_content = True
+                full_response += text
                 yield f'data: {{"type": "chunk", "text": {json.dumps(text)}}}\n\n'
 
         if not got_content:
             yield f'data: {{"type": "chunk", "text": "I could not generate a response. Please try again."}}\n\n'
+        elif full_response and len(full_response) > 30:
+            # ── Async learning: save Q&A pair to vectorstore ─────────────────
+            import asyncio
+            asyncio.create_task(
+                asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
+            )
 
     except Exception as e:
         print(f"Pipeline error: {e}")
@@ -120,3 +155,4 @@ async def generate_streaming_response(query: str):
 
     finally:
         yield f'data: {{"type": "done"}}\n\n'
+

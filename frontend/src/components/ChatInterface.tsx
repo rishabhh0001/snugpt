@@ -45,7 +45,11 @@ export default function ChatInterface() {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: queryText }),
+        body: JSON.stringify({
+          query: queryText,
+          // Send last 10 messages as history (excluding the empty assistant placeholder we just added)
+          history: messages.slice(-11, -1).map(m => ({ role: m.role, content: m.content })),
+        }),
       });
 
       if (!res.ok) {

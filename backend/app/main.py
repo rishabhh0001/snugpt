@@ -22,7 +22,8 @@ async def health_check():
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
+    history = [{"role": m.role, "content": m.content} for m in (request.history or [])]
     return StreamingResponse(
-        generate_streaming_response(request.query),
+        generate_streaming_response(request.query, history=history),
         media_type="text/event-stream"
     )
