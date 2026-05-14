@@ -37,60 +37,93 @@ export default function ChatInterface() {
       // Add a temporary assistant message to stream into
       setMessages((prev) => [...prev, { role: "assistant", content: "", sources: [] }]);
 
-      // Fetch from the backend service prefix configured in vercel.json
-      const endpoint = process.env.NODE_ENV === "production" ? "/_/backend/api/chat" : "/api/chat";
-      
+      // In production go directly to the backend prefix; in dev use the Next.js proxy
+      const endpoint = process.env.NODE_ENV === "production"
+        ? "/_/backend/api/chat"
+        : "/api/chat";
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: queryText }), // Backend expects { "query": "..." }
+        body: JSON.stringify({ query: queryText }),
       });
+
+      if (!res.ok) {
+        throw new Error(`Backend error: ${res.status}`);
+      }
 
       if (!res.body) throw new Error("No response body");
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let done = false;
+      let buffer = "";
+      let streamDone = false;
 
-      while (!done) {
+      while (!streamDone) {
         const { value, done: doneReading } = await reader.read();
-        done = doneReading;
+
+        if (doneReading) {
+          streamDone = true;
+          break;
+        }
+
         if (value) {
-          const chunkStr = decoder.decode(value, { stream: true });
-          const lines = chunkStr.split('\n');
-          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          // Keep the last (possibly incomplete) line in the buffer
+          buffer = lines.pop() ?? "";
+
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const dataStr = line.replace('data: ', '').trim();
-              if (!dataStr) continue;
-              
-              try {
-                const data = JSON.parse(dataStr);
-                
-                setMessages((prev) => {
-                  const newMsgs = [...prev];
-                  const lastMsg = newMsgs[newMsgs.length - 1];
-                  
-                  if (data.type === "sources") {
-                    lastMsg.sources = data.data;
-                  } else if (data.type === "chunk") {
-                    lastMsg.content += data.text;
-                  }
-                  
-                  return newMsgs;
-                });
-              } catch (e) {
-                console.error("Failed to parse SSE JSON", e, dataStr);
+            if (!line.startsWith("data: ")) continue;
+            const dataStr = line.slice(6).trim();
+            if (!dataStr) continue;
+
+            try {
+              const data = JSON.parse(dataStr);
+
+              if (data.type === "done") {
+                streamDone = true;
+                break;
               }
+
+              setMessages((prev) => {
+                const newMsgs = [...prev];
+                const lastMsg = newMsgs[newMsgs.length - 1];
+                if (!lastMsg || lastMsg.role !== "assistant") return prev;
+
+                if (data.type === "sources") {
+                  lastMsg.sources = data.data;
+                } else if (data.type === "chunk" && data.text) {
+                  lastMsg.content += data.text;
+                }
+                return newMsgs;
+              });
+            } catch {
+              // Skip malformed lines silently
             }
           }
         }
       }
+
+      // If we got no content at all, show a fallback message
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant" && !last.content.trim()) {
+          const newMsgs = [...prev];
+          newMsgs[newMsgs.length - 1] = {
+            ...last,
+            content: "I'm having trouble generating a response right now. Please try again.",
+          };
+          return newMsgs;
+        }
+        return prev;
+      });
+
     } catch (error) {
       console.error("Chat error:", error);
       setMessages((prev) => [
         ...prev.slice(0, -1),
-        { role: "assistant", content: "I encountered an error connecting to the SNU servers. Please try again in a moment." }
+        { role: "assistant", content: "I encountered an error connecting to the SNU servers. Please try again in a moment." },
       ]);
     } finally {
       setIsLoading(false);
