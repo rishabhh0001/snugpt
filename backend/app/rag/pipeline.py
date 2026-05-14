@@ -52,7 +52,19 @@ def check_safety(query: str) -> str | None:
     return None
 
 
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
 async def generate_streaming_response(query: str):
+    # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
+    blocked = check_safety(query)
+    if blocked:
+        yield f'data: {{"type": "sources", "data": []}}\n\n'
+        yield f'data: {{"type": "chunk", "text": {json.dumps(blocked)}}}\n\n'
+        yield f'data: {{"type": "done"}}\n\n'
+        return
+
     try:
         # Get relevant documents from DB
         try:
