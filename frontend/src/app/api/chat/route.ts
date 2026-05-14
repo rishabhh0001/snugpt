@@ -2,11 +2,18 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json();
+    const { query, messages } = await req.json();
     
-    // Extract the latest user query
-    const latestMessage = messages[messages.length - 1];
-    if (!latestMessage || latestMessage.role !== 'user') {
+    // Support both old {messages: [...]} format and new {query: "..."} format
+    let finalQuery = query;
+    if (!finalQuery && messages && messages.length > 0) {
+      const latestMessage = messages[messages.length - 1];
+      if (latestMessage && latestMessage.role === 'user') {
+        finalQuery = latestMessage.content;
+      }
+    }
+
+    if (!finalQuery) {
       return new Response("Invalid request", { status: 400 });
     }
 
@@ -18,7 +25,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ query: latestMessage.content }),
+      body: JSON.stringify({ query: finalQuery }),
     });
 
     if (!response.ok) {
