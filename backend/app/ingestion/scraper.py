@@ -28,7 +28,7 @@ ALLOWED_DOMAINS = [
     "wiki.snu.edu.in",
 ]
 
-SKIP_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".gif", ".svg", ".zip", ".docx", ".xlsx"}
+SKIP_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".svg", ".zip", ".docx", ".xlsx"}
 SKIP_PATTERNS   = ["#", "mailto:", "tel:", "javascript:", "login", "logout", "signin", "signup"]
 
 
