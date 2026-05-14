@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+
+# Load env variables before anything else
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "..", ".env"))
+
 # pyrefly: ignore [missing-import]
 from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
