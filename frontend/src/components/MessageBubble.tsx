@@ -102,28 +102,40 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
                     <ExternalLink className="w-2 h-2" />
                   </div>
                 </summary>
-                <div className="mt-4 space-y-3">
-                  {message.sources.map((source, idx) => (
-                    <motion.div 
-                      key={idx} 
-                      initial={{ opacity: 0, x: -5 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="bg-white/[0.03] rounded-xl p-3 text-xs border border-white/5 hover:bg-white/[0.05] transition-all"
-                    >
-                      <div className="font-bold text-snu-yellow mb-1.5 flex items-center gap-1.5">
-                        <div className="w-1 h-1 bg-snu-yellow rounded-full"></div>
-                        {source.metadata?.source
-                          ? source.metadata.source === "Web Search"
-                            ? "🌐 Web Search"
-                            : source.metadata.source.split(/[\\/]/).pop()?.replace(/_/g, ' ').replace('.md', '') || source.metadata.source
-                          : "Document Source"}
-                      </div>
-                      <div className="text-slate-400 leading-relaxed italic">
-                        "{source.content}"
-                      </div>
-                    </motion.div>
-                  ))}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {message.sources.map((source, idx) => {
+                    const isWeb = source.metadata?.source === "Web Search";
+                    const filename = isWeb
+                      ? "Web Search"
+                      : (source.metadata?.source?.split(/[\\/]/).pop() ?? "Source")
+                          .replace(/_/g, " ")
+                          .replace(/\.md$/i, "")
+                          .slice(0, 40);
+                    const preview = source.content?.slice(0, 80).trim();
+
+                    return (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.07] rounded-lg px-2.5 py-1.5 max-w-full"
+                        title={preview}
+                      >
+                        <span className="text-snu-yellow text-[10px] shrink-0">
+                          {isWeb ? "🌐" : "📄"}
+                        </span>
+                        <span className="text-[11px] text-slate-300 truncate font-medium" style={{ maxWidth: "180px" }}>
+                          {filename}
+                        </span>
+                        {preview && (
+                          <span className="text-[10px] text-slate-500 truncate hidden sm:block" style={{ maxWidth: "120px" }}>
+                            — {preview}…
+                          </span>
+                        )}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </details>
             </motion.div>

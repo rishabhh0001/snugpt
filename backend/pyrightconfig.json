@@ -1,0 +1,12 @@
+{
+  "pythonVersion": "3.14",
+  "include": ["app"],
+  "exclude": [
+    "**/__pyrefly_virtual__/**",
+    "**/inmemory/**",
+    "**/node_modules/**",
+    "**/.venv/**"
+  ],
+  "reportMissingModuleSource": "none",
+  "reportMissingImports": "none"
+}

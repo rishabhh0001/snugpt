@@ -41,6 +41,7 @@ TOXIC_PATTERNS = [
 COMPILED_JAILBREAK = [re.compile(p, re.IGNORECASE) for p in JAILBREAK_PATTERNS]
 COMPILED_TOXIC    = [re.compile(p, re.IGNORECASE) for p in TOXIC_PATTERNS]
 
+
 def check_safety(query: str) -> str | None:
     """Returns a refusal message if the query is unsafe, else None."""
     for pattern in COMPILED_JAILBREAK:
@@ -66,7 +67,7 @@ def save_qa_to_vectorstore(query: str, answer: str):
             metadata={"source": "chat_learning", "type": "learned_qa"}
         )
         vs.add_documents([doc])
-        print(f"[Learning] Saved Q&A to vectorstore.")
+        print("[Learning] Saved Q&A to vectorstore.")
     except Exception as e:
         print(f"[Learning] Failed to save Q&A: {e}")
 
@@ -94,6 +95,7 @@ async def generate_streaming_response(query: str, history: list = []):
         context_str += format_docs(docs) if docs else "(No documents retrieved)"
 
         # Run web search as fallback/supplement
+        web_results = ""
         try:
             search_tool = DuckDuckGoSearchRun()
             web_results = search_tool.invoke(query)
@@ -102,7 +104,7 @@ async def generate_streaming_response(query: str, history: list = []):
         except Exception as e:
             print(f"Web search failed: {e}")
 
-        # Build conversation history string (last 6 turns max to stay within token limits)
+        # Build conversation history (last 6 turns max)
         history_str = ""
         if history:
             recent = history[-6:]
@@ -114,17 +116,24 @@ async def generate_streaming_response(query: str, history: list = []):
 
         full_context = context_str + history_str
 
-        # Yield sources metadata
+        # Build sources — deduped by filename, max 8, Web Search only if useful
+        seen_sources: set = set()
         sources_data = []
         for doc in docs:
+            src = doc.metadata.get("source", "")
+            key = src.split("/")[-1].split("\\")[-1]
+            if key and key not in seen_sources and len(sources_data) < 8:
+                seen_sources.add(key)
+                sources_data.append({
+                    "content": doc.page_content[:120],
+                    "metadata": doc.metadata
+                })
+        if web_results and len(web_results.strip()) > 50:
             sources_data.append({
-                "content": doc.page_content[:200] + "...",
-                "metadata": doc.metadata
+                "content": web_results[:120],
+                "metadata": {"source": "Web Search"}
             })
-        sources_data.append({
-            "content": "Real-time web search via DuckDuckGo",
-            "metadata": {"source": "Web Search"}
-        })
+
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 
         # Prepare and stream LLM response
@@ -142,7 +151,7 @@ async def generate_streaming_response(query: str, history: list = []):
         if not got_content:
             yield f'data: {{"type": "chunk", "text": "I could not generate a response. Please try again."}}\n\n'
         elif full_response and len(full_response) > 30:
-            # ── Async learning: save Q&A pair to vectorstore ─────────────────
+            # Async learning: save Q&A pair to vectorstore
             import asyncio
             asyncio.create_task(
                 asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
@@ -155,4 +164,3 @@ async def generate_streaming_response(query: str, history: list = []):
 
     finally:
         yield f'data: {{"type": "done"}}\n\n'
-
