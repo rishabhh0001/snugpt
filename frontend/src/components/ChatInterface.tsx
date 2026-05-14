@@ -162,7 +162,7 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ background: "var(--color-bg)" }}>
+    <div className="flex h-screen h-[100dvh] w-full overflow-hidden" style={{ background: "var(--color-bg)" }}>
 
       {/* ── Desktop Sidebar ── */}
       <div className="hidden md:flex flex-shrink-0 border-r" style={{ borderColor: "var(--color-border)" }}>
@@ -250,10 +250,10 @@ export default function ChatInterface() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4"
+                  className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8"
                 >
                   {/* SNU Logo large */}
-                  <div className="w-16 h-16 rounded-full overflow-hidden mb-6 border-2 shadow-xl"
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden mb-4 md:mb-6 border-2 shadow-xl"
                     style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -263,10 +263,10 @@ export default function ChatInterface() {
                     />
                   </div>
 
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  <h2 className="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">
                     How can I help you today?
                   </h2>
-                  <p className="text-sm mb-10" style={{ color: "var(--color-muted)" }}>
+                  <p className="text-xs md:text-sm mb-6 md:mb-10" style={{ color: "var(--color-muted)" }}>
                     Ask about admissions, academics, campus life, fees, or anything SNU.
                   </p>
 
