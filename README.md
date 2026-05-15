@@ -34,7 +34,7 @@ SNUGPT is not just another chatbot. It is a production-grade **Retrieval-Augment
 graph TD
     User((User)) -->|HTTPS| Frontend[Next.js 14 / Tailwind]
     Frontend -->|Streaming API| Backend[FastAPI]
-    Backend -->|Embedding| OpenAI[OpenAI / Local LLM]
+    Backend -->|Embedding| Llama 3.3[Meta]
     Backend -->|Vector Search| ChromaDB[(Chroma Vector DB)]
     Backend -->|Persistence| Neon[(Neon PostgreSQL)]
     ChromaDB ---|Index| Docs[PDFs / ERP Data / Web Crawls]
