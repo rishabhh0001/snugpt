@@ -17,4 +17,5 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=sync_engine)
 
 def init_db():
     import app.models.chat_log # Ensure models are registered
+    import app.models.waitlist # Ensure waitlist model is registered
     Base.metadata.create_all(bind=sync_engine)

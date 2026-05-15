@@ -28,6 +28,17 @@ SNUGPT is not just another chatbot. It is a production-grade **Retrieval-Augment
 
 ---
 
+## 🧠 Knowledge Base & Indexing
+
+To feed SnuGPT with university-specific documents (PDFs, Markdown, Text):
+
+1.  Place your documents in the `docs/` directory at the root of the project.
+2.  Run the indexing script:
+    ```bash
+    python backend/scripts/index_docs.py
+    ```
+    This will chunk the documents and upload them to ChromaDB (local or cloud depending on your `.env`).
+
 ## 🛠️ Tech Stack & Architecture
 
 ```mermaid

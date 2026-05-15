@@ -17,3 +17,7 @@ chardet
 databases
 asyncpg
 psycopg2-binary
+unstructured
+markdown
+python-docx
+langchain-text-splitters
