@@ -1,17 +1,13 @@
-# Production requirements for Vercel Python function
+# Vercel production — keep under 500 MB (use chromadb-client, NOT chromadb)
 fastapi
 langchain-core
 langchain-nvidia-ai-endpoints
-langchain-chroma
 chromadb-client
 pydantic
 pydantic-settings
 python-dotenv
 python-multipart
-duckduckgo-search
-requests
 sqlalchemy
 databases
 asyncpg
 psycopg2-binary
-langchain-text-splitters

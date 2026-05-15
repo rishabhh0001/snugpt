@@ -17,6 +17,9 @@ node_modules/
 .turbo/
 .vercel/
 
+# Local pip probes
+.pip-test/
+
 # Python
 __pycache__/
 *.py[cod]

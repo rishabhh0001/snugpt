@@ -4,7 +4,7 @@ import json
 from typing import Optional
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from app.rag.prompts import qa_prompt
-from app.rag.vectorstore import get_retriever, get_vectorstore
+from app.rag.vectorstore import add_qa_pair, retrieve_documents
 from app.config import settings
 
 # Lazy initialization of LLM to prevent startup crashes
@@ -66,13 +66,7 @@ def format_docs(docs):
 def save_qa_to_vectorstore(query: str, answer: str):
     """Persist a Q&A pair back into ChromaDB so the bot learns from real conversations."""
     try:
-        from langchain_core.documents import Document
-        vs = get_vectorstore()
-        doc = Document(
-            page_content=f"Q: {query}\nA: {answer}",
-            metadata={"source": "chat_learning", "type": "learned_qa"}
-        )
-        vs.add_documents([doc])
+        add_qa_pair(query, answer)
         print("[Learning] Saved Q&A to vectorstore.")
     except Exception as e:
         print(f"[Learning] Failed to save Q&A: {e}")
@@ -90,8 +84,7 @@ async def generate_streaming_response(query: str, history: list = [], session_id
     try:
         # Get relevant documents from DB
         try:
-            retriever = get_retriever()
-            docs = retriever.invoke(query)
+            docs = retrieve_documents(query, k=4)
         except Exception as e:
             print(f"Retriever error: {e}")
             docs = []
@@ -99,21 +92,7 @@ async def generate_streaming_response(query: str, history: list = [], session_id
         # Format DB docs for the prompt
         context_str = "--- DATABASE DOCUMENTS ---\n"
         context_str += format_docs(docs) if docs else "(No documents retrieved)"
-
-        # Run web search as fallback/supplement
         web_results = ""
-        try:
-            from duckduckgo_search import DDGS
-            with DDGS() as ddgs:
-                results = list(ddgs.text(query, max_results=3))
-                if results:
-                    web_results = "\n".join([f"{r['title']}: {r['body']}" for r in results])
-            
-            if web_results:
-                context_str += "\n\n--- WEB SEARCH RESULTS ---\n"
-                context_str += web_results
-        except Exception as e:
-            print(f"Web search failed: {e}")
 
         # Build conversation history (last 6 turns max)
         history_str = ""

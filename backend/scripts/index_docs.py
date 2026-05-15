@@ -15,7 +15,7 @@ from langchain_community.document_loaders import (
     PyPDFLoader
 )
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from app.rag.vectorstore import get_vectorstore
+from app.rag.vectorstore import add_documents
 
 def index_documents(docs_dir: str):
     """
@@ -65,13 +65,11 @@ def index_documents(docs_dir: str):
 
     # 3. Upload to ChromaDB
     print("Uploading chunks to ChromaDB...")
-    vectorstore = get_vectorstore()
-    
     # We add in batches to avoid any potential API limits or memory issues
     batch_size = 100
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i:i + batch_size]
-        vectorstore.add_documents(batch)
+        add_documents(batch)
         print(f"Progress: {min(i + batch_size, len(chunks))}/{len(chunks)} chunks uploaded.")
 
     print("Indexing complete! SnuGPT is now smarter.")

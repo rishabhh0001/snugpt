@@ -1,0 +1,9 @@
+backend/scripts
+backend/ingestion
+backend/chroma_db
+backend/requirements-dev.txt
+backend/reset_chroma_cloud.py
+push_to_cloud.py
+docs
+**/*.pdf
+**/__pycache__
