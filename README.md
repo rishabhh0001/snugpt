@@ -13,7 +13,9 @@
   <em>The ultimate institutional intelligence layer for the SNU Ecosystem.</em>
 </p>
 
+
 ---
+
 
 ## ⚡ The SNUGPT Overhaul (V1.0.4)
 
@@ -34,7 +36,9 @@ SNUGPT has been transformed from a standard chatbot into a high-density **Neural
 | **📱 Premium UI** | Framer Motion animations and high-contrast dark mode aesthetics. |
 | **🔄 Self-Improving** | Integrated feedback loops for continuous model alignment. |
 
+
 ---
+
 
 ## 🏗️ Neural Architecture & Information Flow
 
@@ -71,20 +75,6 @@ graph TD
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Feeding the Brain
-Place your documents (PDFs, MD, TXT) in the `docs/` directory and index them:
-```bash
-python backend/scripts/index_docs.py
-```
-
-### 2. Launching the Interface
-```bash
-npm run dev
-```
-
----
 
 ## 🎯 Strategic Use Cases
 
@@ -108,7 +98,9 @@ Licensed under the **Apache License 2.0**. This project is open-source and free 
 > [!IMPORTANT]
 > For the complete legal text, please refer to the [FULL LICENSE](./LICENSE) file.
 
+
 ---
+
 
 <p align="center">
   Made with ❤️ by <a href="https://github.com/rishabhh0001">Rishabh Joshi</a>
