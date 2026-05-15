@@ -75,11 +75,13 @@ export default function ChatInterface() {
       });
 
       if (!res.ok) {
+        const rawText = await res.text();
+        console.error("DEBUG: Raw Backend Response:", rawText);
         let errorData;
         try {
-          errorData = await res.json();
+          errorData = JSON.parse(rawText);
         } catch (e) {
-          errorData = { error: await res.text() };
+          errorData = { error: rawText };
         }
         throw new Error(errorData.error || errorData.detail || `Backend error: ${res.status}`);
       }

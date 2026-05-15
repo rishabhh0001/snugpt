@@ -12,10 +12,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://user:pass@localhost/snugpt"
     
     # Chroma Cloud settings
-    use_chroma_cloud: bool = False
-    chroma_api_key: Optional[str] = None
-    chroma_tenant: str = "default"
-    chroma_database: str = "default"
+    use_chroma_cloud: bool = True
+    chroma_api_key: str = "ck-6qVmDL9tQaeYUfScTc1wk64NPpLqjMJ4T1iSaBp5Dx8Q"
+    chroma_tenant: str = "bf7a99b2-7384-49c8-8710-25dc1baccd97"
+    chroma_database: str = "SNUGPT"
 
     class Config:
         env_file = ".env"

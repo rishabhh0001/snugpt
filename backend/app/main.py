@@ -11,11 +11,18 @@ from app.models.database import database, init_db
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic
-    await database.connect()
-    init_db()
+    try:
+        await database.connect()
+        init_db()
+    except Exception as e:
+        import logging
+        logging.error(f"Startup failure (Database): {e}")
     yield
     # Shutdown logic
-    await database.disconnect()
+    try:
+        await database.disconnect()
+    except Exception:
+        pass
 
 app = FastAPI(title="SnuGPT API", version="1.0.0", lifespan=lifespan)
 
