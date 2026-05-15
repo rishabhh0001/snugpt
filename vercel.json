@@ -5,15 +5,14 @@
             "memory": 1024
         }
     },
-    "experimentalServices": {
-        "frontend": {
-            "entrypoint": "frontend",
-            "routePrefix": "/",
-            "framework": "nextjs"
+    "rewrites": [
+        {
+            "source": "/_/backend/:path*",
+            "destination": "/backend/app/main.py"
         },
-        "backend": {
-            "entrypoint": "backend",
-            "routePrefix": "/_/backend"
+        {
+            "source": "/(?!api/|_/backend/).*",
+            "destination": "/frontend/$0"
         }
-    }
+    ]
 }
