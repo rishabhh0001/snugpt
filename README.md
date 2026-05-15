@@ -1,6 +1,7 @@
 # <img src="./public/avatar.svg" width="48" align="center" /> SNUGPT
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Release-V1.0.4_Neural-indigo?style=for-the-badge&logo=rocket" />
   <img src="https://img.shields.io/badge/Architecture-RAG-indigo?style=for-the-badge&logo=ai" />
   <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge&logo=fastapi" />
   <img src="https://img.shields.io/badge/Frontend-Next.js_14-black?style=for-the-badge&logo=nextdotjs" />
@@ -8,15 +9,22 @@
 </p>
 
 <p align="center">
-  <strong>The Next-Generation Institutional Knowledge Engine.</strong><br />
-  <em>Bridge the gap between unstructured data and precise, conversational intelligence.</em>
+  <strong>The Student Brain Engine.</strong><br />
+  <em>The ultimate institutional intelligence layer for the SNU Ecosystem.</em>
 </p>
 
 ---
 
-## ⚡ The SNUGPT Difference
+## ⚡ The SNUGPT Overhaul (V1.0.4)
 
-SNUGPT is not just another chatbot. It is a production-grade **Retrieval-Augmented Generation (RAG)** platform designed to transform static institutional documentation into a dynamic, conversational knowledge base.
+SNUGPT has been transformed from a standard chatbot into a high-density **Neural Intelligence Interface**. Designed for students who need precision without the noise.
+
+### ✨ What's New?
+- **🧠 Compact Neural UI**: Re-engineered for standard laptop viewports. Everything you need, visible at first glance.
+- **✨ Character Reveal Engine**: High-fidelity text animations for a premium, conversational feel.
+- **🌊 Ambient Neural Backgrounds**: Dynamic grid systems and pulsing ambient glows that respond to your presence.
+- **🛡️ Built-in Guardrails**: University-aligned intelligence that respects academic integrity and institutional policies.
+- **📱 Responsive by Design**: Seamlessly scaling from 4K workstations to mobile devices.
 
 | Feature | Description |
 | :--- | :--- |
@@ -28,18 +36,7 @@ SNUGPT is not just another chatbot. It is a production-grade **Retrieval-Augment
 
 ---
 
-## 🧠 Knowledge Base & Indexing
-
-To feed SnuGPT with university-specific documents (PDFs, Markdown, Text):
-
-1.  Place your documents in the `docs/` directory at the root of the project.
-2.  Run the indexing script:
-    ```bash
-    python backend/scripts/index_docs.py
-    ```
-    This will chunk the documents and upload them to ChromaDB (local or cloud depending on your `.env`).
-
-## 🛠️ Tech Stack & Architecture
+## 🏗️ Architecture & Flow
 
 ```mermaid
 graph TD
@@ -53,36 +50,31 @@ graph TD
 
 ---
 
+## 🚀 Getting Started
+
+### 1. Feeding the Brain
+Place your documents (PDFs, MD, TXT) in the `docs/` directory and index them:
+```bash
+python backend/scripts/index_docs.py
+```
+
+### 2. Launching the Interface
+```bash
+npm run dev
+```
+
+---
+
 ## 🎯 Strategic Use Cases
 
-### 🏫 The Campus Concierge
-Acts as an all-knowing digital assistant for students.
-- **Academic Planning**: Prerequisites, professor ratings, and credit requirements.
-- **Administrative Navigation**: Hostel policies, parking appeals, and fee structures.
-- **Dynamic FAQ**: "When is the deadline for the robotics club registration?"
+### 🏫 Academic Intelligence
+- **Course Navigator**: Prerequisites, professor insights, and credit mapping.
+- **Policy Oracle**: Instant answers on hostel rules, fee structures, and appeals.
+- **Research Buddy**: Quickly surface relevant citations from institutional papers.
 
-### 🏢 Enterprise Knowledge Layer
-Unified search for fragmented organizational intelligence.
-- **HR Onboarding**: Policy summaries and expense procedures.
-- **Tech Support**: Troubleshooting legacy server errors from internal wikis.
-
----
-
-## 💬 Conversation Preview
-
-> **User:** "What's the late submission policy for CSD101?"
->
-> **SNUGPT:** *"According to the 2024 Syllabus, late submissions are accepted for 48 hours with a 10% daily penalty. Beyond 48 hours, a zero is awarded unless a medical certificate is provided. [View Source Document]"*
-
----
-
-## 🚀 Development Roadmap
-
-- [x] **Core RAG Pipeline**: PDF ingestion and vector indexing.
-- [x] **Premium UI**: Framer Motion landing page (`/lander`).
-- [x] **Streaming**: Token-by-token server-sent events.
-- [ ] **Multi-Modal Support**: Analyzing images and charts in documents.
-- [ ] **Department API**: Direct integration with university ERP systems.
+### 🏢 Organizational Layer
+- **Unified Search**: Bridge the gap between fragmented ERP data and student queries.
+- **Automated Support**: Reduce administrative load by resolving common queries instantly.
 
 ---
 
