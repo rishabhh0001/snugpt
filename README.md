@@ -36,17 +36,38 @@ SNUGPT has been transformed from a standard chatbot into a high-density **Neural
 
 ---
 
-## 🏗️ Architecture & Flow
+## 🏗️ Neural Architecture & Information Flow
+
+### 🔄 Retrieval Augmented Generation (RAG) Flow
 
 ```mermaid
 graph TD
-    User((User)) -->|HTTPS| Frontend[Next.js 14 / Tailwind]
-    Frontend -->|Streaming API| Backend[FastAPI]
-    Backend -->|Embedding| Llama 3.3[Meta]
-    Backend -->|Vector Search| ChromaDB[(Chroma Vector DB)]
-    Backend -->|Persistence| Neon[(Neon PostgreSQL)]
-    ChromaDB ---|Index| Docs[PDFs / ERP Data / Web Crawls]
+    subgraph "Data Ingestion (Knowledge Layer)"
+        DS[Data Sources: PDFs, ERP, Web] -->|Preprocessing| CP[Chunking & Processing]
+        CP -->|NVIDIA nv-embedqa-e5-v5| EMB[Vector Embeddings]
+        EMB -->|Store| CDB[(Chroma Cloud)]
+    end
+
+    subgraph "Inference Path (Intelligence Layer)"
+        U((User)) -->|Query| FE[Next.js Interface]
+        FE -->|Streaming Request| BE[FastAPI Gateway]
+        BE -->|Semantic Search| CDB
+        CDB -->|Context Retrieval| BE
+        BE -->|Augmented Prompt| LLM[Llama 3.3 / NVIDIA AI]
+        LLM -->|Streamed Response| FE
+        BE -->|Session History| DB[(Neon Postgres)]
+    end
 ```
+
+### 🛠️ Technical Stack
+
+- **Large Language Model**: Meta Llama 3.3 70B Instruct (via NVIDIA AI Endpoints)
+- **Vector Intelligence**: ChromaDB Cloud with `nv-embedqa-e5-v5` embeddings
+- **Backend Architecture**: FastAPI (Asynchronous Python 3.12+)
+- **Frontend Interface**: Next.js 14 (App Router) with Framer Motion 11
+- **Primary Database**: Neon PostgreSQL (Serverless)
+- **Styling & Components**: Tailwind CSS + Lucide Icons
+
 
 ---
 

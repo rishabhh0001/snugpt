@@ -21,7 +21,7 @@ def get_llm():
             model="meta/llama-3.3-70b-instruct",
             nvidia_api_key=api_key,
             temperature=0.1,
-            max_tokens=1024
+            max_tokens=4096
         )
     return _llm
 

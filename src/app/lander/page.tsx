@@ -50,30 +50,11 @@ const CharReveal = ({ text, className }: { text: string; className?: string }) =
 
 const GridBackground = () => (
   <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-    <motion.div 
-      animate={{ 
-        backgroundPosition: ["0% 0%", "100% 100%"],
-        opacity: [0.03, 0.05, 0.03]
-      }}
-      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-      className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" 
-    />
-    <motion.div
-      animate={{ y: ["-100%", "200%"] }}
-      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-      className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/10 to-transparent h-40 w-full z-0 opacity-20"
-    />
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] animate-grid-shift opacity-[0.03]" />
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/10 to-transparent h-40 w-full z-0 opacity-20 animate-scanline" />
     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-500/10 blur-[120px] rounded-full opacity-50" />
-    <motion.div 
-      animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
-      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-blue-600/10 blur-[100px] rounded-full" 
-    />
-    <motion.div 
-      animate={{ scale: [1, 1.2, 1], opacity: [0.05, 0.08, 0.05] }}
-      transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-yellow-500/5 blur-[100px] rounded-full" 
-    />
+    <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-blue-600/10 blur-[100px] rounded-full animate-pulse-slow" />
+    <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-yellow-500/5 blur-[100px] rounded-full animate-pulse-slower" />
   </div>
 );
 
@@ -291,7 +272,7 @@ export default function Lander() {
         <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 py-3 rounded-xl md:rounded-3xl border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl">
           <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
             <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500">
-              <Image src="/avatar.svg" alt="SNUGPT" width={44} height={44} className="object-cover" />
+              <Image src="/avatar.svg" alt="SNUGPT" width={44} height={44} className="object-cover" priority />
               <div className="absolute inset-0 bg-indigo-500/10 mix-blend-overlay" />
             </div>
             <div className="flex flex-col -space-y-1">
@@ -424,7 +405,7 @@ export default function Lander() {
                 </div>
                 <div className="flex gap-6 items-start flex-row-reverse">
                   <div className="relative shrink-0">
-                    <Image src="/avatar.svg" alt="AI" width={48} height={48} className="rounded-2xl border border-indigo-500/50 shadow-[0_0_20px_rgba(79,70,229,0.3)]" />
+                    <Image src="/avatar.svg" alt="AI" width={48} height={48} className="rounded-2xl border border-indigo-500/50 shadow-[0_0_20px_rgba(79,70,229,0.3)]" priority />
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-4 border-[#111]" />
                   </div>
                   <div className="space-y-3 w-full flex flex-col items-end">
@@ -681,6 +662,34 @@ export default function Lander() {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
         }
+        @keyframes grid-shift {
+          from { background-position: 0% 0%; }
+          to { background-position: 40px 40px; }
+        }
+        @keyframes scanline {
+          from { transform: translateY(-100%); }
+          to { transform: translateY(200%); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { transform: scale(1); opacity: 0.1; }
+          50% { transform: scale(1.1); opacity: 0.15; }
+        }
+        @keyframes pulse-slower {
+          0%, 100% { transform: scale(1); opacity: 0.05; }
+          50% { transform: scale(1.2); opacity: 0.08; }
+        }
+        .animate-grid-shift {
+          animation: grid-shift 20s linear infinite;
+        }
+        .animate-scanline {
+          animation: scanline 8s linear infinite;
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 10s ease-in-out infinite;
+        }
+        .animate-pulse-slower {
+          animation: pulse-slower 12s ease-in-out infinite;
+        }
         .animate-gradient-x {
           background-size: 200% 200%;
           animation: gradient-x 3s ease infinite;
@@ -694,6 +703,9 @@ export default function Lander() {
         }
         .perspective-1000 {
           perspective: 1000px;
+        }
+        .will-change-transform {
+          will-change: transform;
         }
       `}} />
 
