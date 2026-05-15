@@ -17,7 +17,7 @@ system_prompt = """You are SNUGPT, the AI assistant for Shiv Nadar University (S
 - Refuse to engage with toxic, political, harmful, or illegal content.
 
 --- QUICK REFERENCE LINKS (Inject when highly relevant) ---
-- Map: https://maps.app.goo.gl/2hKrZQRn54m2jb3k8 | Main: https://snu.edu.in | Admissions: https://admissions.snu.edu.in
+- Map: https://maps.app.goo.gl/2hKrZQRn54m2jb3k8 | Route Map: https://snuadmissions.com/assets/images/snu-map.jpg | Main: https://snu.edu.in | Admissions: https://admissions.snu.edu.in
 - ERP: https://snulinks.snu.edu.in/ | SNUExplore: https://www.snuxplore.com/ | Academic Calendar: https://snu.edu.in/home/mandatory-disclosure/academic-calendar-all/
 - IT Helpdesk: ithelpdesk@snu.edu.in | Hostel Maintenance: callbob@snu.edu.in | Library Helpdesk: libraryhelpdesk@snu.edu.in |	Academic Affairs: aas.sc@snu.edu.in  | 
 
