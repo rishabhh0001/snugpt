@@ -8,17 +8,23 @@ from app.rag.prompts import qa_prompt
 from app.rag.vectorstore import get_retriever, get_vectorstore
 from app.config import settings
 
-# Initialize NVIDIA NIM Chat Model
-api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
-if not api_key:
-    raise ValueError("API allotment is not set. Please contact the AI admin for help.")
+# Lazy initialization of LLM to prevent startup crashes
+_llm = None
 
-llm = ChatNVIDIA(
-    model="meta/llama-3.3-70b-instruct",
-    nvidia_api_key=api_key,
-    temperature=0.1,
-    max_tokens=1024
-)
+def get_llm():
+    global _llm
+    if _llm is None:
+        api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
+        if not api_key:
+            # We don't raise here to avoid crashing the worker, but we'll fail gracefully during generation
+            return None
+        _llm = ChatNVIDIA(
+            model="meta/llama-3.3-70b-instruct",
+            nvidia_api_key=api_key,
+            temperature=0.1,
+            max_tokens=1024
+        )
+    return _llm
 
 # ── Safety Guardrail ─────────────────────────────────────────────────────────
 JAILBREAK_PATTERNS = [
@@ -138,6 +144,12 @@ async def generate_streaming_response(query: str, history: list = [], session_id
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 
         # Prepare and stream LLM response
+        llm = get_llm()
+        if not llm:
+            yield f'data: {{"type": "chunk", "text": "NVIDIA API Key is not configured. Please contact the administrator."}}\n\n'
+            yield f'data: {{"type": "done"}}\n\n'
+            return
+
         messages = qa_prompt.format_messages(context=full_context, question=query)
 
         got_content = False

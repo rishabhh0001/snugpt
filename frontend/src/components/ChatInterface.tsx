@@ -74,7 +74,15 @@ export default function ChatInterface() {
         }),
       });
 
-      if (!res.ok) throw new Error(`Backend error: ${res.status}`);
+      if (!res.ok) {
+        let errorData;
+        try {
+          errorData = await res.json();
+        } catch (e) {
+          errorData = { error: await res.text() };
+        }
+        throw new Error(errorData.error || errorData.detail || `Backend error: ${res.status}`);
+      }
       if (!res.body) throw new Error("No response body");
 
       const reader = res.body.getReader();

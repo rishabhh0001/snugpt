@@ -29,7 +29,18 @@ app.add_middleware(
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "db": database.is_connected}
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import logging
+    logging.error(f"Global error caught: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error", "error": str(exc)},
+    )
+
+from fastapi.responses import JSONResponse
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest, fastapi_request: Request):
