@@ -118,11 +118,11 @@ async def generate_streaming_response(query: str, history: list = [], session_id
                     "content": doc.page_content[:120],
                     "metadata": doc.metadata
                 })
-        if web_results and len(web_results.strip()) > 50:
-            sources_data.append({
-                "content": web_results[:120],
-                "metadata": {"source": "Web Search"}
-            })
+        # if web_results and len(web_results.strip()) > 50:
+        #     sources_data.append({
+        #         "content": web_results[:120],
+        #         "metadata": {"source": "Web Search"}
+        #     })
 
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 
