@@ -8,26 +8,53 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 # Ensure the database URL has the correct driver for 'databases' library
-db_url = settings.database_url
-if db_url.startswith("postgresql://"):
-    db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+raw_db_url = settings.database_url
+if not raw_db_url or "postgresql" not in raw_db_url:
+    # Safe fallback to prevent module-level crash
+    db_url = "postgresql+asyncpg://localhost/snugpt"
+else:
+    db_url = raw_db_url
+    if db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
 database = Database(db_url)
 
-# For synchronous initialization (SQLAlchemy create_all)
-# We must strip the async driver prefix for the sync engine
-sync_url = db_url.replace("+asyncpg", "")
-sync_engine = create_engine(sync_url)
+# Lazy initialization for engines and sessions
+_sync_engine = None
+_SessionLocal = None
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=sync_engine)
+def get_sync_engine():
+    global _sync_engine
+    if _sync_engine is None:
+        db_url = settings.database_url
+        if not db_url or "postgresql" not in db_url:
+            # Fallback for initialization phase if URL is missing
+            return None
+        if db_url.startswith("postgresql://"):
+            db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        sync_url = db_url.replace("+asyncpg", "").replace("postgresql://", "postgresql+psycopg2://", 1)
+        _sync_engine = create_engine(sync_url, pool_pre_ping=True)
+    return _sync_engine
+
+def get_session():
+    global _SessionLocal
+    if _SessionLocal is None:
+        engine = get_sync_engine()
+        if engine:
+            _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    return _SessionLocal
+
 Base = declarative_base()
 
 def init_db():
     try:
+        engine = get_sync_engine()
+        if not engine:
+            logger.warning("No database engine available for init_db.")
+            return
         import app.models.chat_log
         import app.models.waitlist
-        Base.metadata.create_all(bind=sync_engine)
+        Base.metadata.create_all(bind=engine)
         logger.info("Database initialized successfully.")
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
-        # Don't raise, allowing the app to start even if DB is temporarily unavailable

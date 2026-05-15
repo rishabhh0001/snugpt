@@ -80,4 +80,4 @@ async def waitlist(request: WaitlistRequest):
         error_str = str(e).lower()
         if "unique constraint" in error_str or "already exists" in error_str:
             raise HTTPException(status_code=400, detail="This email is already on the waitlist.")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail=str(e))

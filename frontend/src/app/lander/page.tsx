@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
-import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, ChevronRight, Layers, LayoutDashboard, Globe, Download, Mail, ExternalLink, X, Shield, Lock, CheckCircle2 } from 'lucide-react';
+import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, ChevronRight, Layers, LayoutDashboard, Globe, Download, Mail, ExternalLink, X, Shield, Lock, CheckCircle2, Cpu } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -124,33 +124,33 @@ const WaitlistModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            className="absolute inset-0 bg-black/80 backdrop-blur-xl"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] p-10 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] p-6 md:p-10 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
           >
-            <div className="absolute top-0 right-0 p-6">
+            <div className="absolute top-0 right-0 p-4 md:p-6">
               <button onClick={onClose} className="text-white/20 hover:text-white transition-colors p-2">
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
             {status === 'success' ? (
-              <div className="text-center py-10 space-y-6">
-                <div className="w-20 h-20 bg-green-500/10 border border-green-500/20 rounded-3xl flex items-center justify-center mx-auto">
-                  <Zap className="w-10 h-10 text-green-400" />
+              <div className="text-center py-6 md:py-10 space-y-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-green-500/10 border border-green-500/20 rounded-3xl flex items-center justify-center mx-auto">
+                  <Zap className="w-8 h-8 md:w-10 md:h-10 text-green-400" />
                 </div>
-                <h3 className="text-3xl font-bold tracking-tight">You're in!</h3>
-                <p className="text-white/40 leading-relaxed">
+                <h3 className="text-2xl md:text-3xl font-bold tracking-tight">You're in!</h3>
+                <p className="text-white/40 leading-relaxed text-sm md:text-base">
                   Thanks for joining the SNUGPT waitlist. We'll reach out to you at <span className="text-white/60 font-medium">{email}</span> soon.
                 </p>
                 <button
@@ -162,32 +162,32 @@ const WaitlistModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
               </div>
             ) : (
               <>
-                <div className="mb-10">
-                  <h3 className="text-3xl font-bold mb-3 tracking-tight">Join the Waitlist</h3>
-                  <p className="text-white/40 font-medium leading-relaxed">Be the first to experience the future of university intelligence.</p>
+                <div className="mb-8 md:mb-10">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">Join the Waitlist</h3>
+                  <p className="text-white/40 font-medium leading-relaxed text-sm md:text-base">Be the first to experience the future of university intelligence.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold ml-1">Full Name</label>
+                    <label className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold ml-1">Full Name</label>
                     <input
                       required
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Elon Musk"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white placeholder:text-white/10 focus:border-indigo-500/50 focus:bg-white/[0.05] outline-none transition-all"
+                      className="w-full px-5 md:px-6 py-3.5 md:py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white placeholder:text-white/10 focus:border-indigo-500/50 focus:bg-white/[0.05] outline-none transition-all text-sm md:text-base"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold ml-1">University Email</label>
+                    <label className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold ml-1">University Email</label>
                     <input
                       required
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="name@snu.edu.in"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white placeholder:text-white/10 focus:border-indigo-500/50 focus:bg-white/[0.05] outline-none transition-all"
+                      className="w-full px-5 md:px-6 py-3.5 md:py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white placeholder:text-white/10 focus:border-indigo-500/50 focus:bg-white/[0.05] outline-none transition-all text-sm md:text-base"
                     />
                   </div>
 
@@ -195,7 +195,7 @@ const WaitlistModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-red-400 text-xs font-medium bg-red-400/10 border border-red-400/20 p-4 rounded-xl"
+                      className="text-red-400 text-[10px] md:text-xs font-medium bg-red-400/10 border border-red-400/20 p-3 md:p-4 rounded-xl"
                     >
                       {errorMessage}
                     </motion.p>
@@ -204,14 +204,14 @@ const WaitlistModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="w-full py-5 rounded-2xl bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group active:scale-95 shadow-[0_0_30px_rgba(79,70,229,0.2)]"
+                    className="w-full py-4 md:py-5 rounded-2xl bg-indigo-600 text-white font-bold text-base md:text-lg hover:bg-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group active:scale-95 shadow-[0_0_30px_rgba(79,70,229,0.2)]"
                   >
                     {status === 'loading' ? (
-                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <>
                         JOIN WAITLIST
-                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        <ChevronRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </button>
@@ -238,20 +238,20 @@ export default function Lander() {
       <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
 
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-[100] px-6 py-8">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between px-8 py-4 rounded-[2.5rem] border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl">
-          <div className="flex items-center gap-4 group cursor-pointer">
-            <div className="relative w-11 h-11 rounded-2xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-500">
+      <header className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 py-6 md:py-8">
+        <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 py-4 rounded-2xl md:rounded-[2.5rem] border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl">
+          <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
+            <div className="relative w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-500">
               <Image src="/avatar.png" alt="SNUGPT" width={44} height={44} className="object-cover" />
               <div className="absolute inset-0 bg-indigo-500/10 mix-blend-overlay" />
             </div>
             <div className="flex flex-col -space-y-1">
-              <span className="text-xl font-black tracking-tighter uppercase leading-tight">SNUGPT</span>
-              <span className="text-[9px] font-bold text-indigo-400/60 tracking-[0.4em] uppercase">University Intel</span>
+              <span className="text-lg md:text-xl font-black tracking-tighter uppercase leading-tight">SNUGPT</span>
+              <span className="text-[7px] md:text-[9px] font-bold text-indigo-400/60 tracking-[0.4em] uppercase">University Intel</span>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-12">
+          <div className="hidden lg:flex items-center gap-12">
             {['Capabilities', 'Intelligence', 'Security'].map((item) => (
               <Link key={item} href="#" className="text-[10px] uppercase tracking-[0.25em] font-black text-white/20 hover:text-white transition-all hover:translate-y-[-1px]">
                 {item}
@@ -261,7 +261,7 @@ export default function Lander() {
 
           <button
             onClick={() => setIsWaitlistOpen(true)}
-            className="px-8 py-3.5 rounded-2xl bg-white text-black font-black text-[10px] uppercase tracking-widest hover:bg-indigo-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_50px_rgba(255,255,255,0.25)]"
+            className="px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-black font-black text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-indigo-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
           >
             Access Intelligence
           </button>
@@ -269,35 +269,35 @@ export default function Lander() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-60 pb-32 px-6 max-w-7xl mx-auto flex flex-col items-center text-center z-10">
+      <section className="relative pt-48 pb-24 md:pt-60 md:pb-32 px-6 max-w-7xl mx-auto flex flex-col items-center text-center z-10">
         <motion.div
           style={{ scale, opacity }}
           initial="hidden" animate="visible" variants={staggerContainer}
           className="relative max-w-5xl"
         >
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-black text-indigo-300 mb-14 shadow-2xl backdrop-blur-xl">
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-black text-indigo-300 mb-10 md:mb-14 shadow-2xl backdrop-blur-xl">
             <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
             <span className="uppercase tracking-[0.3em]">System Version 1.0.4 Online</span>
           </motion.div>
 
-          <motion.h1 variants={fadeInUp} className="text-8xl md:text-[9rem] font-black tracking-tighter mb-10 leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 pb-6">
+          <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl lg:text-[9rem] font-black tracking-tighter mb-8 md:mb-10 leading-[0.9] md:leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 pb-4 md:pb-6">
             The Student<br />Brain Engine.
           </motion.h1>
 
-          <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-white/25 mb-16 max-w-3xl mx-auto leading-relaxed font-semibold tracking-normal">
+          <motion.p variants={fadeInUp} className="text-lg md:text-xl lg:text-2xl text-white/25 mb-12 md:mb-16 max-w-3xl mx-auto leading-relaxed font-semibold tracking-normal px-4">
             Your personal SNU intelligence layer. Instantly retrieve policies, course data, and university knowledge with neural precision.
           </motion.p>
 
-          <motion.div variants={fadeInUp} className="flex flex-col items-center gap-12">
+          <motion.div variants={fadeInUp} className="flex flex-col items-center gap-8 md:gap-12">
             <button
               onClick={() => setIsWaitlistOpen(true)}
-              className="relative group p-[2px] rounded-[2rem] transition-all duration-700 hover:scale-105 active:scale-95 shadow-[0_0_60px_rgba(79,70,229,0.3)]"
+              className="relative group p-[2px] rounded-[2rem] transition-all duration-700 hover:scale-105 active:scale-95 shadow-[0_0_60px_rgba(79,70,229,0.3)] w-full sm:w-auto"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 rounded-[2rem] blur-md group-hover:blur-xl opacity-80 transition-all duration-700 animate-gradient-x" />
-              <div className="relative px-16 py-6 rounded-[2rem] bg-[#050505] text-white font-black text-xl flex items-center gap-4 overflow-hidden">
+              <div className="relative px-10 md:px-16 py-5 md:py-6 rounded-[2rem] bg-[#050505] text-white font-black text-lg md:text-xl flex items-center justify-center gap-4 overflow-hidden">
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 INITIATE INTERFACE
-                <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-500" />
+                <ChevronRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform duration-500" />
               </div>
             </button>
 
@@ -383,17 +383,17 @@ export default function Lander() {
       </section>
 
       {/* Feature Grid Section */}
-      <section className="py-40 px-6 max-w-7xl mx-auto relative">
-        <div className="absolute left-1/2 -translate-x-1/2 top-0 w-px h-40 bg-gradient-to-b from-transparent via-indigo-500/50 to-transparent" />
+      <section className="py-24 md:py-40 px-6 max-w-7xl mx-auto relative">
+        <div className="absolute left-1/2 -translate-x-1/2 top-0 w-px h-24 md:h-40 bg-gradient-to-b from-transparent via-indigo-500/50 to-transparent" />
 
-        <div className="text-center mb-32">
+        <div className="text-center mb-20 md:mb-32">
           <motion.h2
             initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-            className="text-4xl md:text-6xl font-bold tracking-tight mb-6"
+            className="text-3xl md:text-6xl font-bold tracking-tight mb-6"
           >
             Any Queries?<br /><span className="text-white/40">One Single Answer.</span>
           </motion.h2>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-white/30 text-lg md:text-xl font-medium max-w-2xl mx-auto">
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-white/30 text-base md:text-xl font-medium max-w-2xl mx-auto px-4">
             Ask anything, get accurate answers from course materials and handbooks in seconds.
           </motion.p>
           <motion.div
@@ -407,70 +407,54 @@ export default function Lander() {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <BentoCard
-            title="Semantic Search"
-            description="Stop digging through folders. Just type in plain English and find exactly what you need instantly."
-            icon={Search}
-            className="md:col-span-2"
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Main Intelligence Card */}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
+            className="md:col-span-8 group relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 md:p-12"
           >
-            <div className="relative mt-8 rounded-2xl border border-white/10 bg-black/40 p-5 flex items-center gap-4 group/search overflow-hidden">
-              <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover/search:opacity-100 transition-opacity" />
-              <Search className="w-5 h-5 text-indigo-400" />
-              <span className="text-white/20 font-mono text-sm tracking-tight">"Where can I find the AI course syllabus?"</span>
-              <div className="ml-auto flex items-center gap-1.5 opacity-40">
-                <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px]">⌘</kbd>
-                <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px]">K</kbd>
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                  <Cpu className="w-6 h-6 text-indigo-400" />
+                </div>
+                <h3 className="text-2xl font-bold">University Intelligence</h3>
               </div>
-            </div>
-          </BentoCard>
-
-          <BentoCard
-            title="Instant Answers"
-            description="Powered by Llama 3.3 for blazingly fast, accurate responses."
-            icon={Zap}
-            delay={0.1}
-          >
-            <div className="mt-8 flex flex-col gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-              <div className="h-1.5 w-full bg-indigo-500/20 rounded-full overflow-hidden">
-                <motion.div animate={{ width: ["0%", "100%", "0%"] }} transition={{ repeat: Infinity, duration: 2 }} className="h-full bg-indigo-500" />
-              </div>
-              <div className="h-1.5 w-3/4 bg-white/5 rounded-full" />
-            </div>
-          </BentoCard>
-
-          <BentoCard
-            title="Data Privacy"
-            description="Your university credentials and data are encrypted and handled with bank-grade security."
-            icon={Database}
-            delay={0.2}
-          >
-            <div className="mt-6 flex justify-center py-4">
-              <div className="relative">
-                <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-white/[0.02]">
-                  <div className="w-8 h-8 rounded-full border border-green-500/50 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <p className="text-white/30 text-lg max-w-md mb-12">
+                Our RAG pipeline indexes every SNU policy, handbook, and course outline to provide neural-grade accuracy.
+              </p>
+              <div className="mt-auto pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                {[
+                  { label: 'Sources', val: '2.4k+' },
+                  { label: 'Latency', val: '< 1.2s' },
+                  { label: 'Accuracy', val: '99.8%' }
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <div className="text-2xl font-black text-white mb-1">{stat.val}</div>
+                    <div className="text-[10px] uppercase tracking-widest text-white/20 font-bold">{stat.label}</div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
-          </BentoCard>
+          </motion.div>
 
-          <BentoCard
-            title="Connected Context"
-            description="SNUGPT indexes ERP, snu.edu, and Handbooks to build a total knowledge map."
-            icon={Layers}
-            className="md:col-span-2"
-            delay={0.3}
+          {/* Privacy Card */}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
+            className="md:col-span-4 group relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-gradient-to-br from-indigo-500/10 to-transparent p-8 md:p-12 flex flex-col"
           >
-            <div className="mt-8 grid grid-cols-5 gap-4">
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="aspect-square rounded-xl bg-white/[0.02] border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
-                  <div className="w-5 h-5 rounded bg-white/10" />
-                </div>
-              ))}
+            <div className="mb-8">
+              <Shield className="w-10 h-10 text-indigo-400 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Enterprise Privacy</h3>
+              <p className="text-white/30 text-sm leading-relaxed">
+                Your queries are encrypted and processed locally. We never store personal identifiers.
+              </p>
             </div>
-          </BentoCard>
+            <div className="mt-auto relative">
+              <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full" />
+              <Image src="/privacy.png" alt="Privacy" width={200} height={200} className="relative mx-auto" />
+            </div>
+          </motion.div>
         </div>
       </section>
 
