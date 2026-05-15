@@ -8,10 +8,10 @@ env.bak/
 venv.bak/
 
 # Next.js
-frontend/.next/
-frontend/out/
-frontend/build/
-frontend/node_modules/
+.next/
+out/
+build/
+node_modules/
 
 # Python
 __pycache__/
