@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "SnuGPT — Shiv Nadar University AI Assistant",
   description: "Your intelligent AI companion for Shiv Nadar University. Ask about admissions, academics, campus life, fees, and more.",
   icons: {
-    icon: "/avatar.svg",
+    icon: [{ url: "/avatar.svg", type: "image/svg+xml" }],
     apple: "/avatar.svg",
   },
   openGraph: {

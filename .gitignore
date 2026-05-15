@@ -107,5 +107,5 @@ Desktop.ini
 tmp/
 temp/
 
-# Accidental large / generated assets
-public/avatar.png
+# Source art (generated assets live in public/avatar.svg)
+/avatar.png

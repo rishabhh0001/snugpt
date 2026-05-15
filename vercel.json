@@ -9,16 +9,15 @@
     }
   },
   "functions": {
-    "api/index.py": {
+    "api/py/index.py": {
       "maxDuration": 60,
-      "memory": 1024,
       "excludeFiles": "{backend/scripts/**,backend/ingestion/**,backend/chroma_db/**,backend/requirements-dev.txt,backend/reset_chroma_cloud.py,push_to_cloud.py,node_modules/**,.next/**,docs/**,**/*.pdf,**/*.docx,**/__pycache__/**,**/.pytest_cache/**}"
     }
   },
   "rewrites": [
     {
       "source": "/_/backend/:path*",
-      "destination": "/api/index/:path*"
+      "destination": "/api/py/:path*"
     }
   ]
 }

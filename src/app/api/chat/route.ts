@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getPythonApiUrl } from "@/lib/backend";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,7 +38,10 @@ export async function POST(req: NextRequest) {
       const text = await response.text();
       return new Response(text, {
         status: response.status,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type":
+            response.headers.get("content-type") ?? "application/json",
+        },
       });
     }
 

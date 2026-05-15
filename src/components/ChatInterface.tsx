@@ -60,9 +60,9 @@ export default function ChatInterface() {
     abortControllerRef.current = abortController;
 
     try {
-      const endpoint = "/api/chat";
-
-      const res = await fetch(endpoint, {
+      // Prefer /api/chat (Next proxy). Fall back to /_/backend if /api/chat 404s (legacy deploys).
+      let endpoint = "/api/chat";
+      let res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: abortController.signal,
@@ -73,6 +73,20 @@ export default function ChatInterface() {
         }),
       });
 
+      if (res.status === 404) {
+        endpoint = "/_/backend/api/chat";
+        res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: abortController.signal,
+          body: JSON.stringify({
+            query: queryText,
+            session_id: convId,
+            history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          }),
+        });
+      }
+
       if (!res.ok) {
         const rawText = await res.text();
         console.error("DEBUG: Raw Backend Response:", rawText);
@@ -82,7 +96,12 @@ export default function ChatInterface() {
         } catch (e) {
           errorData = { error: rawText };
         }
-        throw new Error(errorData.error || errorData.detail || `Backend error: ${res.status}`);
+        const isHtml = rawText.trimStart().startsWith("<!");
+        throw new Error(
+          isHtml
+            ? "Chat API is unavailable. Redeploy the latest version and try again."
+            : errorData.error || errorData.detail || `Backend error: ${res.status}`
+        );
       }
       if (!res.body) throw new Error("No response body");
 

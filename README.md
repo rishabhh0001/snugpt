@@ -1,4 +1,4 @@
-# <img src="./frontend/public/avatar.png" width="48" align="center" /> SNUGPT
+# <img src="./public/avatar.svg" width="48" align="center" /> SNUGPT
 
 <p align="center">
   <img src="https://img.shields.io/badge/Architecture-RAG-indigo?style=for-the-badge&logo=ai" />
