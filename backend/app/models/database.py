@@ -7,42 +7,81 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Ensure the database URL has the correct driver for 'databases' library
-# Ensure the database URL has the correct driver for 'databases' library
-raw_db_url = settings.database_url
-if not raw_db_url:
-    # Safe fallback to prevent module-level crash
-    db_url = "postgresql+asyncpg://localhost/snugpt"
-else:
-    db_url = raw_db_url
-    # Handle both postgres:// and postgresql://
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
-    elif db_url.startswith("postgresql://"):
-        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-    
-    # Ensure +asyncpg is present for the async 'database' object
-    if "postgresql" in db_url and "+asyncpg" not in db_url:
-        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+Base = declarative_base()
+_database: Database | None = None
 
-database = Database(db_url)
 
-# Lazy initialization for engines and sessions
+def _async_database_url() -> str | None:
+    raw = settings.database_url
+    if not raw:
+        return None
+
+    url = raw.strip()
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql://") and "+asyncpg" not in url:
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    return url
+
+
+def _sync_database_url() -> str | None:
+    raw = settings.database_url
+    if not raw:
+        return None
+
+    url = raw.strip()
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    if "+asyncpg" in url:
+        url = url.replace("+asyncpg", "")
+    if url.startswith("postgresql://") and "+psycopg2" not in url:
+        url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    return url
+
+
+def get_database() -> Database:
+    if _database is None:
+        raise RuntimeError("Database is not configured or not connected")
+    return _database
+
+
+def is_database_connected() -> bool:
+    return _database is not None and _database.is_connected
+
+
+async def connect_database() -> None:
+    global _database
+    async_url = _async_database_url()
+    if not async_url:
+        logger.warning("DATABASE_URL is not set; waitlist and chat logs disabled.")
+        return
+
+    _database = Database(async_url)
+    await _database.connect()
+    init_db()
+    logger.info("Connected to Neon database.")
+
+
+async def disconnect_database() -> None:
+    global _database
+    if _database is not None and _database.is_connected:
+        await _database.disconnect()
+    _database = None
+
+
 _sync_engine = None
 _SessionLocal = None
+
 
 def get_sync_engine():
     global _sync_engine
     if _sync_engine is None:
-        db_url = settings.database_url
-        if not db_url or "postgresql" not in db_url:
-            # Fallback for initialization phase if URL is missing
+        sync_url = _sync_database_url()
+        if not sync_url:
             return None
-        if db_url.startswith("postgresql://"):
-            db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        sync_url = db_url.replace("+asyncpg", "").replace("postgresql://", "postgresql+psycopg2://", 1)
         _sync_engine = create_engine(sync_url, pool_pre_ping=True)
     return _sync_engine
+
 
 def get_session():
     global _SessionLocal
@@ -52,17 +91,16 @@ def get_session():
             _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     return _SessionLocal
 
-Base = declarative_base()
 
 def init_db():
     try:
         engine = get_sync_engine()
         if not engine:
-            logger.warning("No database engine available for init_db.")
+            logger.warning("DATABASE_URL not set; skipping table creation.")
             return
-        import app.models.chat_log
-        import app.models.waitlist
+        import app.models.chat_log  # noqa: F401
+        import app.models.waitlist  # noqa: F401
         Base.metadata.create_all(bind=engine)
-        logger.info("Database initialized successfully.")
+        logger.info("Database tables initialized.")
     except Exception as e:
-        logger.error(f"Database initialization failed: {e}")
+        logger.error("Database initialization failed: %s", e)

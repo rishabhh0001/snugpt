@@ -255,7 +255,7 @@ export default function Lander() {
         <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 py-4 rounded-2xl md:rounded-[2.5rem] border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl">
           <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
             <div className="relative w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-500">
-              <Image src="/avatar.png" alt="SNUGPT" width={44} height={44} className="object-cover" />
+              <Image src="/avatar.svg" alt="SNUGPT" width={44} height={44} className="object-cover" />
               <div className="absolute inset-0 bg-indigo-500/10 mix-blend-overlay" />
             </div>
             <div className="flex flex-col -space-y-1">
@@ -372,7 +372,7 @@ export default function Lander() {
                 </div>
                 <div className="flex gap-6 items-start flex-row-reverse">
                   <div className="relative shrink-0">
-                    <Image src="/avatar.png" alt="AI" width={48} height={48} className="rounded-2xl border border-indigo-500/50 shadow-[0_0_20px_rgba(79,70,229,0.3)]" />
+                    <Image src="/avatar.svg" alt="AI" width={48} height={48} className="rounded-2xl border border-indigo-500/50 shadow-[0_0_20px_rgba(79,70,229,0.3)]" />
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-4 border-[#111]" />
                   </div>
                   <div className="space-y-3 w-full flex flex-col items-end">
@@ -536,7 +536,7 @@ export default function Lander() {
           >
             <div className="absolute -inset-8 bg-indigo-600/30 blur-3xl rounded-full animate-pulse" />
             <div className="relative w-full h-full rounded-[2.5rem] bg-indigo-600 flex items-center justify-center border border-indigo-400 shadow-2xl overflow-hidden group">
-              <Image src="/avatar.png" alt="SNUGPT" width={128} height={128} className="transition-transform duration-700 group-hover:scale-110" />
+              <Image src="/avatar.svg" alt="SNUGPT" width={128} height={128} className="transition-transform duration-700 group-hover:scale-110" />
             </div>
           </motion.div>
 
@@ -569,7 +569,7 @@ export default function Lander() {
       <footer className="py-20 px-6 border-t border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3">
-            <Image src="/avatar.png" alt="SNUGPT" width={24} height={24} className="rounded-lg border border-white/10" />
+            <Image src="/avatar.svg" alt="SNUGPT" width={24} height={24} className="rounded-lg border border-white/10" />
             <span className="font-bold tracking-tight text-white/80">SNUGPT</span>
           </div>
 

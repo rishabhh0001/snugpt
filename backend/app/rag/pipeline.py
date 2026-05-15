@@ -168,17 +168,25 @@ async def generate_streaming_response(query: str, history: list = [], session_id
         if not got_content:
             yield f'data: {{"type": "chunk", "text": "I could not generate a response. Please try again."}}\n\n'
         elif full_response and len(full_response) > 30:
-            # Async learning: save Q&A pair to vectorstore
             import asyncio
             from app.models.chat_log import save_chat_log
-            
-            asyncio.create_task(
-                asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
-            )
-            # Secure Logging: save to structured DB
-            asyncio.create_task(
-                save_chat_log(query, full_response, session_id=session_id, context={"sources": sources_data}, user_ip=user_ip)
-            )
+
+            # Persist before stream ends (serverless may freeze after response)
+            try:
+                await save_chat_log(
+                    query,
+                    full_response,
+                    session_id=session_id,
+                    context={"sources": sources_data},
+                    user_ip=user_ip,
+                )
+            except Exception as log_err:
+                print(f"Chat log save failed: {log_err}")
+
+            try:
+                await asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
+            except Exception as learn_err:
+                print(f"Vectorstore learning failed: {learn_err}")
 
     except Exception as e:
         import traceback

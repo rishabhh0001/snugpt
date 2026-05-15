@@ -2,49 +2,57 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { query, messages } = await req.json();
-    
-    // Support both old {messages: [...]} format and new {query: "..."} format
+    const body = await req.json();
+    const { query, messages, history, session_id } = body;
+
     let finalQuery = query;
-    if (!finalQuery && messages && messages.length > 0) {
-      const latestMessage = messages[messages.length - 1];
-      if (latestMessage && latestMessage.role === 'user') {
-        finalQuery = latestMessage.content;
+    if (!finalQuery && messages?.length > 0) {
+      const latest = messages[messages.length - 1];
+      if (latest?.role === "user") {
+        finalQuery = latest.content;
       }
     }
 
     if (!finalQuery) {
-      return new Response("Invalid request", { status: 400 });
+      return new Response(JSON.stringify({ error: "Missing query" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000";
+    const backendUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000";
 
-    // Call FastAPI backend
     const response = await fetch(`${backendUrl}/api/chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query: finalQuery }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: finalQuery,
+        history: history ?? [],
+        session_id: session_id ?? null,
+      }),
     });
 
     if (!response.ok) {
-      throw new Error(`Backend responded with status: ${response.status}`);
+      const text = await response.text();
+      return new Response(text, {
+        status: response.status,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    // Pass the SSE stream directly back to the client
     return new Response(response.body, {
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        Connection: "keep-alive",
       },
     });
   } catch (error) {
     console.error("Error in chat route:", error);
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), { 
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 }

@@ -1,4 +1,4 @@
-# Production-Optimized Requirements for Vercel (Bundle Size < 500MB)
+# Production requirements for Vercel Python function
 fastapi
 langchain-core
 langchain-nvidia-ai-endpoints
@@ -13,4 +13,5 @@ requests
 sqlalchemy
 databases
 asyncpg
+psycopg2-binary
 langchain-text-splitters

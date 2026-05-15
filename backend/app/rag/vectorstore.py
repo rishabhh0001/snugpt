@@ -21,11 +21,8 @@ def get_vectorstore():
     else:
         # DEVELOPMENT / HTTP FALLBACK: Use HttpClient (requires a running Chroma server)
         # We avoid PersistentClient on Vercel to keep the bundle small
-        host = os.getenv("CHROMA_HOST", "localhost")
-        try:
-            port = int(os.getenv("CHROMA_PORT", "8000"))
-        except ValueError:
-            port = 8000
+        host = settings.chroma_host
+        port = settings.chroma_port
         logger.info(f"Connecting to Chroma server at {host}:{port}")
         client = chromadb.HttpClient(host=host, port=port)
     

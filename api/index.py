@@ -1,12 +1,12 @@
-# api/index.py
-import sys
+# Vercel Python entry — FastAPI ASGI app
 import os
+import sys
 
-# Add the root directory to sys.path so we can import from 'backend'
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+backend_dir = os.path.join(root, "backend")
 
-# Import the FastAPI app from backend/app/main.py
-from backend.app.main import app
+# main.py imports `app.*` modules; backend/ must be on sys.path
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
-# This is the entry point for Vercel
-# Vercel will automatically detect 'app' and serve it
+from app.main import app  # noqa: E402

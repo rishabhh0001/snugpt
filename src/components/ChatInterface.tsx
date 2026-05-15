@@ -236,7 +236,7 @@ export default function ChatInterface() {
           <div className="md:hidden flex items-center gap-2">
             <div className="w-6 h-6 rounded-full overflow-hidden border" style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/avatar.png" alt="SNUGPT" className="w-full h-full object-cover" />
+              <img src="/avatar.svg" alt="SNUGPT" className="w-full h-full object-cover" />
             </div>
             <span className="text-sm font-semibold text-white">SNUGPT</span>
           </div>
@@ -269,7 +269,7 @@ export default function ChatInterface() {
                     style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/avatar.png"
+                      src="/avatar.svg"
                       alt="SnuGPT logo"
                       className="w-full h-full object-cover"
                     />

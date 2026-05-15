@@ -37,7 +37,7 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
           style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/avatar.png"
+            src="/avatar.svg"
             alt="SNUGPT"
             width={28}
             height={28}

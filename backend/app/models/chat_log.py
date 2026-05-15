@@ -1,8 +1,14 @@
-from sqlalchemy import Column, String, Text, DateTime, JSON
-from sqlalchemy.sql import func
-from typing import Optional
+import logging
 import uuid
-from app.models.database import Base
+from typing import Optional
+
+from sqlalchemy import Column, DateTime, JSON, String, Text
+from sqlalchemy.sql import func
+
+from app.models.database import Base, get_database, is_database_connected
+
+logger = logging.getLogger(__name__)
+
 
 class ChatLog(Base):
     __tablename__ = "chat_logs"
@@ -11,30 +17,40 @@ class ChatLog(Base):
     session_id = Column(String(64), index=True)
     user_query = Column(Text, nullable=False)
     ai_response = Column(Text, nullable=False)
-    context = Column(JSON, nullable=True) 
-    user_ip = Column(String(45), nullable=True) 
+    context = Column(JSON, nullable=True)
+    user_ip = Column(String(45), nullable=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
-async def save_chat_log(query: str, response: str, session_id: Optional[str] = None, context: Optional[dict] = None, user_ip: Optional[str] = None):
-    """Saves a chat interaction to the secure database for future training."""
-    from app.models.database import database
-    
+
+async def save_chat_log(
+    query: str,
+    response: str,
+    session_id: Optional[str] = None,
+    context: Optional[dict] = None,
+    user_ip: Optional[str] = None,
+):
+    """Persist a chat turn to Neon for analytics and future training."""
+    if not is_database_connected():
+        logger.warning("Database not connected; skipping chat log save.")
+        return
+
+    db = get_database()
+
     query_insert = """
     INSERT INTO chat_logs (id, session_id, user_query, ai_response, context, user_ip, timestamp)
     VALUES (:id, :session_id, :user_query, :ai_response, :context, :user_ip, CURRENT_TIMESTAMP)
     """
-    
-    import json
+
     values = {
         "id": str(uuid.uuid4()),
-        "session_id": session_id or "ann",
+        "session_id": session_id or "anonymous",
         "user_query": query,
         "ai_response": response,
-        "context": json.dumps(context) if context else None,
-        "user_ip": user_ip
+        "context": context,
+        "user_ip": user_ip,
     }
-    
+
     try:
-        await database.execute(query=query_insert, values=values)
-    except Exception:
-        pass # Fail silently to not block user interaction
+        await db.execute(query=query_insert, values=values)
+    except Exception as e:
+        logger.error("Failed to save chat log: %s", e)

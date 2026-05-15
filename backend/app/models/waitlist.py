@@ -1,7 +1,13 @@
-from sqlalchemy import Column, String, DateTime
-from sqlalchemy.sql import func
+import logging
 import uuid
-from app.models.database import Base
+
+from sqlalchemy import Column, DateTime, String
+from sqlalchemy.sql import func
+
+from app.models.database import Base, get_database, is_database_connected
+
+logger = logging.getLogger(__name__)
+
 
 class WaitlistEntry(Base):
     __tablename__ = "waitlist"
@@ -11,19 +17,24 @@ class WaitlistEntry(Base):
     email = Column(String(255), nullable=False, unique=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
+
 async def add_to_waitlist(name: str, email: str):
-    """Saves a waitlist entry to the database."""
-    from app.models.database import database
-    
+    """Save a waitlist signup to Neon."""
+    if not is_database_connected():
+        raise RuntimeError("Database is not connected")
+
+    db = get_database()
+
     query_insert = """
     INSERT INTO waitlist (id, name, email, timestamp)
     VALUES (:id, :name, :email, CURRENT_TIMESTAMP)
     """
-    
+
     values = {
         "id": str(uuid.uuid4()),
-        "name": name,
-        "email": email
+        "name": name.strip(),
+        "email": email.strip().lower(),
     }
-    
-    await database.execute(query=query_insert, values=values)
+
+    await db.execute(query=query_insert, values=values)
+    logger.info("Waitlist signup saved for %s", values["email"])
