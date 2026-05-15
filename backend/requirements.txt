@@ -1,4 +1,5 @@
 # Minimal Runtime Requirements for Vercel
+pysqlite3-binary
 fastapi
 langchain-core
 langchain-community
