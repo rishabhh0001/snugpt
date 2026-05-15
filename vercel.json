@@ -11,8 +11,8 @@
             "destination": "/backend/app/main.py"
         },
         {
-            "source": "/(.*)",
-            "destination": "/frontend/$1"
+            "source": "/:path*",
+            "destination": "/frontend/:path*"
         }
     ]
 }
