@@ -1,5 +1,7 @@
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
@@ -12,6 +14,8 @@ venv.bak/
 out/
 build/
 node_modules/
+.turbo/
+.vercel/
 
 # Python
 __pycache__/
@@ -19,7 +23,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -36,12 +39,22 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+pip-log.txt
+pip-delete-this-directory.txt
 
-# ChromaDB & Vector Stores
+# ChromaDB & vector stores
 **/chroma_db/**
 backend/chroma_db/
+.chroma/
 
-# Knowledge Base & Raw Documents
+# Knowledge base & raw documents
 docs/
 backend/docs/
 **/knowledge_base/**
@@ -54,9 +67,26 @@ backend/docs/
 **/*.txt
 !requirements.txt
 !README.md
-!**/docs/*.md # Allow documentation markdown files if needed, but ignore raw data ones if they are in data folders
 
-# OS generated files
+# Logs & debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE & editors
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# OS
 .DS_Store
 .DS_Store?
 ._*
@@ -64,3 +94,15 @@ backend/docs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+Desktop.ini
+
+# Local databases & caches
+*.sqlite
+*.sqlite3
+*.db
+.cache/
+tmp/
+temp/
+
+# Accidental large / generated assets
+public/avatar.png
