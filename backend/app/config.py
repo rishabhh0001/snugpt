@@ -5,6 +5,7 @@ import os
 class Settings(BaseSettings):
     nvidia_api_key: str = ""
     chroma_persist_dir: str = "./chroma_db"
+    database_url: str = os.getenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/snugpt")
     
     class Config:
         env_file = "../.env"

@@ -8,6 +8,7 @@ class HistoryMessage(BaseModel):
 class ChatRequest(BaseModel):
     query: str
     history: Optional[List[HistoryMessage]] = []
+    session_id: Optional[str] = None
 
 class SourceDocument(BaseModel):
     content: str

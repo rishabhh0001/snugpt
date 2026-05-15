@@ -69,6 +69,7 @@ export default function ChatInterface() {
         signal: abortController.signal,
         body: JSON.stringify({
           query: queryText,
+          session_id: convId,
           history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
         }),
       });

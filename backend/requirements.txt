@@ -13,4 +13,7 @@ duckduckgo-search
 requests
 beautifulsoup4
 chardet
-
+sqlalchemy
+databases
+asyncpg
+psycopg2-binary

@@ -1,6 +1,7 @@
 import os
 import re
 import json
+from typing import Optional
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.tools import DuckDuckGoSearchRun
 from app.rag.prompts import qa_prompt
@@ -72,7 +73,7 @@ def save_qa_to_vectorstore(query: str, answer: str):
         print(f"[Learning] Failed to save Q&A: {e}")
 
 
-async def generate_streaming_response(query: str, history: list = []):
+async def generate_streaming_response(query: str, history: list = [], session_id: Optional[str] = None, user_ip: Optional[str] = None):
     # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
     blocked = check_safety(query)
     if blocked:
@@ -143,7 +144,7 @@ async def generate_streaming_response(query: str, history: list = []):
         full_response = ""
         async for chunk in llm.astream(messages):
             text = chunk.content
-            if text:
+            if text and isinstance(text, str):
                 got_content = True
                 full_response += text
                 yield f'data: {{"type": "chunk", "text": {json.dumps(text)}}}\n\n'
@@ -153,8 +154,14 @@ async def generate_streaming_response(query: str, history: list = []):
         elif full_response and len(full_response) > 30:
             # Async learning: save Q&A pair to vectorstore
             import asyncio
+            from app.models.chat_log import save_chat_log
+            
             asyncio.create_task(
                 asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
+            )
+            # Secure Logging: save to structured DB
+            asyncio.create_task(
+                save_chat_log(query, full_response, session_id=session_id, context={"sources": sources_data}, user_ip=user_ip)
             )
 
     except Exception as e:
