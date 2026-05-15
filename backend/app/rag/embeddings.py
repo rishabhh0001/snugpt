@@ -1,13 +1,9 @@
-# pyrefly: ignore [missing-import]
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
-import os
-
-# Initialize NVIDIA embeddings (singleton)
-# We use the NV-Embed-QA model which is optimized for RAG
-embeddings = NVIDIAEmbeddings(
-    model="nvidia/nv-embedqa-e5-v5", 
-    api_key=os.getenv("NVIDIA_API_KEY")
-)
+from app.config import settings
 
 def get_embeddings():
-    return embeddings
+    # We use the NV-Embed-QA model which is optimized for RAG
+    return NVIDIAEmbeddings(
+        model="nvidia/nv-embedqa-e5-v5", 
+        nvidia_api_key=settings.nvidia_api_key
+    )
