@@ -9,7 +9,7 @@ sys.path.append(str(backend_dir))
 from app.rag.vectorstore import add_documents
 from langchain_core.documents import Document
 
-def upload_text(text: str, source: str = "manual_entry"):
+def upload_text(text: str, source: str = "supervised data"):
     """Uploads raw text to ChromaDB."""
     if not text.strip():
         print("Error: Empty text provided.")
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload text or file content to ChromaDB.")
     parser.add_argument("content", nargs="?", help="The text content to upload")
     parser.add_argument("--file", help="Path to a file to upload")
-    parser.add_argument("--source", default="manual_entry", help="Source metadata for the document")
+    parser.add_argument("--source", default="supervised data", help="Source metadata for the document")
     
     args = parser.parse_args()
     
