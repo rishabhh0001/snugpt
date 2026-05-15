@@ -12,8 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from langchain_community.document_loaders import (
     DirectoryLoader,
     TextLoader,
-    PyPDFLoader,
-    UnstructuredMarkdownLoader
+    PyPDFLoader
 )
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.rag.vectorstore import get_vectorstore
@@ -30,12 +29,12 @@ def index_documents(docs_dir: str):
         return
 
     # 1. Define Loaders for different file types
-    # Text files
+    # Text and Markdown files
     text_loader_kwargs={'autodetect_encoding': True}
     loaders = {
         ".txt": DirectoryLoader(docs_dir, glob="**/*.txt", loader_cls=TextLoader, loader_kwargs=text_loader_kwargs),
         ".pdf": DirectoryLoader(docs_dir, glob="**/*.pdf", loader_cls=PyPDFLoader),
-        ".md": DirectoryLoader(docs_dir, glob="**/*.md", loader_cls=UnstructuredMarkdownLoader),
+        ".md": DirectoryLoader(docs_dir, glob="**/*.md", loader_cls=TextLoader, loader_kwargs=text_loader_kwargs),
     }
 
     documents = []

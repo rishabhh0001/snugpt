@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { MessageProps } from "./MessageBubble";
 
 export interface Conversation {
@@ -27,6 +27,8 @@ export function useConversations() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Load from localStorage on mount
   useEffect(() => {
     try {
@@ -36,7 +38,6 @@ export function useConversations() {
         setConversations(parsed);
         if (parsed.length > 0) setActiveId(parsed[0].id);
       } else {
-        // First visit — create a blank conversation
         const blank = newConversation();
         setConversations([blank]);
         setActiveId(blank.id);
@@ -47,7 +48,9 @@ export function useConversations() {
       setConversations([blank]);
       setActiveId(blank.id);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
   }, []);
 
   function newConversation(): Conversation {
@@ -79,9 +82,8 @@ export function useConversations() {
           : c
       );
       
-      // Debounce the localStorage save to prevent lag during fast token streaming
-      if ((window as any)._saveTimeout) clearTimeout((window as any)._saveTimeout);
-      (window as any)._saveTimeout = setTimeout(() => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(() => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next.slice(0, MAX_CONVERSATIONS)));
       }, 500);
       
@@ -93,16 +95,17 @@ export function useConversations() {
     setConversations((prev) => {
       const next = prev.filter((c) => c.id !== id);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      
+      setActiveId((currentActive) => {
+        if (currentActive === id) {
+          return next[0]?.id ?? null;
+        }
+        return currentActive;
+      });
+      
       return next;
     });
-    setActiveId((prev) => {
-      if (prev === id) {
-        const remaining = conversations.filter((c) => c.id !== id);
-        return remaining[0]?.id ?? null;
-      }
-      return prev;
-    });
-  }, [conversations]);
+  }, []);
 
   const activeConversation = conversations.find((c) => c.id === activeId) ?? null;
 

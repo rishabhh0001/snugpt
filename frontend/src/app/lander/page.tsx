@@ -103,7 +103,13 @@ const WaitlistModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
     e.preventDefault();
     setStatus('loading');
     try {
-      const endpoint = window.location.hostname === 'localhost' ? '/api/waitlist' : '/_/backend/api/waitlist';
+      const isProd = process.env.NODE_ENV === 'production';
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+      
+      // On Vercel (prod), we prefer relative paths to avoid CORS issues.
+      // On local (dev), we use NEXT_PUBLIC_BACKEND_URL or fallback to relative.
+      const endpoint = isProd ? '/_/backend/api/waitlist' : (backendUrl ? `${backendUrl}/api/waitlist` : '/api/waitlist');
+
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
