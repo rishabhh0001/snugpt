@@ -1,23 +1,24 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
 import os
+from dotenv import load_dotenv
+
+# Load .env if it exists (local dev), otherwise rely on system env vars (Vercel)
+load_dotenv()
 
 class Settings(BaseSettings):
     nvidia_api_key: str = ""
     chroma_persist_dir: str = "./chroma_db"
-    database_url: str = os.getenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/snugpt")
+    database_url: str = "postgresql+asyncpg://user:pass@localhost/snugpt"
     
+    # Chroma Cloud settings
+    use_chroma_cloud: bool = False
+    chroma_api_key: Optional[str] = None
+    chroma_tenant: str = "default"
+    chroma_database: str = "default"
+
     class Config:
-        env_file = "../.env"
+        env_file = ".env"
         extra = "ignore"
-        # We will attempt to read from root directory first in case we run it from there.
-        # But wait, pydantic uses relative to cwd. Let's make it robust:
-        # Actually it's easier to just rely on os.environ being loaded beforehand.
         
 settings = Settings()
-
-# Try loading .env from parent directory if API key isn't set yet
-if not settings.nvidia_api_key:
-    from dotenv import load_dotenv
-    load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
-    settings = Settings()
