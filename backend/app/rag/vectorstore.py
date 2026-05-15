@@ -1,5 +1,5 @@
 import os
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 import chromadb
 from app.rag.embeddings import get_embeddings
 from app.config import settings
