@@ -72,19 +72,19 @@ const BentoCard = ({ children, className = "", title, description, icon: Icon, d
       whileHover={{ y: -5, transition: { duration: 0.3 } }}
       viewport={{ once: true, margin: "-100px" }}
       variants={fadeInUp}
-      className={`relative group rounded-[2rem] md:rounded-[3rem] border border-white/5 bg-white/[0.01] p-8 md:p-14 overflow-hidden transition-all duration-500 hover:border-indigo-500/30 hover:bg-white/[0.03] ${className}`}
+      className={`relative group rounded-[2rem] md:rounded-[3rem] border border-white/5 bg-white/[0.01] p-8 md:p-12 overflow-hidden transition-all duration-500 hover:border-indigo-500/30 hover:bg-white/[0.02] ${className}`}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
       <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full group-hover:bg-indigo-500/10 transition-colors duration-700" />
 
       <div className="relative z-10 h-full flex flex-col">
         {Icon && (
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-            <Icon className="w-7 h-7 text-indigo-400" />
+          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+            <Icon className="w-6 h-6 text-indigo-400" />
           </div>
         )}
         <h3 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">{title}</h3>
-        <p className="text-white/40 text-lg leading-relaxed mb-10 max-w-md">{description}</p>
+        <p className="font-inter text-white/40 text-base md:text-lg leading-relaxed mb-10 max-w-md font-medium tracking-tight">{description}</p>
         <div className="mt-auto">
           {children}
         </div>
@@ -240,7 +240,7 @@ export default function Lander() {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#ededed] font-sans overflow-x-hidden selection:bg-indigo-500/30 tracking-tight">
+    <div className="min-h-screen bg-[#050505] text-[#ededed] font-jakarta overflow-x-hidden selection:bg-indigo-500/30 tracking-tight">
       <MouseFollowGlow />
       <GridBackground />
       <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
@@ -283,45 +283,49 @@ export default function Lander() {
           initial="hidden" animate="visible" variants={staggerContainer}
           className="relative max-w-5xl"
         >
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-black text-indigo-300 mb-10 md:mb-14 shadow-2xl backdrop-blur-xl">
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-            <span className="uppercase tracking-[0.3em]">System Version 1.0.4 Online</span>
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-indigo-500/5 border border-indigo-500/20 text-[10px] font-black text-indigo-400 mb-10 md:mb-14 shadow-[0_0_30px_rgba(79,70,229,0.1)] backdrop-blur-xl">
+            <div className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </div>
+            <span className="uppercase tracking-[0.4em]">Neural Core V1.0.4 Online</span>
           </motion.div>
 
-          <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl lg:text-[9rem] font-black tracking-tighter mb-8 md:mb-10 leading-[0.9] md:leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 pb-4 md:pb-6">
+          <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-8 md:mb-10 leading-[0.9] md:leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 pb-4 md:pb-6">
             The Student<br />Brain Engine.
           </motion.h1>
 
-          <motion.p variants={fadeInUp} className="text-lg md:text-xl lg:text-2xl text-white/25 mb-12 md:mb-16 max-w-3xl mx-auto leading-relaxed font-semibold tracking-normal px-4">
+          <motion.p variants={fadeInUp} className="text-lg md:text-xl text-white/40 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed font-medium tracking-tight px-4">
             Your personal SNU intelligence layer. Instantly retrieve policies, course data, and university knowledge with neural precision.
           </motion.p>
 
-          <motion.div variants={fadeInUp} className="flex flex-col items-center gap-8 md:gap-12">
+          <motion.div variants={fadeInUp} className="flex flex-col items-center gap-8 md:gap-12 w-full max-w-3xl mx-auto">
+            {/* Mock Search Bar Centerpiece */}
+            <div className="w-full relative group/hero-search cursor-pointer">
+              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-blue-500/20 to-indigo-500/20 rounded-3xl blur-xl opacity-0 group-hover/hero-search:opacity-100 transition-opacity duration-700" />
+              <div className="relative w-full px-8 py-6 rounded-3xl bg-white/[0.02] border border-white/10 backdrop-blur-2xl flex items-center gap-6 shadow-2xl transition-all duration-500 group-hover/hero-search:border-indigo-500/30">
+                <Search className="w-6 h-6 text-indigo-400" />
+                <div className="flex flex-col items-start overflow-hidden">
+                  <span className="text-sm font-bold text-white/60 tracking-tight">Ask Intelligence...</span>
+                  <span className="text-xs text-white/20 font-medium truncate w-full">"How do I apply for a partial tuition waiver?"</span>
+                </div>
+                <div className="ml-auto flex items-center gap-3">
+                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black tracking-widest text-white/30 uppercase">
+                    <Command className="w-3.5 h-3.5" /> K
+                  </div>
+                  <div onClick={() => setIsWaitlistOpen(true)} className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={() => setIsWaitlistOpen(true)}
-              className="relative group p-[2px] rounded-[2rem] transition-all duration-700 hover:scale-105 active:scale-95 shadow-[0_0_60px_rgba(79,70,229,0.3)] w-full sm:w-auto"
+              className="px-10 md:px-14 py-5 md:py-6 rounded-full bg-white text-black font-black text-sm md:text-base tracking-[0.2em] uppercase hover:scale-105 active:scale-95 transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)]"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 rounded-[2rem] blur-md group-hover:blur-xl opacity-80 transition-all duration-700 animate-gradient-x" />
-              <div className="relative px-10 md:px-16 py-5 md:py-6 rounded-[2rem] bg-[#050505] text-white font-black text-lg md:text-xl flex items-center justify-center gap-4 overflow-hidden">
-                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                INITIATE INTERFACE
-                <ChevronRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform duration-500" />
-              </div>
+              Access Engine
             </button>
-
-            <motion.div variants={fadeInUp} className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-sm">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="w-6 h-6 rounded-full border border-[#050505] bg-indigo-500/20 flex items-center justify-center text-[8px] font-bold text-indigo-300">
-                      SNU
-                    </div>
-                  ))}
-                </div>
-                <div className="h-3 w-px bg-white/10 mx-1" />
-                <span className="text-[10px] font-medium text-white/40 tracking-wide uppercase">Trusted by 500+ Students</span>
-              </div>
-            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -397,62 +401,93 @@ export default function Lander() {
         <div className="text-center mb-20 md:mb-32">
           <motion.h2
             initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-            className="text-3xl md:text-6xl font-bold tracking-tight mb-6"
+            className="text-3xl md:text-5xl font-bold tracking-tight mb-6"
           >
             Any Queries?<br /><span className="text-white/40">One Single Answer.</span>
           </motion.h2>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-white/30 text-base md:text-xl font-medium max-w-2xl mx-auto px-4">
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-white/30 text-base md:text-lg font-medium max-w-xl mx-auto px-4">
             Ask anything, get accurate answers from course materials and handbooks in seconds.
           </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-12 flex items-center justify-center gap-3 py-2 px-5 rounded-full bg-white/[0.03] border border-white/10 w-fit mx-auto backdrop-blur-md"
-          >
-            <div className="w-2 h-2 rounded-full bg-[#F2A900] shadow-[0_0_10px_#F2A900]" />
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em]">Verified Intelligence Layer</span>
-          </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+          {/* Semantic Search - Large Card */}
           <BentoCard
             className="md:col-span-8"
-            title="University Intelligence"
-            description="Our RAG pipeline indexes every SNU policy, handbook, and course outline to provide neural-grade accuracy."
-            icon={Cpu}
+            title="Semantic Search"
+            description="Stop digging through folders. Just type in plain English and find exactly what you need instantly."
+            icon={Search}
           >
-            <div className="pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-3 gap-8">
-              {[
-                { label: 'Sources', val: '2.4k+' },
-                { label: 'Latency', val: '< 1.2s' },
-                { label: 'Accuracy', val: '99.8%' }
-              ].map((stat) => (
-                <div key={stat.label} className="group/stat">
-                  <div className="text-3xl font-black text-white mb-1 group-hover/stat:text-indigo-400 transition-colors">{stat.val}</div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/20 font-bold">{stat.label}</div>
+            <div className="mt-8 relative group/search">
+              <div className="absolute inset-0 bg-indigo-500/10 blur-xl opacity-0 group-hover/search:opacity-100 transition-opacity duration-500" />
+              <div className="relative w-full px-6 py-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-4 text-white/20">
+                <Search className="w-5 h-5" />
+                <span className="text-sm font-medium">"Where can I find the AI course syllabus?"</span>
+                <div className="ml-auto flex items-center gap-1.5">
+                  <div className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-bold">⌘</div>
+                  <div className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-bold">K</div>
                 </div>
-              ))}
+              </div>
             </div>
           </BentoCard>
 
+          {/* Instant Answers - Small Card */}
           <BentoCard
             className="md:col-span-4"
-            title="Enterprise Privacy"
-            description="Your queries are encrypted and processed locally. We never store personal identifiers."
+            title="Instant Answers"
+            description="Powered by Llama 3.3 for blazingly fast, accurate responses."
+            icon={Zap}
+          >
+            <div className="mt-8 space-y-4">
+              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: "0%" }}
+                  whileInView={{ width: "65%" }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  className="h-full bg-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.5)]"
+                />
+              </div>
+              <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-white/20">
+                <span>Processing Neural Path</span>
+                <span className="text-indigo-400">65%</span>
+              </div>
+            </div>
+          </BentoCard>
+
+          {/* Data Privacy - Small Card */}
+          <BentoCard
+            className="md:col-span-4"
+            title="Data Privacy"
+            description="Your university credentials and data are encrypted and handled with bank-grade security."
             icon={Shield}
           >
-            <div className="relative h-32 flex items-center justify-center overflow-hidden rounded-2xl bg-white/[0.02] border border-white/5">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.1)_0%,transparent_70%)]" />
+            <div className="mt-8 relative h-24 flex items-center justify-center overflow-hidden rounded-2xl bg-white/[0.02] border border-white/5">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.05)_0%,transparent_70%)]" />
               <motion.div
                 animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.3, 0.6, 0.3]
+                  scale: [1, 1.2, 1],
+                  opacity: [0.2, 0.4, 0.2]
                 }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute w-24 h-24 border border-indigo-500/20 rounded-full"
+                className="absolute w-20 h-20 border border-indigo-500/20 rounded-full"
               />
-              <Lock className="w-10 h-10 text-indigo-400/40 relative z-10" />
+              <Lock className="w-8 h-8 text-indigo-400/40 relative z-10" />
+            </div>
+          </BentoCard>
+
+          {/* Connected Context - Large Card */}
+          <BentoCard
+            className="md:col-span-8"
+            title="Connected Context"
+            description="SNUGPT indexes ERP, snu.edu, and Handbooks to build a total knowledge map."
+            icon={Layers}
+          >
+            <div className="mt-8 grid grid-cols-5 gap-3">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="aspect-square rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center group/icon hover:border-indigo-500/30 transition-colors">
+                  <div className="w-2 h-2 rounded-full bg-white/5 group-hover/icon:bg-indigo-500/40 transition-colors" />
+                </div>
+              ))}
             </div>
           </BentoCard>
         </div>
@@ -529,9 +564,11 @@ export default function Lander() {
             viewport={{ once: true }}
             className="w-32 h-32 mb-16 relative"
           >
-            <div className="absolute -inset-8 bg-indigo-600/30 blur-3xl rounded-full animate-pulse" />
-            <div className="relative w-full h-full rounded-[2.5rem] bg-indigo-600 flex items-center justify-center border border-indigo-400 shadow-2xl overflow-hidden group">
+            <div className="absolute -inset-12 bg-indigo-600/20 blur-3xl rounded-full animate-pulse" />
+            <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-[2.5rem] opacity-20 blur-xl animate-gradient-x" />
+            <div className="relative w-full h-full rounded-[2.5rem] bg-[#0A0A0A] flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden group">
               <Image src="/avatar.svg" alt="SNUGPT" width={128} height={128} className="transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-indigo-500/10 mix-blend-overlay" />
             </div>
           </motion.div>
 
@@ -539,7 +576,7 @@ export default function Lander() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-5xl md:text-[5rem] font-bold tracking-tight mb-12 leading-none"
+            className="text-5xl md:text-[5.5rem] font-black tracking-tighter mb-12 leading-none"
           >
             Start resolving queries<br /><span className="text-indigo-400">today.</span>
           </motion.h2>
@@ -551,10 +588,10 @@ export default function Lander() {
           >
             <button
               onClick={() => setIsWaitlistOpen(true)}
-              className="px-12 py-6 rounded-2xl bg-white text-black font-bold text-xl hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 shadow-[0_0_50px_rgba(255,255,255,0.2)] inline-flex items-center gap-3 group"
+              className="px-12 py-6 rounded-[2rem] bg-white text-black font-black text-lg md:text-xl hover:bg-indigo-50 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(255,255,255,0.2)] inline-flex items-center gap-4 group"
             >
-              JOIN THE WAITLIST
-              <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+              INITIALIZE INTERFACE
+              <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-500" />
             </button>
           </motion.div>
         </div>
