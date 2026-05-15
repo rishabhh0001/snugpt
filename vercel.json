@@ -17,7 +17,7 @@
   "rewrites": [
     {
       "source": "/_/backend/:path*",
-      "destination": "/api/py/:path*"
+      "destination": "/api/py/index.py"
     }
   ]
 }

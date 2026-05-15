@@ -16,7 +16,7 @@ export function getPythonApiUrl(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
 
   if (process.env.VERCEL_URL && !process.env.NEXT_PUBLIC_BACKEND_URL) {
-    return `${base}/api/py${normalized}`;
+    return `${base}/_/backend${normalized}`;
   }
 
   return `${base}${normalized}`;

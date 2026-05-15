@@ -23,8 +23,11 @@ class StripBackendPrefixMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         path = request.scope.get("path", "")
-        if path.startswith(BACKEND_PREFIX):
-            request.scope["path"] = path[len(BACKEND_PREFIX) :] or "/"
+        # Strip prefixes added by Vercel rewrites or deployment structure
+        for prefix in [BACKEND_PREFIX, "/api/py/index.py", "/api/py"]:
+            if path.startswith(prefix):
+                request.scope["path"] = path[len(prefix) :] or "/"
+                break
         return await call_next(request)
 
 

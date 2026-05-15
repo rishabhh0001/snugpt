@@ -17,15 +17,29 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    // Only proxy to local FastAPI during local development
-    if (process.env.NODE_ENV !== "development") {
-      return [];
-    }
     const backend = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000";
     return [
       {
-        source: "/api/:path*",
-        destination: `${backend}/api/:path*`,
+        source: "/api/chat",
+        destination: process.env.NODE_ENV === "development" 
+          ? `${backend}/api/chat`
+          : "/_/backend/api/chat",
+      },
+      {
+        source: "/api/waitlist",
+        destination: process.env.NODE_ENV === "development"
+          ? `${backend}/api/waitlist`
+          : "/_/backend/api/waitlist",
+      },
+      {
+        source: "/api/health",
+        destination: process.env.NODE_ENV === "development"
+          ? `${backend}/api/health`
+          : "/_/backend/api/health",
+      },
+      {
+        source: "/_/backend/:path*",
+        destination: "/api/py/index.py",
       },
     ];
   },
