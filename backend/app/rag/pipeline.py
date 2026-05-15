@@ -49,7 +49,7 @@ COMPILED_JAILBREAK = [re.compile(p, re.IGNORECASE) for p in JAILBREAK_PATTERNS]
 COMPILED_TOXIC    = [re.compile(p, re.IGNORECASE) for p in TOXIC_PATTERNS]
 
 
-def check_safety(query: str) -> str | None:
+def check_safety(query: str) -> Optional[str]:
     """Returns a refusal message if the query is unsafe, else None."""
     for pattern in COMPILED_JAILBREAK:
         if pattern.search(query):
@@ -177,8 +177,10 @@ async def generate_streaming_response(query: str, history: list = [], session_id
             )
 
     except Exception as e:
-        print(f"Pipeline error: {e}")
-        error_msg = f"An error occurred: {str(e)[:200]}"
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Pipeline error: {error_details}")
+        error_msg = f"Neural Engine Error: {str(e)[:100]}"
         yield f'data: {{"type": "chunk", "text": {json.dumps(error_msg)}}}\n\n'
 
     finally:

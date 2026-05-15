@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse, StreamingResponse
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 from app.models.schemas import ChatRequest, ChatResponse, WaitlistRequest
 from app.models.waitlist import add_to_waitlist
 from app.rag.pipeline import generate_streaming_response
@@ -47,7 +47,6 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal server error", "error": str(exc)},
     )
 
-from fastapi.responses import JSONResponse
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest, fastapi_request: Request):

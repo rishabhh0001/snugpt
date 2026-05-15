@@ -12,5 +12,7 @@ python-multipart
 duckduckgo-search
 requests
 sqlalchemy
+databases
 asyncpg
 psycopg2-binary
+langchain-text-splitters

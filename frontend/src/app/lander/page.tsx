@@ -6,17 +6,23 @@ import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, Chevro
 import Link from 'next/link';
 import Image from 'next/image';
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const } }
+const fadeInUp: any = {
+  hidden: { opacity: 0, y: 30, filter: 'blur(8px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+  }
 };
 
-const staggerContainer = {
+const staggerContainer: any = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.12
+      staggerChildren: 0.15,
+      delayChildren: 0.1
     }
   }
 };
@@ -63,21 +69,22 @@ const BentoCard = ({ children, className = "", title, description, icon: Icon, d
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
+      whileHover={{ y: -5, transition: { duration: 0.3 } }}
+      viewport={{ once: true, margin: "-100px" }}
       variants={fadeInUp}
-      transition={{ delay }}
-      className={`relative group rounded-3xl border border-white/10 bg-white/[0.02] p-8 overflow-hidden hover:border-indigo-500/30 transition-all duration-500 hover:shadow-[0_0_30px_rgba(79,70,229,0.1)] ${className}`}
+      className={`relative group rounded-[2rem] md:rounded-[3rem] border border-white/5 bg-white/[0.01] p-8 md:p-14 overflow-hidden transition-all duration-500 hover:border-indigo-500/30 hover:bg-white/[0.03] ${className}`}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full group-hover:bg-indigo-500/10 transition-colors duration-700" />
 
       <div className="relative z-10 h-full flex flex-col">
         {Icon && (
-          <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 mb-6 group-hover:scale-110 transition-transform duration-500 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20">
-            <Icon className="w-6 h-6 text-white/80 group-hover:text-indigo-400 transition-colors" />
+          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+            <Icon className="w-7 h-7 text-indigo-400" />
           </div>
         )}
-        <h3 className="text-2xl font-semibold mb-3 text-white/90 group-hover:text-white transition-colors">{title}</h3>
-        <p className="text-white/40 leading-relaxed mb-6 group-hover:text-white/60 transition-colors">{description}</p>
+        <h3 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">{title}</h3>
+        <p className="text-white/40 text-lg leading-relaxed mb-10 max-w-md">{description}</p>
         <div className="mt-auto">
           {children}
         </div>
@@ -192,13 +199,13 @@ const WaitlistModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
                   </div>
 
                   {status === 'error' && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-400 text-[10px] md:text-xs font-medium bg-red-400/10 border border-red-400/20 p-3 md:p-4 rounded-xl"
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-red-400 text-[10px] md:text-xs font-medium bg-red-400/5 border border-red-400/10 p-3 rounded-xl"
                     >
                       {errorMessage}
-                    </motion.p>
+                    </motion.div>
                   )}
 
                   <button
@@ -397,64 +404,56 @@ export default function Lander() {
             Ask anything, get accurate answers from course materials and handbooks in seconds.
           </motion.p>
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mt-12 flex items-center justify-center gap-4 py-3 px-6 rounded-2xl bg-[#003B71]/10 border border-[#003B71]/20 w-fit mx-auto backdrop-blur-md shadow-[0_0_20px_rgba(0,59,113,0.1)]"
+            className="mt-12 flex items-center justify-center gap-3 py-2 px-5 rounded-full bg-white/[0.03] border border-white/10 w-fit mx-auto backdrop-blur-md"
           >
-            <Shield className="w-5 h-5 text-[#F2A900]" />
-            <span className="text-xs font-bold text-white/50 uppercase tracking-[0.2em]">Verified SNU Intelligence Layer</span>
+            <div className="w-2 h-2 rounded-full bg-[#F2A900] shadow-[0_0_10px_#F2A900]" />
+            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em]">Verified Intelligence Layer</span>
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Main Intelligence Card */}
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-            className="md:col-span-8 group relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 md:p-12"
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <BentoCard
+            className="md:col-span-8"
+            title="University Intelligence"
+            description="Our RAG pipeline indexes every SNU policy, handbook, and course outline to provide neural-grade accuracy."
+            icon={Cpu}
           >
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-                  <Cpu className="w-6 h-6 text-indigo-400" />
+            <div className="pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-3 gap-8">
+              {[
+                { label: 'Sources', val: '2.4k+' },
+                { label: 'Latency', val: '< 1.2s' },
+                { label: 'Accuracy', val: '99.8%' }
+              ].map((stat) => (
+                <div key={stat.label} className="group/stat">
+                  <div className="text-3xl font-black text-white mb-1 group-hover/stat:text-indigo-400 transition-colors">{stat.val}</div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/20 font-bold">{stat.label}</div>
                 </div>
-                <h3 className="text-2xl font-bold">University Intelligence</h3>
-              </div>
-              <p className="text-white/30 text-lg max-w-md mb-12">
-                Our RAG pipeline indexes every SNU policy, handbook, and course outline to provide neural-grade accuracy.
-              </p>
-              <div className="mt-auto pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                {[
-                  { label: 'Sources', val: '2.4k+' },
-                  { label: 'Latency', val: '< 1.2s' },
-                  { label: 'Accuracy', val: '99.8%' }
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <div className="text-2xl font-black text-white mb-1">{stat.val}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-white/20 font-bold">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
-          </motion.div>
+          </BentoCard>
 
-          {/* Privacy Card */}
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-            className="md:col-span-4 group relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-gradient-to-br from-indigo-500/10 to-transparent p-8 md:p-12 flex flex-col"
+          <BentoCard
+            className="md:col-span-4"
+            title="Enterprise Privacy"
+            description="Your queries are encrypted and processed locally. We never store personal identifiers."
+            icon={Shield}
           >
-            <div className="mb-8">
-              <Shield className="w-10 h-10 text-indigo-400 mb-6" />
-              <h3 className="text-2xl font-bold mb-4">Enterprise Privacy</h3>
-              <p className="text-white/30 text-sm leading-relaxed">
-                Your queries are encrypted and processed locally. We never store personal identifiers.
-              </p>
+            <div className="relative h-32 flex items-center justify-center overflow-hidden rounded-2xl bg-white/[0.02] border border-white/5">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.1)_0%,transparent_70%)]" />
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.3, 0.6, 0.3]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute w-24 h-24 border border-indigo-500/20 rounded-full"
+              />
+              <Lock className="w-10 h-10 text-indigo-400/40 relative z-10" />
             </div>
-            <div className="mt-auto relative">
-              <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full" />
-              <Image src="/privacy.png" alt="Privacy" width={200} height={200} className="relative mx-auto" />
-            </div>
-          </motion.div>
+          </BentoCard>
         </div>
       </section>
 

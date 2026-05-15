@@ -1,4 +1,10 @@
 {
+    "functions": {
+        "backend/app/main.py": {
+            "maxDuration": 60,
+            "memory": 1024
+        }
+    },
     "experimentalServices": {
         "frontend": {
             "entrypoint": "frontend",
