@@ -1,8 +1,10 @@
 {
-    "functions": {
-        "backend/app/main.py": {
-            "maxDuration": 60,
-            "memory": 1024
+    "experimentalServices": {
+        "backend": {
+            "root": "backend/app",
+            "entrypoint": "main.py",
+            "memory": 1024,
+            "maxDuration": 60
         }
     },
     "rewrites": [
