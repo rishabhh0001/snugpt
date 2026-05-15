@@ -1,4 +1,7 @@
 import { NextRequest } from "next/server";
+import { getPythonApiUrl } from "@/lib/backend";
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,10 +23,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000";
-
-    const response = await fetch(`${backendUrl}/api/chat`, {
+    const response = await fetch(getPythonApiUrl("/api/chat"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

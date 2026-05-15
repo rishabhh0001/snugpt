@@ -1,15 +1,24 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "build": {
+    "env": {
+      "UV_LINK_MODE": "copy"
+    }
+  },
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
       "memory": 1024,
-      "excludeFiles": "{backend/scripts/**,backend/ingestion/**,backend/chroma_db/**,backend/requirements-dev.txt,backend/reset_chroma_cloud.py,push_to_cloud.py,node_modules/**,.next/**,docs/**,**/*.pdf,**/*.docx,**/__pycache__/**,**/.pytest_cache/**,public/**}"
+      "excludeFiles": "{backend/scripts/**,backend/ingestion/**,backend/chroma_db/**,backend/requirements-dev.txt,backend/reset_chroma_cloud.py,push_to_cloud.py,node_modules/**,.next/**,docs/**,**/*.pdf,**/*.docx,**/__pycache__/**,**/.pytest_cache/**}"
     }
   },
   "rewrites": [
     {
       "source": "/_/backend/:path*",
-      "destination": "/api/index.py"
+      "destination": "/api/index/:path*"
     }
   ]
 }

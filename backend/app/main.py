@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.models.database import connect_database, disconnect_database, is_database_connected
@@ -13,6 +14,18 @@ from app.models.waitlist import add_to_waitlist
 from app.rag.pipeline import generate_streaming_response
 
 logger = logging.getLogger(__name__)
+
+BACKEND_PREFIX = "/_/backend"
+
+
+class StripBackendPrefixMiddleware(BaseHTTPMiddleware):
+    """Map /_/backend/api/* rewrites to FastAPI /api/* routes."""
+
+    async def dispatch(self, request: Request, call_next):
+        path = request.scope.get("path", "")
+        if path.startswith(BACKEND_PREFIX):
+            request.scope["path"] = path[len(BACKEND_PREFIX) :] or "/"
+        return await call_next(request)
 
 
 @asynccontextmanager
@@ -37,6 +50,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(StripBackendPrefixMiddleware)
+
+
+@app.get("/")
+@app.get("/api")
+async def root():
+    return {"service": "snugpt-api", "status": "ok"}
 
 
 @app.get("/api/health")

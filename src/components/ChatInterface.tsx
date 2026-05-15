@@ -60,9 +60,7 @@ export default function ChatInterface() {
     abortControllerRef.current = abortController;
 
     try {
-      const isProd = process.env.NODE_ENV === "production";
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
-      const endpoint = isProd ? "/_/backend/api/chat" : (backendUrl ? `${backendUrl}/api/chat` : "/api/chat");
+      const endpoint = "/api/chat";
 
       const res = await fetch(endpoint, {
         method: "POST",
