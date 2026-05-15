@@ -13,3 +13,4 @@ duckduckgo-search
 requests
 sqlalchemy
 asyncpg
+psycopg2-binary
