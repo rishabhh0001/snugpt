@@ -3,7 +3,6 @@ import re
 import json
 from typing import Optional
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
-from langchain_community.tools import DuckDuckGoSearchRun
 from app.rag.prompts import qa_prompt
 from app.rag.vectorstore import get_retriever, get_vectorstore
 from app.config import settings
@@ -104,10 +103,15 @@ async def generate_streaming_response(query: str, history: list = [], session_id
         # Run web search as fallback/supplement
         web_results = ""
         try:
-            search_tool = DuckDuckGoSearchRun()
-            web_results = search_tool.invoke(query)
-            context_str += "\n\n--- WEB SEARCH RESULTS ---\n"
-            context_str += web_results
+            from duckduckgo_search import DDGS
+            with DDGS() as ddgs:
+                results = list(ddgs.text(query, max_results=3))
+                if results:
+                    web_results = "\n".join([f"{r['title']}: {r['body']}" for r in results])
+            
+            if web_results:
+                context_str += "\n\n--- WEB SEARCH RESULTS ---\n"
+                context_str += web_results
         except Exception as e:
             print(f"Web search failed: {e}")
 

@@ -12,30 +12,22 @@ def get_vectorstore():
     if settings.chroma_api_key and settings.use_chroma_cloud:
         # PRODUCTION: Use Chroma Cloud
         logger.info(f"Connecting to Chroma Cloud (Tenant: {settings.chroma_tenant}, DB: {settings.chroma_database})...")
-        try:
-            # Note: CloudClient is for Hosted Chroma. If using your own server, use HttpClient.
-            client = chromadb.CloudClient(
-                api_key=settings.chroma_api_key,
-                tenant=settings.chroma_tenant,
-                database=settings.chroma_database
-            )
-        except Exception as e:
-            logger.error(f"Chroma Cloud connection failed: {e}. Falling back to local.")
-            # Fallback to local
-            persist_dir = settings.chroma_persist_dir
-            if os.environ.get("VERCEL"):
-                persist_dir = "/tmp/chroma_db"
-            os.makedirs(persist_dir, exist_ok=True)
-            client = chromadb.PersistentClient(path=persist_dir)
+        # CloudClient is available in chromadb-client
+        client = chromadb.CloudClient(
+            api_key=settings.chroma_api_key,
+            tenant=settings.chroma_tenant,
+            database=settings.chroma_database
+        )
     else:
-        # DEVELOPMENT / VERCEL FALLBACK: Use local SQLite
-        persist_dir = settings.chroma_persist_dir
-        if os.environ.get("VERCEL"):
-            persist_dir = "/tmp/chroma_db"
-            
-        logger.info(f"Using local vector store at {persist_dir}")
-        os.makedirs(persist_dir, exist_ok=True)
-        client = chromadb.PersistentClient(path=persist_dir)
+        # DEVELOPMENT / HTTP FALLBACK: Use HttpClient (requires a running Chroma server)
+        # We avoid PersistentClient on Vercel to keep the bundle small
+        host = os.getenv("CHROMA_HOST", "localhost")
+        try:
+            port = int(os.getenv("CHROMA_PORT", "8000"))
+        except ValueError:
+            port = 8000
+        logger.info(f"Connecting to Chroma server at {host}:{port}")
+        client = chromadb.HttpClient(host=host, port=port)
     
     vectorstore = Chroma(
         client=client,

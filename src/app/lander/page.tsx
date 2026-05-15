@@ -591,7 +591,7 @@ export default function Lander() {
         </div>
       </footer>
 
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes gradient-x {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -610,7 +610,7 @@ export default function Lander() {
         .perspective-1000 {
           perspective: 1000px;
         }
-      `}</style>
+      `}} />
 
     </div>
   );

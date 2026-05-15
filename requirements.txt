@@ -1,11 +1,9 @@
-# Minimal Runtime Requirements for Vercel
-pysqlite3-binary
+# Production-Optimized Requirements for Vercel (Bundle Size < 500MB)
 fastapi
 langchain-core
-langchain-community
 langchain-nvidia-ai-endpoints
 langchain-chroma
-chromadb
+chromadb-client
 pydantic
 pydantic-settings
 python-dotenv
@@ -15,5 +13,4 @@ requests
 sqlalchemy
 databases
 asyncpg
-psycopg2-binary
 langchain-text-splitters
