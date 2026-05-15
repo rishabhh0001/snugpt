@@ -1,6 +1,10 @@
 import os
 import sys
 from typing import List
+from dotenv import load_dotenv
+
+# Load environment variables BEFORE importing any app modules
+load_dotenv()
 
 # Add the backend directory to sys.path to allow importing from 'app'
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,19 +17,16 @@ from langchain_community.document_loaders import (
 )
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.rag.vectorstore import get_vectorstore
-from dotenv import load_dotenv
-
-load_dotenv()
 
 def index_documents(docs_dir: str):
     """
     Loads documents from the specified directory, chunks them, 
     and adds them to the Chroma vector store.
     """
-    print(f"🚀 Starting indexing process for directory: {docs_dir}")
+    print(f"Starting indexing process for directory: {docs_dir}")
     
     if not os.path.exists(docs_dir):
-        print(f"❌ Directory {docs_dir} does not exist.")
+        print(f"Directory {docs_dir} does not exist.")
         return
 
     # 1. Define Loaders for different file types
@@ -39,21 +40,21 @@ def index_documents(docs_dir: str):
 
     documents = []
     for extension, loader in loaders.items():
-        print(f"📂 Loading {extension} files...")
+        print(f"Loading {extension} files...")
         try:
             docs = loader.load()
             if docs:
-                print(f"✅ Loaded {len(docs)} documents from {extension} files.")
+                print(f"Loaded {len(docs)} documents from {extension} files.")
                 documents.extend(docs)
         except Exception as e:
-            print(f"⚠️ Error loading {extension} files: {e}")
+            print(f"Error loading {extension} files: {e}")
 
     if not documents:
-        print("light_bulb: No documents found to index.")
+        print("No documents found to index.")
         return
 
     # 2. Chunking
-    print("✂️ Splitting documents into chunks...")
+    print("Splitting documents into chunks...")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
@@ -61,10 +62,10 @@ def index_documents(docs_dir: str):
         add_start_index=True,
     )
     chunks = text_splitter.split_documents(documents)
-    print(f"✅ Created {len(chunks)} chunks from {len(documents)} documents.")
+    print(f"Created {len(chunks)} chunks from {len(documents)} documents.")
 
     # 3. Upload to ChromaDB
-    print("📤 Uploading chunks to ChromaDB...")
+    print("Uploading chunks to ChromaDB...")
     vectorstore = get_vectorstore()
     
     # We add in batches to avoid any potential API limits or memory issues
@@ -72,9 +73,9 @@ def index_documents(docs_dir: str):
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i:i + batch_size]
         vectorstore.add_documents(batch)
-        print(f"📦 Progress: {min(i + batch_size, len(chunks))}/{len(chunks)} chunks uploaded.")
+        print(f"Progress: {min(i + batch_size, len(chunks))}/{len(chunks)} chunks uploaded.")
 
-    print("✨ Indexing complete! SnuGPT is now smarter.")
+    print("Indexing complete! SnuGPT is now smarter.")
 
 if __name__ == "__main__":
     # Path to the docs directory relative to the project root

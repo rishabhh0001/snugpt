@@ -37,14 +37,24 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# ChromaDB
+# ChromaDB & Vector Stores
+**/chroma_db/**
 backend/chroma_db/
 
-# Knowledge Base & Scraped Data
+# Knowledge Base & Raw Documents
+docs/
+backend/docs/
 **/knowledge_base/**
 **/scraped_web/**
-**/*.md
-**/chroma_db/**
+**/*.pdf
+**/*.docx
+**/*.doc
+**/*.xlsx
+**/*.csv
+**/*.txt
+!requirements.txt
+!README.md
+!**/docs/*.md # Allow documentation markdown files if needed, but ignore raw data ones if they are in data folders
 
 # OS generated files
 .DS_Store

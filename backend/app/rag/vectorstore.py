@@ -7,16 +7,25 @@ from app.config import settings
 def get_vectorstore():
     # Detect if we should use Chroma Cloud or Local
     api_key = os.getenv("CHROMA_API_KEY")
+    use_cloud = os.getenv("USE_CHROMA_CLOUD", "false").lower() == "true"
     
-    if api_key:
+    if api_key and use_cloud:
         # PRODUCTION: Use Chroma Cloud
-        client = chromadb.CloudClient(
-            api_key=api_key,
-            tenant="bf7a99b2-7384-49c8-8710-25dc1baccd97",
-            database="SNUGPT"
-        )
+        tenant = os.getenv("CHROMA_TENANT", "default")
+        database_name = os.getenv("CHROMA_DATABASE", "default")
+        print(f"Connecting to Chroma Cloud (Tenant: {tenant}, DB: {database_name})...")
+        try:
+            client = chromadb.CloudClient(
+                api_key=api_key,
+                tenant=tenant,
+                database=database_name
+            )
+        except Exception as e:
+            print(f"Cloud connection failed: {e}. Falling back to local storage.")
+            client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
     else:
         # DEVELOPMENT: Use Local SQLite
+        print(f"Using local vector store at {settings.chroma_persist_dir}")
         os.makedirs(settings.chroma_persist_dir, exist_ok=True)
         client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
     
