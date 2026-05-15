@@ -40,7 +40,7 @@ if __name__ == "__main__":
             print(f"Error: File {args.file} not found.")
             sys.exit(1)
         content = file_path.read_text(encoding="utf-8")
-        source = args.source if args.source != "manual_entry" else file_path.name
+        source = args.source if args.source != "supervised data" else file_path.name
         upload_text(content, source)
     elif args.content:
         upload_text(args.content, args.source)
