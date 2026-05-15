@@ -8,13 +8,21 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 # Ensure the database URL has the correct driver for 'databases' library
+# Ensure the database URL has the correct driver for 'databases' library
 raw_db_url = settings.database_url
-if not raw_db_url or "postgresql" not in raw_db_url:
+if not raw_db_url:
     # Safe fallback to prevent module-level crash
     db_url = "postgresql+asyncpg://localhost/snugpt"
 else:
     db_url = raw_db_url
-    if db_url.startswith("postgresql://"):
+    # Handle both postgres:// and postgresql://
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    
+    # Ensure +asyncpg is present for the async 'database' object
+    if "postgresql" in db_url and "+asyncpg" not in db_url:
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
 database = Database(db_url)

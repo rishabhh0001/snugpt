@@ -18,7 +18,7 @@ def push_to_cloud():
     
     # CloudClient automatically handles headers and endpoints
     cloud_client = chromadb.CloudClient(
-        api_key='ck-6qVmDL9tQaeYUfScTc1wk64NPpLqjMJ4T1iSaBp5Dx8Q',
+        api_key=api_key,
         tenant='bf7a99b2-7384-49c8-8710-25dc1baccd97',
         database='SNUGPT'
     )
