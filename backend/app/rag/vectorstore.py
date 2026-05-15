@@ -13,6 +13,7 @@ def get_vectorstore():
         # PRODUCTION: Use Chroma Cloud
         logger.info(f"Connecting to Chroma Cloud (Tenant: {settings.chroma_tenant}, DB: {settings.chroma_database})...")
         try:
+            # Note: CloudClient is for Hosted Chroma. If using your own server, use HttpClient.
             client = chromadb.CloudClient(
                 api_key=settings.chroma_api_key,
                 tenant=settings.chroma_tenant,
@@ -20,12 +21,21 @@ def get_vectorstore():
             )
         except Exception as e:
             logger.error(f"Chroma Cloud connection failed: {e}. Falling back to local.")
-            client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
+            # Fallback to local
+            persist_dir = settings.chroma_persist_dir
+            if os.environ.get("VERCEL"):
+                persist_dir = "/tmp/chroma_db"
+            os.makedirs(persist_dir, exist_ok=True)
+            client = chromadb.PersistentClient(path=persist_dir)
     else:
-        # DEVELOPMENT: Use Local SQLite
-        logger.info(f"Using local vector store at {settings.chroma_persist_dir}")
-        os.makedirs(settings.chroma_persist_dir, exist_ok=True)
-        client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
+        # DEVELOPMENT / VERCEL FALLBACK: Use local SQLite
+        persist_dir = settings.chroma_persist_dir
+        if os.environ.get("VERCEL"):
+            persist_dir = "/tmp/chroma_db"
+            
+        logger.info(f"Using local vector store at {persist_dir}")
+        os.makedirs(persist_dir, exist_ok=True)
+        client = chromadb.PersistentClient(path=persist_dir)
     
     vectorstore = Chroma(
         client=client,
