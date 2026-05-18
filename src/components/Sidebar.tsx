@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, MessageSquare, Trash2, X, ChevronRight, Mail } from "lucide-react";
 import { Conversation } from "./useConversations";
+import Link from "next/link";
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -33,14 +34,14 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: "var(--color-border)" }}>
-        <div className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5 hover:opacity-85 transition-opacity">
           <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shadow-lg border"
             style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/avatar.svg" alt="SNUGPT" className="w-full h-full object-cover" />
           </div>
           <span className="font-bold text-sm tracking-tight text-white">SNUGPT</span>
-        </div>
+        </Link>
         {mobile && onClose && (
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-all active:scale-90 p-1 rounded-lg">
             <X className="w-5 h-5" />

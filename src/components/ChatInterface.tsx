@@ -7,6 +7,7 @@ import MessageBubble, { MessageProps } from "./MessageBubble";
 import { useConversations } from "./useConversations";
 import Sidebar from "./Sidebar";
 import { PureMultimodalInput } from "@/components/ui/multimodal-ai-chat-input";
+import Link from "next/link";
 
 export default function ChatInterface() {
   const { conversations, activeId, activeConversation, setActiveId, createNew, updateMessages, deleteConversation } =
@@ -54,6 +55,7 @@ export default function ChatInterface() {
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
+    let current = [...nextMessages];
     try {
       // Prefer /api/chat (Next proxy). Fall back to /_/backend if /api/chat 404s (legacy deploys).
       let endpoint = "/api/chat";
@@ -104,7 +106,7 @@ export default function ChatInterface() {
       const decoder = new TextDecoder();
       let buffer = "";
       let streamDone = false;
-      let current = [...nextMessages];
+      current = [...nextMessages];
 
       while (!streamDone) {
         const { value, done } = await reader.read();
@@ -149,6 +151,12 @@ export default function ChatInterface() {
     } catch (err: any) {
       if (err.name === "AbortError") {
         console.log("Generation stopped by user.");
+        const updated = [...current];
+        const last = updated[updated.length - 1];
+        if (last && last.role === "assistant") {
+          last.content = "This response was stopped.";
+        }
+        updateMessages(convId!, updated);
       } else {
         console.error("Chat error:", err);
         const errMsgs = [...messages, userMsg, {
@@ -243,13 +251,13 @@ export default function ChatInterface() {
           </button>
 
           {/* Mobile logo (visible when sidebar hidden) */}
-          <div className="md:hidden flex items-center gap-2">
+          <Link href="/" className="md:hidden flex items-center gap-2 hover:opacity-85 transition-opacity">
             <div className="w-6 h-6 rounded-full overflow-hidden border" style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/avatar.svg" alt="SNUGPT" className="w-full h-full object-cover" />
             </div>
             <span className="text-sm font-semibold text-white">SNUGPT</span>
-          </div>
+          </Link>
 
           <div className="flex-1" />
 

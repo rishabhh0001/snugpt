@@ -216,25 +216,29 @@ export default function MessageBubble({
         {/* Feedback Buttons */}
         {!isUser && message.content && (
           <div className="flex items-center gap-2 mt-2 px-0.5 text-[11px]" style={{ color: "var(--color-muted)" }}>
-            <button
-              onClick={handleThumbsUp}
-              title="Helpful"
-              className={`p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center ${
-                activeFeedback === "up" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-white"
-              }`}
-            >
-              <ThumbsUp className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={handleThumbsDown}
-              title="Not helpful"
-              className={`p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center ${
-                activeFeedback === "down" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-white"
-              }`}
-            >
-              <ThumbsDown className="w-3.5 h-3.5" />
-            </button>
-            <div className="w-px h-3 bg-white/[0.08] mx-1" />
+            {message.content !== "This response was stopped." && (
+              <>
+                <button
+                  onClick={handleThumbsUp}
+                  title="Helpful"
+                  className={`p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center ${
+                    activeFeedback === "up" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-white"
+                  }`}
+                >
+                  <ThumbsUp className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={handleThumbsDown}
+                  title="Not helpful"
+                  className={`p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center ${
+                    activeFeedback === "down" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-white"
+                  }`}
+                >
+                  <ThumbsDown className="w-3.5 h-3.5" />
+                </button>
+                <div className="w-px h-3 bg-white/[0.08] mx-1" />
+              </>
+            )}
             <button
               onClick={handleCopy}
               title="Copy answer"
