@@ -137,9 +137,9 @@ Adds student credentials to the serverless Neon DB registry.
 *   **Request Payload (`WaitlistRequest`)**:
     ```json
     {
-      "first_name": "Rishabh",
-      "mobile_number": "+919876543210",
-      "email_address": "rj204@snu.edu.in"
+      "first_name": "R******",
+      "mobile_number": "+919876******",
+      "email_address": "r****@snu.edu.in"
     }
     ```
 *   **Response Payload**:
