@@ -1,5 +1,4 @@
-import { NotFound } from "@/components/ui/not-found-2";
+import NotFound from "@/components/ui/demo";
 
 export default function GlobalNotFound() {
-  return <NotFound />;
-}
+  return <NotFound />;}
