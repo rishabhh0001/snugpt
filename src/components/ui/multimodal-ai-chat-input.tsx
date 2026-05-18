@@ -58,8 +58,8 @@ const buttonVariants = cva(
         // Secondary: grayscale background, gray text
         secondary:
           'bg-gray-200 text-black hover:bg-gray-300',
-        // Ghost: hover effect, default text color (should be black)
-        ghost: 'text-black hover:bg-gray-100 hover:text-black', // Explicitly set text to black
+        // Ghost: dark theme responsive ghost styling
+        ghost: 'text-zinc-400 hover:bg-zinc-800/40 hover:text-white', 
         // Link: black text
         link: 'text-black underline-offset-4 hover:underline',
       },
@@ -106,8 +106,7 @@ const Textarea = React.forwardRef<
   return (
     <textarea
       className={cn(
-        // Adjusted text color, placeholder color, and border/ring colors to grayscale
-        'flex min-h-[80px] w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base ring-offset-white placeholder:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm text-black', // Added text-black
+        'flex min-h-[80px] w-full rounded-md border border-zinc-850 bg-[#161616] px-3 py-2 text-base ring-offset-zinc-950 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm text-[#ececec]',
         className,
       )}
       ref={ref}
@@ -225,7 +224,7 @@ function PureSuggestedActions({
             variant="ghost"
             onClick={() => onSelectAction(suggestedAction.action)}
             className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start
-                       border-gray-300 bg-white hover:bg-gray-100 text-black hover:text-gray-900"
+                       border-zinc-800/40 bg-zinc-900/60 hover:bg-zinc-850/60 text-zinc-300 hover:text-white hover:border-[#f2a900]/40 transition-all duration-200"
           >
             <span className="font-medium">{suggestedAction.title}</span>
             <span className="text-gray-500">
@@ -302,7 +301,7 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit border border-gray-300 hover:bg-gray-200"
+      className="rounded-md rounded-bl-lg p-[7px] h-fit border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800/40"
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
@@ -322,8 +321,7 @@ function PureStopButton({ onStop }: { onStop: () => void }) {
   return (
     <Button
       data-testid="stop-button"
-      // Using default variant (bg-black) and setting text color to white for the icon
-      className="rounded-full p-1.5 h-fit border border-black text-white" // Added text-white
+      className="rounded-full p-1.5 h-fit bg-red-600 hover:bg-red-700 text-white border-none"
       onClick={(event) => {
         event.preventDefault();
         onStop();
@@ -361,8 +359,7 @@ function PureSendButton({
   return (
     <Button
       data-testid="send-button"
-      // Uses default variant (bg-black text-white)
-      className="rounded-full p-1.5 h-fit"
+      className="rounded-full p-1.5 h-fit bg-[#f2a900] text-[#002e5b] hover:bg-[#cc8e00] disabled:bg-zinc-800/40 disabled:text-zinc-600 disabled:opacity-40 border-none"
       onClick={(event) => {
         event.preventDefault();
         if (!isDisabled) {
@@ -640,15 +637,15 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="Message SNUGPT..."
         value={input}
         onChange={handleInput}
         className={cn(
           'min-h-[24px] max-h-[calc(75dvh)] overflow-y-auto resize-none rounded-2xl !text-base pb-10',
-          'bg-gray-100 border border-gray-300', 
+          'bg-[#161616] border border-orange-950/40 hover:border-orange-900/60 focus:border-[#f2a900]/60 focus-visible:ring-1 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-1 transition-all duration-200', 
           className,
         )}
-        style={{color: 'black'}}
+        style={{color: '#ececec'}}
         rows={1}
         autoFocus
         disabled={!canSend || isGenerating || uploadQueue.length > 0}
