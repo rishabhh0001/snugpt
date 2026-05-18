@@ -1,120 +1,44 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeftIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Globe } from "@/components/ui/cosmic-404";
+import { motion } from "framer-motion";
+import { useState, useCallback } from "react";
+import Preloader from "@/components/ui/preloader";
 
-// 🎞️ Animation Variants
-const fadeUp: any = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: "easeOut" } },
-};
+const DemoOne = () => {
+  const [showPreloader, setShowPreloader] = useState(true);
 
-const globeVariants: any = {
-  hidden: { scale: 0.85, opacity: 0, y: 10 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    y: 0,
-    transition: { duration: 1, ease: "easeOut" },
-  },
-  floating: {
-    y: [-4, 4],
-    transition: {
-      duration: 5,
-      ease: "easeInOut",
-      repeat: Infinity,
-      repeatType: "reverse",
-    },
-  },
-};
+  const handleComplete = useCallback(() => {
+    setShowPreloader(false);
+  }, []);
 
-export interface NotFoundProps {
-  title?: string;
-  description?: string;
-  backText?: string;
-  onBack?: () => void;
-}
-
-export default function NotFound({
-  title = "Oops! Lost in space",
-  description = "We couldn’t find the page you’re looking for. It might have been moved or deleted.",
-  backText = "Go Back",
-  onBack,
-}: NotFoundProps) {
-  const router = useRouter();
-
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      router.push("/");
-    }
-  };
+  const handleReplay = useCallback(() => {
+    setShowPreloader(true);
+  }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center px-4 h-screen bg-background text-foreground overflow-hidden">
-      <AnimatePresence mode="wait">
+    <>
+      {showPreloader && <Preloader onComplete={handleComplete} />}
+      <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <motion.div
-          className="text-center flex flex-col items-center justify-center"
+          className="text-center space-y-8 max-w-3xl"
           initial="hidden"
           animate="visible"
-          exit="hidden"
-          variants={fadeUp}
         >
-          {/* Animated 4[Globe]4 */}
-          <div className="flex items-center justify-center gap-6 mb-8 select-none">
-            <motion.span
-              className="text-7xl md:text-9xl font-extrabold text-foreground/90 selection:bg-transparent"
-              variants={fadeUp}
-            >
-              4
-            </motion.span>
-
-            <motion.div
-              className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center"
-              variants={globeVariants}
-              animate={["visible", "floating"]}
-            >
-              <Globe className="w-full h-full" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)]" />
-            </motion.div>
-
-            <motion.span
-              className="text-7xl md:text-9xl font-extrabold text-foreground/90 selection:bg-transparent"
-              variants={fadeUp}
-            >
-              4
-            </motion.span>
-          </div>
-
-          <motion.h1
-            className="mb-4 text-3xl md:text-5xl font-bold tracking-tight text-foreground bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent"
-            variants={fadeUp}
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">Welcome</h1>
+          <p className="text-xl text-muted-foreground">
+            Your content has loaded successfully. The preloader animation has completed.
+          </p>
+          <button
+            onClick={handleReplay}
+            className="px-6 py-3 mt-6 text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transform transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 cursor-pointer"
           >
-            {title}
-          </motion.h1>
-
-          <motion.p
-            className="mx-auto mb-10 max-w-md text-base md:text-lg text-muted-foreground/80 leading-relaxed"
-            variants={fadeUp}
-          >
-            {description}
-          </motion.p>
-
-          <motion.div variants={fadeUp}>
-            <Button
-              onClick={handleBack}
-              className="gap-2 cursor-pointer transition-all duration-300 font-medium px-6 py-5 active:scale-95 text-base shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20"
-            >
-              <ArrowLeftIcon className="w-5 h-5" />
-              {backText}
-            </Button>
-          </motion.div>
+            Replay Preloader
+          </button>
         </motion.div>
-      </AnimatePresence>
-    </div>
+      </main>
+    </>
   );
-}
+};
+
+export { DemoOne };
+export default DemoOne;
