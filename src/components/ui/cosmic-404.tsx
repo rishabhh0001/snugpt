@@ -11,13 +11,13 @@ const GLOBE_CONFIG: any = {
   devicePixelRatio: 2,
   phi: 0,
   theta: 0.3,
-  dark: 1, // Set to dark mode for premium dark space visual aesthetic
-  diffuse: 0.4,
+  dark: 0, // Make earth white by removing dark space ocean shading
+  diffuse: 1.2,
   mapSamples: 16000,
-  mapBrightness: 1.2,
-  baseColor: [0.3, 0.3, 0.3], // Dark grey base
-  markerColor: [251 / 255, 100 / 255, 21 / 255], // Orange markers
-  glowColor: [0.1, 0.1, 0.1], // Subtle dark glow
+  mapBrightness: 6, // High brightness to make the white glow brilliantly
+  baseColor: [1, 1, 1], // Pure white land mass
+  markerColor: [251 / 255, 100 / 255, 21 / 255], // Contrast orange markers
+  glowColor: [1.1, 1.1, 1.1], // Cosmic white atmosphere glow
   markers: [
     { location: [41.0082, 28.9784], size: 0.06 },
     { location: [40.7128, -74.006], size: 0.1 },
@@ -37,7 +37,7 @@ export function Globe({ className, config = GLOBE_CONFIG }: GlobeProps) {
   const widthRef = useRef(0);
 
   const onRender = useCallback((state: Record<string, any>) => {
-    phiRef.current += 0.005; 
+    phiRef.current += 0.012; // Increase speed so rotation is highly visible and smooth!
     state.phi = phiRef.current;
     state.width = widthRef.current * 2;
     state.height = widthRef.current * 2;
