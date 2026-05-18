@@ -51,9 +51,86 @@ const CharReveal = ({ text, className }: { text: string; className?: string }) =
   );
 };
 
+type BGVariantType = 'dots' | 'diagonal-stripes' | 'grid' | 'horizontal-lines' | 'vertical-lines' | 'checkerboard';
+type BGMaskType =
+	| 'fade-center'
+	| 'fade-edges'
+	| 'fade-top'
+	| 'fade-bottom'
+	| 'fade-left'
+	| 'fade-right'
+	| 'fade-x'
+	| 'fade-y'
+	| 'none';
+
+type BGPatternProps = React.ComponentProps<'div'> & {
+	variant?: BGVariantType;
+	mask?: BGMaskType;
+	size?: number;
+	fill?: string;
+};
+
+const maskClasses: Record<BGMaskType, string> = {
+	'fade-edges': '[mask-image:radial-gradient(ellipse_at_center,black,transparent)]',
+	'fade-center': '[mask-image:radial-gradient(ellipse_at_center,transparent,black)]',
+	'fade-top': '[mask-image:linear-gradient(to_bottom,transparent,black)]',
+	'fade-bottom': '[mask-image:linear-gradient(to_bottom,black,transparent)]',
+	'fade-left': '[mask-image:linear-gradient(to_right,transparent,black)]',
+	'fade-right': '[mask-image:linear-gradient(to_right,black,transparent)]',
+	'fade-x': '[mask-image:linear-gradient(to_right,transparent,black,transparent)]',
+	'fade-y': '[mask-image:linear-gradient(to_bottom,transparent,black,transparent)]',
+	none: '',
+};
+
+function geBgImage(variant: BGVariantType, fill: string, size: number) {
+	switch (variant) {
+		case 'dots':
+			return `radial-gradient(${fill} 1px, transparent 1px)`;
+		case 'grid':
+			return `linear-gradient(to right, ${fill} 1px, transparent 1px), linear-gradient(to bottom, ${fill} 1px, transparent 1px)`;
+		case 'diagonal-stripes':
+			return `repeating-linear-gradient(45deg, ${fill}, ${fill} 1px, transparent 1px, transparent ${size}px)`;
+		case 'horizontal-lines':
+			return `linear-gradient(to bottom, ${fill} 1px, transparent 1px)`;
+		case 'vertical-lines':
+			return `linear-gradient(to right, ${fill} 1px, transparent 1px)`;
+		case 'checkerboard':
+			return `linear-gradient(45deg, ${fill} 25%, transparent 25%), linear-gradient(-45deg, ${fill} 25%, transparent 25%), linear-gradient(45deg, transparent 75%, ${fill} 75%), linear-gradient(-45deg, transparent 75%, ${fill} 75%)`;
+		default:
+			return undefined;
+	}
+}
+
+const BGPattern = ({
+	variant = 'grid',
+	mask = 'none',
+	size = 24,
+	fill = '#252525',
+	className,
+	style,
+	...props
+}: BGPatternProps) => {
+	const bgSize = `${size}px ${size}px`;
+	const backgroundImage = geBgImage(variant, fill, size);
+
+	return (
+		<div
+			className={cn('absolute inset-0 z-0 size-full', maskClasses[mask], className)}
+			style={{
+				backgroundImage,
+				backgroundSize: bgSize,
+				...style,
+			}}
+			{...props}
+		/>
+	);
+};
+
+BGPattern.displayName = 'BGPattern';
+
 const GridBackground = () => (
   <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] animate-grid-shift opacity-[0.03]" />
+    <BGPattern variant="grid" mask="fade-center" fill="#ffffff10" size={40} className="opacity-[0.05]" />
     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/10 to-transparent h-40 w-full z-0 opacity-20 animate-scanline" />
     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-amber-500/5 blur-[120px] rounded-full opacity-50" />
     <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-blue-600/10 blur-[100px] rounded-full animate-pulse-slow" />
@@ -306,19 +383,48 @@ const HeroMockupWindow = () => {
   };
 
   // Simulated Chat Cycle States
+  const [qaIndex, setQaIndex] = useState(0);
   const [currentStep, setCurrentStep] = useState(0); // 0: query typing, 1: scanning, 2: response streaming
   const [typedQuery, setTypedQuery] = useState("");
   const [typedResponse, setTypedResponse] = useState("");
   const [visibleSources, setVisibleSources] = useState<string[]>([]);
 
-  const queryText = "How do I apply for a partial tuition waiver?";
-  const responseText = "Tuition waivers are granted under Section 4.2 of the SNU Academic Handbook. Requirements: minimum 8.5 CGPA, parents' income certificate < 8 LPA. Submit your application via the ERP Academics portal before the May 25 deadline.";
+  const qaPairs = [
+    {
+      q: "Who is the Vice-Chancellor of SNU?",
+      a: "Professor Ananya Mukherjee is the Vice-Chancellor of Shiv Nadar University."
+    },
+    {
+      q: "Who is the Dean of the School of Engineering?",
+      a: "Professor Suneet Tuli is the Dean of the School of Engineering."
+    },
+    {
+      q: "Who is the Dean of Students?",
+      a: "Brigadier Steve Ismail (Retd.) is the Dean of Students at Shiv Nadar University."
+    },
+    {
+      q: "Who is the Founder of the university?",
+      a: "Mr. Shiv Nadar is the Founder of the university."
+    },
+    {
+      q: "Who is the Dean of Academics?",
+      a: "Professor Partha Chatterjee is the Dean of Academics."
+    },
+    {
+      q: "Who is the Chancellor of SNU?",
+      a: "Mr. Shikhar Malhotra is the Chancellor of Shiv Nadar University."
+    }
+  ];
 
   useEffect(() => {
     let isMounted = true;
 
     const runCycle = async () => {
       if (!isMounted) return;
+
+      const currentQA = qaPairs[qaIndex];
+      const queryText = currentQA.q;
+      const responseText = currentQA.a;
 
       // Phase 0: Reset and start typing query
       setCurrentStep(0);
@@ -363,7 +469,7 @@ const HeroMockupWindow = () => {
       await new Promise((resolve) => setTimeout(resolve, 6000));
       
       if (isMounted) {
-        runCycle();
+        setQaIndex((prev) => (prev + 1) % qaPairs.length);
       }
     };
 
@@ -372,7 +478,7 @@ const HeroMockupWindow = () => {
     return () => {
       isMounted = false;
     };
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, qaIndex]);
 
   return (
     <motion.div
@@ -508,11 +614,11 @@ const HeroMockupWindow = () => {
                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-50" />
                     <span className="text-xs md:text-sm text-white/90 leading-relaxed font-medium tracking-tight block relative z-10 font-inter">
                       {typedResponse}
-                      {typedResponse.length < responseText.length && <span className="animate-pulse text-indigo-400 font-black ml-0.5">▋</span>}
+                      {typedResponse.length < qaPairs[qaIndex].a.length && <span className="animate-pulse text-indigo-400 font-black ml-0.5">▋</span>}
                     </span>
                   </div>
 
-                  {typedResponse.length === responseText.length && (
+                  {typedResponse.length === qaPairs[qaIndex].a.length && (
                     <motion.div
                       initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
                       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -795,7 +901,7 @@ export default function Lander() {
                 <Search className="w-5 h-5 text-amber-400" />
                 <div className="flex flex-col items-start overflow-hidden">
                   <span className="text-xs font-bold text-white/60 tracking-tight">Ask Intelligence...</span>
-                  <span className="text-[10px] text-white/20 font-medium truncate w-full">"How do I apply for a partial tuition waiver?"</span>
+                  <span className="text-[10px] text-white/20 font-medium truncate w-full">"Who is the Vice-Chancellor of SNU?"</span>
                 </div>
                 <div className="ml-auto flex items-center gap-3">
                   <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black tracking-widest text-white/30 uppercase">
