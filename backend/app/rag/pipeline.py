@@ -187,7 +187,7 @@ async def generate_streaming_response(
         else:
             llm = get_llm()
             if not llm:
-                yield f'data: {{"type": "chunk", "text": "NVIDIA API Key is not configured. Please contact the administrator."}}\n\n'
+                yield f'data: {{"type": "chunk", "text": "NVIDIA Key is not configured. Please contact the administrator."}}\n\n'
                 yield f'data: {{"type": "done"}}\n\n'
                 return
 
