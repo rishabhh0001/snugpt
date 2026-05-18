@@ -42,7 +42,7 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
           <span className="font-bold text-sm tracking-tight text-white">SNUGPT</span>
         </div>
         {mobile && onClose && (
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg">
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-all active:scale-90 p-1 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         )}
@@ -52,7 +52,7 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
       <div className="px-3 py-3">
         <button
           onClick={onNew}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-white/[0.06] text-gray-300 hover:text-white border"
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] hover:bg-white/[0.06] text-gray-300 hover:text-white border"
           style={{ borderColor: "var(--color-border)" }}
         >
           <Plus className="w-4 h-4 flex-shrink-0" />

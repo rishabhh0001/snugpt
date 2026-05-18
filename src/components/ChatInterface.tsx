@@ -232,7 +232,7 @@ export default function ChatInterface() {
           style={{ borderColor: "var(--color-border)" }}>
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-1.5 rounded-lg hover:bg-white/[0.06] transition-colors text-gray-400 hover:text-white"
+            className="md:hidden p-1.5 rounded-lg hover:bg-white/[0.06] transition-all active:scale-90 text-gray-400 hover:text-white"
             onClick={() => setSidebarOpen(true)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,7 +254,7 @@ export default function ChatInterface() {
           <button
             onClick={handleNew}
             title="New chat"
-            className="p-1.5 rounded-lg transition-colors hover:bg-white/[0.06] text-gray-400 hover:text-white"
+            className="p-1.5 rounded-lg transition-all active:scale-90 hover:bg-white/[0.06] text-gray-400 hover:text-white"
           >
             <SquarePen className="w-4 h-4" />
           </button>

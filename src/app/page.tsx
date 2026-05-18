@@ -797,7 +797,7 @@ export default function Lander() {
              {/* Mobile menu toggle button */}
              <button
                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-               className="lg:hidden p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
+               className="lg:hidden p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all active:scale-90"
              >
                <MenuToggleIcon open={mobileMenuOpen} className="w-5 h-5" duration={300} />
              </button>
