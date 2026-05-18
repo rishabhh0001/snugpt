@@ -8,14 +8,14 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
 
 export const metadata: Metadata = {
-  title: "SnuGPT — Shiv Nadar University AI Assistant",
+  title: "SNUGPT — Shiv Nadar University AI Assistant",
   description: "Your intelligent AI companion for Shiv Nadar University. Ask about admissions, academics, campus life, fees, and more.",
   icons: {
     icon: [{ url: "/avatar.svg", type: "image/svg+xml" }],
     apple: "/avatar.svg",
   },
   openGraph: {
-    title: "SnuGPT",
+    title: "SNUGPT",
     description: "AI assistant for Shiv Nadar University students and parents.",
     type: "website",
   },

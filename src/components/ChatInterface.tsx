@@ -278,7 +278,7 @@ export default function ChatInterface() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/avatar.svg"
-                      alt="SnuGPT logo"
+                      alt="SNUGPT logo"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -318,7 +318,7 @@ export default function ChatInterface() {
               selectedVisibilityType="private"
             />
             <p className="text-center text-[10px] mt-2" style={{ color: "var(--color-muted)" }}>
-              SnuGPT is an unofficial student assistant and can make mistakes. Verify critical info on{" "}
+              SNUGPT is an unofficial student assistant and can make mistakes. Verify critical info on{" "}
               <a href="https://snu.edu.in" target="_blank" rel="noopener noreferrer"
                 className="underline underline-offset-2 hover:text-white transition-colors">
                 snu.edu.in

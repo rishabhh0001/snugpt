@@ -78,7 +78,7 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
           ) : (
             /* Typing indicator */
             <div className="py-1 min-w-[120px]">
-              <ShiningText text="SnuGPT is thinking..." />
+              <ShiningText text="SNUGPT is thinking..." />
             </div>
           )}
         </div>

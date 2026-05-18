@@ -37,9 +37,9 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
           <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shadow-lg border"
             style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/avatar.svg" alt="SnuGPT" className="w-full h-full object-cover" />
+            <img src="/avatar.svg" alt="SNUGPT" className="w-full h-full object-cover" />
           </div>
-          <span className="font-bold text-sm tracking-tight text-white">SnuGPT</span>
+          <span className="font-bold text-sm tracking-tight text-white">SNUGPT</span>
         </div>
         {mobile && onClose && (
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg">

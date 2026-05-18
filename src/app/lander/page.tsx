@@ -469,7 +469,7 @@ const HeroMockupWindow = () => {
               </motion.div>
             )}
 
-            {/* Step 2: SnuGPT Intelligent Response */}
+            {/* Step 2: SNUGPT Intelligent Response */}
             {currentStep === 2 && typedResponse && (
               <motion.div
                 initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
