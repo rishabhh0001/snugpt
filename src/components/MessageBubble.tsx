@@ -23,6 +23,7 @@ function getFilename(src: string): string {
 
 export default function MessageBubble({ message }: { message: MessageProps }) {
   const isUser = message.role === "user";
+  const isLoader = !isUser && !message.content;
   if (message.role === "system" || message.role === "data") return null;
 
   return (
@@ -30,11 +31,11 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className={`flex w-full gap-3 py-4 ${isUser ? "justify-end" : "justify-start"}`}
+      className={`flex w-full gap-3 py-4 ${isUser ? "justify-end" : "justify-start"} ${isLoader ? "items-center" : ""}`}
     >
       {/* Assistant avatar — user uploaded avatar */}
       {!isUser && (
-        <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden mt-0.5 border"
+        <div className={`w-7 h-7 rounded-full flex-shrink-0 overflow-hidden border ${isLoader ? "" : "mt-0.5"}`}
           style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
