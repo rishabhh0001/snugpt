@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue, useReducedMotion } from 'framer-motion';
-import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, ChevronRight, Layers, LayoutDashboard, Globe, Download, Mail, ExternalLink, X, Shield, Lock, CheckCircle2, Cpu } from 'lucide-react';
+import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, ChevronRight, Layers, LayoutDashboard, Globe, Download, Mail, ExternalLink, X, Shield, Lock, CheckCircle2, Cpu, BookOpen, FileText, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
@@ -543,6 +543,28 @@ export default function Lander() {
   const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+
+  const infoLinks = [
+    {
+      title: "About SnuGPT",
+      description: "Learn more about our RAG architecture & vision",
+      href: "/about",
+      icon: BookOpen,
+    },
+    {
+      title: "Privacy Policy",
+      description: "University data compliance & encryption safety",
+      href: "/privacy-policy",
+      icon: Shield,
+    },
+    {
+      title: "Apache License",
+      description: "Open-source permissions and terms",
+      href: "/license",
+      icon: FileText,
+    }
+  ];
 
   const scrolled = useNavbarScroll(10);
 
@@ -590,79 +612,157 @@ export default function Lander() {
           </div>
 
           <div className="hidden items-center gap-4 lg:flex">
-            {['Capabilities', 'Intelligence', 'Security'].map((item) => (
-              <Link
-                key={item}
-                href="#"
-                className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
-              >
-                {/* Link text */}
-                <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
-                  {item}
-                </span>
-                {/* Top & bottom border animation */}
-                <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
-                {/* Background fill animation */}
-                <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsWaitlistOpen(true)}
-              className="px-5 py-2 md:px-6 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+            <Link
+              href="#features"
+              className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
             >
-              Access Intelligence
-            </button>
+              {/* Link text */}
+              <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                Features
+              </span>
+              {/* Top & bottom border animation */}
+              <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+              {/* Background fill animation */}
+              <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+            </Link>
 
-            {/* Mobile menu toggle button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
+            {/* Info Dropdown wrapper */}
+            <div
+              className="relative py-2"
+              onMouseEnter={() => setInfoDropdownOpen(true)}
+              onMouseLeave={() => setInfoDropdownOpen(false)}
             >
-              <MenuToggleIcon open={mobileMenuOpen} className="w-5 h-5" duration={300} />
-            </button>
-          </div>
-        </nav>
-
-        {/* Mobile menu drawer overlay */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="w-full bg-black/95 border-t border-white/10 overflow-hidden flex flex-col p-6 gap-6 lg:hidden backdrop-blur-3xl"
-            >
-              <div className="flex flex-col gap-4">
-                {['Capabilities', 'Intelligence', 'Security'].map((item) => (
-                  <Link
-                    key={item}
-                    href="#"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300"
-                  >
-                    <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
-                      {item}
-                    </span>
-                    <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
-                    <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
-                  </Link>
-                ))}
-              </div>
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsWaitlistOpen(true);
-                }}
-                className="w-full py-4 rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-amber-50 active:scale-95 transition-all"
+                className="relative inline-flex items-center gap-1 group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
               >
-                Access Intelligence
+                <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                  Info
+                </span>
+                <ChevronDown className="w-3 h-3 text-white/40 relative z-10 group-hover:text-black transition-colors duration-300 group-hover:rotate-180 transition-transform duration-300" />
+                <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+                <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
               </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+              <AnimatePresence>
+                {infoDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-black/95 border border-white/10 backdrop-blur-2xl rounded-2xl p-3 shadow-2xl z-50 flex flex-col gap-1"
+                  >
+                    {infoLinks.map((item, i) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={i}
+                          href={item.href}
+                          className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.03] border border-transparent hover:border-white/5 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-white/60 group-hover:scale-105 group-hover:border-amber-500/20 group-hover:text-amber-400 transition-all duration-300 shrink-0">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex flex-col items-start text-left">
+                            <span className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors duration-300 font-jakarta">
+                              {item.title}
+                            </span>
+                            <span className="text-[10px] text-white/30 font-medium font-inter leading-tight mt-0.5">
+                              {item.description}
+                            </span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+ 
+           <div className="flex items-center gap-2">
+             <button
+               onClick={() => setIsWaitlistOpen(true)}
+               className="px-5 py-2 md:px-6 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+             >
+               Access Intelligence
+             </button>
+ 
+             {/* Mobile menu toggle button */}
+             <button
+               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+               className="lg:hidden p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
+             >
+               <MenuToggleIcon open={mobileMenuOpen} className="w-5 h-5" duration={300} />
+             </button>
+           </div>
+         </nav>
+ 
+         {/* Mobile menu drawer overlay */}
+         <AnimatePresence>
+           {mobileMenuOpen && (
+             <motion.div
+               initial={{ opacity: 0, height: 0 }}
+               animate={{ opacity: 1, height: "auto" }}
+               exit={{ opacity: 0, height: 0 }}
+               className="w-full bg-black/95 border-t border-white/10 overflow-hidden flex flex-col p-6 gap-6 lg:hidden backdrop-blur-3xl"
+             >
+              <div className="flex flex-col gap-2">
+                {/* Mobile Features */}
+                <Link
+                  href="#features"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300"
+                >
+                  <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                    Features
+                  </span>
+                  <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+                  <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+                </Link>
+
+                {/* Mobile Info Header */}
+                <div className="px-4 pt-4 pb-2 border-t border-white/5 mt-2">
+                  <span className="text-[10px] uppercase tracking-[0.3em] font-black text-white/20">University Info</span>
+                </div>
+
+                {/* Mobile Info links */}
+                {infoLinks.map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={i}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] border border-transparent hover:border-white/5 transition-all group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-white/45 group-hover:text-amber-400 transition-colors shrink-0">
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex flex-col items-start text-left">
+                        <span className="text-xs font-bold text-white/60 group-hover:text-white transition-colors">
+                          {item.title}
+                        </span>
+                        <span className="text-[9px] text-white/20 font-medium font-inter mt-0.5 leading-tight">
+                          {item.description}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+               <button
+                 onClick={() => {
+                   setMobileMenuOpen(false);
+                   setIsWaitlistOpen(true);
+                 }}
+                 className="w-full py-4 rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-amber-50 active:scale-95 transition-all"
+               >
+                 Access Intelligence
+               </button>
+             </motion.div>
+           )}
+         </AnimatePresence>
       </header>
 
       {/* Hero Section */}
@@ -726,7 +826,7 @@ export default function Lander() {
       </section>
 
       {/* Feature Grid Section */}
-      <section className="py-16 md:py-24 px-6 max-w-7xl mx-auto relative">
+      <section id="features" className="py-16 md:py-24 px-6 max-w-7xl mx-auto relative">
         <div className="absolute left-1/2 -translate-x-1/2 top-0 w-px h-16 md:h-24 bg-gradient-to-b from-transparent via-indigo-500/50 to-transparent" />
 
         <div className="text-center mb-16 md:mb-24">
