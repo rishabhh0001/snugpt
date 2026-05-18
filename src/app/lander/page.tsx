@@ -763,7 +763,7 @@ export default function Lander() {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent pointer-events-none" />
             <div className="h-12 flex items-center justify-between border-b border-white/5 px-2">
-              <span className="text-xs font-mono text-amber-400">SESSION_EXPORT_001.PDF</span>
+              <span className="text-xs font-mono text-amber-400">CHAT_EXPORT_01.PDF</span>
               <div className="flex gap-2">
                 <div className="w-3 h-3 rounded-full bg-white/10" />
                 <div className="w-3 h-3 rounded-full bg-white/10" />
@@ -825,7 +825,7 @@ export default function Lander() {
               onClick={() => setIsWaitlistOpen(true)}
               className="px-12 py-6 rounded-[2rem] bg-white text-black font-black text-lg md:text-xl hover:bg-amber-50 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(255,255,255,0.2)] inline-flex items-center gap-4 group"
             >
-              INITIALIZE INTERFACE
+              INITIALIZE CHAT INTERFACE
               <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-500" />
             </button>
           </motion.div>
@@ -853,7 +853,7 @@ export default function Lander() {
           </div>
 
           <div className="text-xs text-white/10 font-mono">
-            BUILD_ID: V1.0.2_LATEST
+            BUILD_ID: V1.0.4(+58)
           </div>
         </div>
       </footer>

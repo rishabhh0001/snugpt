@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class ChatLog(Base):
     __tablename__ = "chat_logs"
 
-    id = Column(String(36), primary_key=True)
+    id = Column(String(16), primary_key=True)
     session_id = Column(String(64), index=True)
     user_query = Column(Text, nullable=False)
     ai_response = Column(Text, nullable=False)

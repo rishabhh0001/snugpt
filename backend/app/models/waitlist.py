@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class WaitlistEntry(Base):
     __tablename__ = "waitlist"
 
-    id = Column(String(36), primary_key=True)
+    id = Column(String(16), primary_key=True)
     name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
