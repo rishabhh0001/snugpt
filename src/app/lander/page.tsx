@@ -531,8 +531,8 @@ export default function Lander() {
       <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
 
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 py-4 md:py-6">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 py-3 rounded-xl md:rounded-3xl border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl">
+      <header className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 py-4 md:py-6 flex flex-col items-center gap-3 pointer-events-none">
+        <nav className="max-w-7xl w-full mx-auto flex items-center justify-between px-4 md:px-8 py-3 rounded-xl md:rounded-3xl border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl pointer-events-auto">
           <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
             <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500">
               <Image src="/avatar.svg" alt="SNUGPT" width={44} height={44} className="object-cover" priority />
@@ -559,6 +559,18 @@ export default function Lander() {
             Access Intelligence
           </button>
         </nav>
+
+        {/* Ecosystem Sub-bar */}
+        <div className="flex items-center justify-center gap-3 py-1.5 px-5 rounded-full bg-black/30 border border-white/5 backdrop-blur-2xl shadow-xl text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] pointer-events-auto select-none">
+          <span className="text-white/20">Built for the SNU Ecosystem:</span>
+          <div className="flex items-center gap-2.5 text-white/60">
+            <span className="font-black text-white hover:text-amber-400 transition-colors">SNU, DELHI-NCR</span>
+            <span className="text-white/10 font-light">•</span>
+            <span className="font-black text-white hover:text-amber-400 transition-colors">RESEARCH</span>
+            <span className="text-white/10 font-light">•</span>
+            <span className="font-black text-white hover:text-amber-400 transition-colors">ACADEMICS</span>
+          </div>
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -613,15 +625,7 @@ export default function Lander() {
               Access Engine
             </button>
 
-            {/* Trusted By Section */}
-            <motion.div variants={fadeInUp} className="mt-8 md:mt-12 flex flex-col items-center gap-4">
-              <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Built for the SNU Ecosystem</span>
-              <div className="flex items-center gap-6 md:gap-10 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-                <span className="text-xs md:text-sm font-black tracking-tighter text-white">SNU DELHI</span>
-                <span className="text-xs md:text-sm font-black tracking-tighter text-white">RESEARCH</span>
-                <span className="text-xs md:text-sm font-black tracking-tighter text-white">ACADEMICS</span>
-              </div>
-            </motion.div>
+
           </motion.div>
         </motion.div>
 
