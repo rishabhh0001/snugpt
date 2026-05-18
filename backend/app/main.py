@@ -166,7 +166,7 @@ async def share_chat(request: ShareChatRequest, fastapi_request: Request):
         origin = fastapi_request.headers.get("origin")
         if not origin:
             # Fallback to host header if origin isn't present
-            host = fastapi_request.headers.get("host") or "snugpt.org"
+            host = fastapi_request.headers.get("host") or "snugpt.rishabhj.in"
             scheme = fastapi_request.url.scheme
             origin = f"{scheme}://{host}"
             

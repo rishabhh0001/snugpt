@@ -118,7 +118,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-base font-bold text-white uppercase tracking-wider">Inference Layer</h3>
                 <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter">
-                  Powered by <strong>Meta Llama 3.3 70B Instruct</strong> running over high-speed NVIDIA AI Foundation endpoints, streaming answers token-by-token for commercial-grade speed.
+                  Powered by <strong>Meta Llama 3.1 8B Instruct</strong> running over high-speed NVIDIA AI Foundation endpoints, streaming answers token-by-token for commercial-grade speed.
                 </p>
               </div>
             </motion.div>

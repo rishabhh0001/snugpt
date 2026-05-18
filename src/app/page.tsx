@@ -987,7 +987,7 @@ export default function Lander() {
           <BentoCard
             className="md:col-span-4"
             title="Instant Answers"
-            description="Powered by Llama 3.3 for blazingly fast, accurate responses."
+            description="Powered by Llama 3.1 for blazingly fast, accurate responses."
             icon={Zap}
           >
             <div className="mt-8 space-y-4">
