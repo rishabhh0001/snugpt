@@ -25,6 +25,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.agents/
 .Python
 develop-eggs/
 dist/

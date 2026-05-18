@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue, useReducedMotion } from 'framer-motion';
 import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, ChevronRight, Layers, LayoutDashboard, Globe, Download, Mail, ExternalLink, X, Shield, Lock, CheckCircle2, Cpu } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -51,10 +51,10 @@ const CharReveal = ({ text, className }: { text: string; className?: string }) =
 const GridBackground = () => (
   <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
     <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] animate-grid-shift opacity-[0.03]" />
-    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/10 to-transparent h-40 w-full z-0 opacity-20 animate-scanline" />
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-500/10 blur-[120px] rounded-full opacity-50" />
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/10 to-transparent h-40 w-full z-0 opacity-20 animate-scanline" />
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-amber-500/5 blur-[120px] rounded-full opacity-50" />
     <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-blue-600/10 blur-[100px] rounded-full animate-pulse-slow" />
-    <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-yellow-500/5 blur-[100px] rounded-full animate-pulse-slower" />
+    <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-yellow-500/10 blur-[100px] rounded-full animate-pulse-slower" />
   </div>
 );
 
@@ -79,7 +79,7 @@ const MouseFollowGlow = () => {
       style={{
         background: useTransform(
           [mouseX, mouseY],
-          ([x, y]) => `radial-gradient(600px circle at ${x}px ${y}px, rgba(79, 70, 229, 0.15), transparent 80%)`
+          ([x, y]) => `radial-gradient(600px circle at ${x}px ${y}px, rgba(242, 169, 0, 0.08), transparent 80%)`
         ),
       }}
     />
@@ -94,15 +94,15 @@ const BentoCard = ({ children, className = "", title, description, icon: Icon, d
       whileHover={{ y: -5, transition: { duration: 0.3 } }}
       viewport={{ once: true, margin: "-100px" }}
       variants={fadeInUp}
-      className={`relative group rounded-[1.5rem] md:rounded-[2rem] border border-white/5 bg-white/[0.01] p-6 md:p-10 overflow-hidden transition-all duration-500 hover:border-indigo-500/30 hover:bg-white/[0.02] ${className}`}
+      className={`relative group rounded-[1.5rem] md:rounded-[2rem] border border-white/5 bg-white/[0.01] p-6 md:p-10 overflow-hidden transition-all duration-500 hover:border-amber-500/30 hover:bg-white/[0.02] ${className}`}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-      <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full group-hover:bg-indigo-500/10 transition-colors duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-amber-500/5 blur-[80px] rounded-full group-hover:bg-amber-500/10 transition-colors duration-700" />
 
       <div className="relative z-10 h-full flex flex-col">
         {Icon && (
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-            <Icon className="w-5 h-5 text-indigo-400" />
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+            <Icon className="w-5 h-5 text-amber-400" />
           </div>
         )}
         <h3 className="text-xl md:text-2xl font-bold mb-3 tracking-tight">{title}</h3>
@@ -255,6 +255,269 @@ const WaitlistModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
   );
 };
 
+const HeroMockupWindow = () => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Smooth buttery springs for Jhey's 3D tilt
+  const rotateX = useSpring(0, { stiffness: 100, damping: 20 });
+  const rotateY = useSpring(0, { stiffness: 100, damping: 20 });
+  const tiltX = useSpring(0, { stiffness: 100, damping: 20 });
+  const tiltY = useSpring(0, { stiffness: 100, damping: 20 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (shouldReduceMotion || !cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left - width / 2;
+    const mouseY = e.clientY - rect.top - height / 2;
+
+    rotateX.set(-(mouseY / height) * 10);
+    rotateY.set((mouseX / width) * 10);
+    tiltX.set((mouseX / width) * 10);
+    tiltY.set((mouseY / height) * 10);
+  };
+
+  const handleMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+    tiltX.set(0);
+    tiltY.set(0);
+  };
+
+  // Simulated Chat Cycle States
+  const [currentStep, setCurrentStep] = useState(0); // 0: query typing, 1: scanning, 2: response streaming
+  const [typedQuery, setTypedQuery] = useState("");
+  const [typedResponse, setTypedResponse] = useState("");
+  const [visibleSources, setVisibleSources] = useState<string[]>([]);
+
+  const queryText = "How do I apply for a partial tuition waiver?";
+  const responseText = "Tuition waivers are granted under Section 4.2 of the SNU Academic Handbook. Requirements: minimum 8.5 CGPA, parents' income certificate < 8 LPA. Submit your application via the ERP Academics portal before the May 25 deadline.";
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const runCycle = async () => {
+      if (!isMounted) return;
+
+      // Phase 0: Reset and start typing query
+      setCurrentStep(0);
+      setTypedQuery("");
+      setTypedResponse("");
+      setVisibleSources([]);
+
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      
+      // Type query Snappy
+      for (let i = 0; i <= queryText.length; i++) {
+        if (!isMounted) return;
+        setTypedQuery(queryText.slice(0, i));
+        await new Promise((resolve) => setTimeout(resolve, shouldReduceMotion ? 10 : 35));
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!isMounted) return;
+
+      // Phase 1: Scanning databases
+      setCurrentStep(1);
+      const sources = ["ERP Portal (Academics)", "SNU Policy Handbook v2.0", "Student Welfare Guidelines"];
+      for (let i = 0; i < sources.length; i++) {
+        await new Promise((resolve) => setTimeout(resolve, shouldReduceMotion ? 100 : 500));
+        if (!isMounted) return;
+        setVisibleSources((prev) => [...prev, sources[i]]);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!isMounted) return;
+
+      // Phase 2: Typing response
+      setCurrentStep(2);
+      const words = responseText.split(" ");
+      for (let i = 0; i <= words.length; i++) {
+        if (!isMounted) return;
+        setTypedResponse(words.slice(0, i).join(" "));
+        await new Promise((resolve) => setTimeout(resolve, shouldReduceMotion ? 10 : 25));
+      }
+
+      // Hold at end
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+      
+      if (isMounted) {
+        runCycle();
+      }
+    };
+
+    runCycle();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [shouldReduceMotion]);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      initial={{ opacity: 0, y: 40, filter: "blur(6px)", rotateX: 6 }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", rotateX: 0 }}
+      transition={{ type: "spring", duration: 0.85, bounce: 0.05 }}
+      viewport={{ once: true }}
+      style={{
+        rotateX: shouldReduceMotion ? 0 : rotateX,
+        rotateY: shouldReduceMotion ? 0 : rotateY,
+        x: shouldReduceMotion ? 0 : tiltX,
+        y: shouldReduceMotion ? 0 : tiltY,
+        transformStyle: "preserve-3d",
+      }}
+      className="relative mt-16 md:mt-24 w-full max-w-5xl rounded-[2rem] border border-white/10 bg-[#0A0A0A]/90 backdrop-blur-3xl overflow-hidden shadow-[0_0_100px_rgba(79,70,229,0.15)] perspective-1000 p-1 group will-change-transform"
+    >
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+      
+      {/* OS Titlebar */}
+      <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/[0.02]">
+        <div className="flex gap-2.5">
+          <button className="w-3.5 h-3.5 rounded-full bg-red-500/20 border border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.2)] active:scale-90 transition-transform" />
+          <button className="w-3.5 h-3.5 rounded-full bg-yellow-500/20 border border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.2)] active:scale-90 transition-transform" />
+          <button className="w-3.5 h-3.5 rounded-full bg-green-500/20 border border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.2)] active:scale-90 transition-transform" />
+        </div>
+        <div className="text-[11px] font-mono text-white/20 uppercase tracking-[0.3em]">SNUGPT_V1</div>
+        <div className="w-20" />
+      </div>
+
+      <div className="aspect-[16/10] bg-black/40 relative overflow-hidden flex flex-col justify-center items-center p-6 md:p-12">
+        {/* Dynamic Grid Background in Mockup */}
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1e1e1e_1px,transparent_1px)] [background-size:20px_20px]" />
+
+        <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl p-6 md:p-8 shadow-2xl relative z-10 flex flex-col justify-between min-h-[75%]">
+          
+          {/* Simulated Messaging Area */}
+          <div className="flex-1 flex flex-col justify-center">
+            
+            {/* Step 0: User Query Bubble */}
+            {typedQuery && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ type: "spring", duration: 0.5, bounce: 0 }}
+                className="flex gap-4 items-start mb-6 justify-end w-full"
+              >
+                <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-indigo-600/90 text-white px-5 py-3 shadow-lg relative border border-indigo-500/20">
+                  <span className="text-xs md:text-sm font-medium tracking-tight block">
+                    {typedQuery}
+                    {currentStep === 0 && <span className="animate-pulse ml-0.5 font-bold">|</span>}
+                  </span>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shrink-0 text-indigo-300">
+                  <Search className="w-4 h-4" />
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 1: Matching and Indexing Sources */}
+            {currentStep >= 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ type: "spring", duration: 0.5, bounce: 0 }}
+                className="w-full rounded-2xl border border-white/5 bg-white/[0.02] p-4 md:p-5 mb-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 shrink-0">
+                    <Database className="w-4 h-4 text-indigo-400 animate-pulse" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-white/80">Retrieving Policy Context...</span>
+                    <span className="text-[10px] text-white/40 font-medium">Neural Core active</span>
+                  </div>
+                  {/* Scanning progress animation */}
+                  <div className="ml-auto w-24 h-1 bg-white/5 rounded-full overflow-hidden relative">
+                    <motion.div
+                      initial={{ left: "-100%" }}
+                      animate={{ left: "100%" }}
+                      transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                      className="absolute h-full w-12 bg-indigo-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {["ERP Portal (Academics)", "SNU Policy Handbook v2.0", "Student Welfare Guidelines"].map((src) => {
+                    const isVisible = visibleSources.includes(src);
+                    return (
+                      <div
+                        key={src}
+                        className={`px-3 py-2 rounded-xl border flex items-center gap-2 transition-all duration-300 ${
+                          isVisible 
+                            ? "border-indigo-500/20 bg-indigo-500/5 text-white/80" 
+                            : "border-white/5 bg-white/[0.01] text-white/20"
+                        }`}
+                      >
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center border shrink-0 ${
+                          isVisible 
+                            ? "border-indigo-400 bg-indigo-500/10 text-indigo-400" 
+                            : "border-white/10 text-white/10"
+                        }`}>
+                          {isVisible && <CheckCircle2 className="w-2.5 h-2.5" />}
+                        </div>
+                        <span className="text-[10px] font-bold tracking-tight truncate">{src}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 2: SnuGPT Intelligent Response */}
+            {currentStep === 2 && typedResponse && (
+              <motion.div
+                initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ type: "spring", duration: 0.6, bounce: 0 }}
+                className="flex gap-4 items-start w-full"
+              >
+                <div className="relative shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center overflow-hidden">
+                    <Image src="/avatar.svg" alt="AI" width={32} height={32} className="rounded-lg" />
+                  </div>
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0A0A0A]" />
+                </div>
+                
+                <div className="flex-1 space-y-3.5">
+                  <div className="rounded-2xl rounded-tl-sm border border-indigo-500/10 bg-indigo-500/5 p-4 md:p-5 shadow-2xl relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-50" />
+                    <span className="text-xs md:text-sm text-white/90 leading-relaxed font-medium tracking-tight block relative z-10 font-inter">
+                      {typedResponse}
+                      {typedResponse.length < responseText.length && <span className="animate-pulse text-indigo-400 font-black ml-0.5">▋</span>}
+                    </span>
+                  </div>
+
+                  {typedResponse.length === responseText.length && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      transition={{ type: "spring", duration: 0.5 }}
+                      className="flex items-center gap-4 text-[10px] text-white/30 uppercase tracking-widest font-black"
+                    >
+                      <span className="flex items-center gap-1.5 text-indigo-400">
+                        <Sparkles className="w-3.5 h-3.5" /> Checked against 3 sources
+                      </span>
+                      <span>•</span>
+                      <span>Confidence: 99.8%</span>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 export default function Lander() {
   const { scrollYProgress } = useScroll();
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
@@ -262,7 +525,7 @@ export default function Lander() {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#ededed] font-jakarta overflow-x-hidden selection:bg-indigo-500/30 tracking-tight">
+    <div className="min-h-screen bg-[#050505] text-[#ededed] font-jakarta overflow-x-hidden selection:bg-amber-500/30 tracking-tight">
       <MouseFollowGlow />
       <GridBackground />
       <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
@@ -291,7 +554,7 @@ export default function Lander() {
 
           <button
             onClick={() => setIsWaitlistOpen(true)}
-            className="px-5 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-indigo-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+            className="px-5 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
           >
             Access Intelligence
           </button>
@@ -305,12 +568,12 @@ export default function Lander() {
           initial="hidden" animate="visible" variants={staggerContainer}
           className="relative max-w-5xl"
         >
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-indigo-500/5 border border-indigo-500/20 text-[9px] font-black text-indigo-400 mb-8 md:mb-10 shadow-[0_0_30px_rgba(79,70,229,0.1)] backdrop-blur-xl">
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-amber-500/5 border border-amber-500/20 text-[9px] font-black text-amber-500 mb-8 md:mb-10 shadow-[0_0_30px_rgba(242,169,0,0.1)] backdrop-blur-xl">
             <div className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
             </div>
-            <span className="uppercase tracking-[0.4em]">Neural Core V1.0.4 Online</span>
+            <span className="uppercase tracking-[0.4em] text-amber-400/90">Student Built Handbook Engine</span>
           </motion.div>
           
           <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 md:mb-8 leading-[0.9] md:leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 pb-2 md:pb-4">
@@ -325,9 +588,9 @@ export default function Lander() {
           <motion.div variants={fadeInUp} className="flex flex-col items-center gap-6 md:gap-10 w-full max-w-2xl mx-auto">
             {/* Mock Search Bar Centerpiece */}
             <div className="w-full relative group/hero-search cursor-pointer">
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-blue-500/20 to-indigo-500/20 rounded-3xl blur-xl opacity-0 group-hover/hero-search:opacity-100 transition-opacity duration-700" />
-              <div className="relative w-full px-6 py-4 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-2xl flex items-center gap-4 shadow-2xl transition-all duration-500 group-hover/hero-search:border-indigo-500/30">
-                <Search className="w-5 h-5 text-indigo-400" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-blue-600/30 to-amber-500/20 rounded-3xl blur-xl opacity-0 group-hover/hero-search:opacity-100 transition-opacity duration-700" />
+              <div className="relative w-full px-6 py-4 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-2xl flex items-center gap-4 shadow-2xl transition-all duration-500 group-hover/hero-search:border-amber-500/30">
+                <Search className="w-5 h-5 text-amber-400" />
                 <div className="flex flex-col items-start overflow-hidden">
                   <span className="text-xs font-bold text-white/60 tracking-tight">Ask Intelligence...</span>
                   <span className="text-[10px] text-white/20 font-medium truncate w-full">"How do I apply for a partial tuition waiver?"</span>
@@ -336,8 +599,8 @@ export default function Lander() {
                   <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black tracking-widest text-white/30 uppercase">
                     <Command className="w-3 h-3" /> K
                   </div>
-                  <div onClick={() => setIsWaitlistOpen(true)} className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform">
-                    <Sparkles className="w-4 h-4" />
+                  <div onClick={() => setIsWaitlistOpen(true)} className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform hover:bg-amber-400">
+                    <Sparkles className="w-4 h-4 text-blue-950" />
                   </div>
                 </div>
               </div>
@@ -363,69 +626,7 @@ export default function Lander() {
         </motion.div>
 
         {/* Hero Mockup */}
-        <motion.div
-          initial={{ opacity: 0, y: 60, rotateX: 10 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          whileHover={{ scale: 1.01, transition: { duration: 0.5 } }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          viewport={{ once: true }}
-          className="relative mt-16 md:mt-24 w-full max-w-5xl rounded-[2rem] border border-white/10 bg-[#0A0A0A]/90 backdrop-blur-3xl overflow-hidden shadow-[0_0_100px_rgba(79,70,229,0.1)] perspective-1000 p-1 group cursor-pointer"
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-          <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/[0.02]">
-            <div className="flex gap-2.5">
-              <div className="w-3.5 h-3.5 rounded-full bg-red-500/20 border border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.2)]" />
-              <div className="w-3.5 h-3.5 rounded-full bg-yellow-500/20 border border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.2)]" />
-              <div className="w-3.5 h-3.5 rounded-full bg-green-500/20 border border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.2)]" />
-            </div>
-            <div className="text-[11px] font-mono text-white/20 uppercase tracking-[0.3em]">SNUGPT_V1</div>
-            <div className="w-20" />
-          </div>
-
-          <div className="aspect-[16/10] bg-black/40 relative group">
-            {/* Dynamic Grid Background in Mockup */}
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1e1e1e_1px,transparent_1px)] [background-size:20px_20px]" />
-
-            <div className="relative p-12 h-full flex flex-col items-center justify-center">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="w-full max-w-3xl rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl p-8 shadow-2xl relative"
-              >
-                <div className="flex gap-6 items-start mb-10">
-                  <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
-                    <Database className="w-6 h-6 text-indigo-400/80" />
-                  </div>
-                  <div className="space-y-3 w-full">
-                    <div className="h-5 w-48 bg-white/10 rounded-full" />
-                    <div className="h-3 w-full bg-white/5 rounded-full" />
-                    <div className="h-3 w-2/3 bg-white/5 rounded-full" />
-                  </div>
-                </div>
-                <div className="flex gap-6 items-start flex-row-reverse">
-                  <div className="relative shrink-0">
-                    <Image src="/avatar.svg" alt="AI" width={48} height={48} className="rounded-2xl border border-indigo-500/50 shadow-[0_0_20px_rgba(79,70,229,0.3)]" priority />
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-4 border-[#111]" />
-                  </div>
-                  <div className="space-y-3 w-full flex flex-col items-end">
-                    <div className="h-10 w-3/4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center px-4">
-                      <div className="h-2 w-full bg-indigo-400/30 rounded-full overflow-hidden relative">
-                        <motion.div
-                          initial={{ x: "-100%" }}
-                          animate={{ x: "100%" }}
-                          transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                          className="absolute inset-0 bg-indigo-400"
-                        />
-                      </div>
-                    </div>
-                    <div className="h-3 w-1/2 bg-white/5 rounded-full" />
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
+        <HeroMockupWindow />
       </section>
 
       {/* Feature Grid Section */}
@@ -453,7 +654,7 @@ export default function Lander() {
             icon={Search}
           >
             <div className="mt-8 relative group/search">
-              <div className="absolute inset-0 bg-indigo-500/10 blur-xl opacity-0 group-hover/search:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-amber-500/10 blur-xl opacity-0 group-hover/search:opacity-100 transition-opacity duration-500" />
               <div className="relative w-full px-6 py-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-4 text-white/20">
                 <Search className="w-5 h-5" />
                 <span className="text-sm font-medium">"Where can I find the AI course syllabus?"</span>
@@ -478,12 +679,12 @@ export default function Lander() {
                   initial={{ width: "0%" }}
                   whileInView={{ width: "65%" }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.5)]"
+                  className="h-full bg-amber-500 shadow-[0_0_15px_rgba(242,169,0,0.5)]"
                 />
               </div>
               <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-white/20">
                 <span>Processing Neural Path</span>
-                <span className="text-indigo-400">65%</span>
+                <span className="text-amber-400">65%</span>
               </div>
             </div>
           </BentoCard>
@@ -496,16 +697,16 @@ export default function Lander() {
             icon={Shield}
           >
             <div className="mt-8 relative h-24 flex items-center justify-center overflow-hidden rounded-2xl bg-white/[0.02] border border-white/5">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.05)_0%,transparent_70%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(242,169,0,0.05)_0%,transparent_70%)]" />
               <motion.div
                 animate={{
                   scale: [1, 1.2, 1],
                   opacity: [0.2, 0.4, 0.2]
                 }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute w-20 h-20 border border-indigo-500/20 rounded-full"
+                className="absolute w-20 h-20 border border-amber-500/20 rounded-full"
               />
-              <Lock className="w-8 h-8 text-indigo-400/40 relative z-10" />
+              <Lock className="w-8 h-8 text-amber-400/40 relative z-10" />
             </div>
           </BentoCard>
 
@@ -518,8 +719,8 @@ export default function Lander() {
           >
             <div className="mt-8 grid grid-cols-5 gap-3">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="aspect-square rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center group/icon hover:border-indigo-500/30 transition-colors">
-                  <div className="w-2 h-2 rounded-full bg-white/5 group-hover/icon:bg-indigo-500/40 transition-colors" />
+                <div key={i} className="aspect-square rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center group/icon hover:border-amber-500/30 transition-colors">
+                  <div className="w-2 h-2 rounded-full bg-white/5 group-hover/icon:bg-amber-500/40 transition-colors" />
                 </div>
               ))}
             </div>
@@ -539,13 +740,13 @@ export default function Lander() {
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="flex flex-col gap-4">
             {[
-              { icon: Share2, text: "One-click study group sharing", color: "indigo" },
+              { icon: Share2, text: "One-click study group sharing", color: "amber" },
               { icon: Download, text: "Export as professional PDF/Markdown", color: "white" },
-              { icon: Globe, text: "Cloud sync across all devices", color: "indigo" }
+              { icon: Globe, text: "Cloud sync across all devices", color: "amber" }
             ].map((item, i) => (
               <motion.div key={i} variants={fadeInUp} className="flex items-center gap-4 group cursor-default">
                 <div className={`w-10 h-10 rounded-xl bg-${item.color}-500/5 border border-${item.color}-500/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  <item.icon className={`w-5 h-5 text-${item.color === 'indigo' ? 'indigo-400' : 'white/60'}`} />
+                  <item.icon className={`w-5 h-5 text-${item.color === 'amber' ? 'amber-400' : 'white/60'}`} />
                 </div>
                 <span className="text-white/50 group-hover:text-white transition-colors font-medium">{item.text}</span>
               </motion.div>
@@ -560,9 +761,9 @@ export default function Lander() {
             transition={{ duration: 1 }}
             className="relative rounded-3xl border border-white/10 bg-[#0A0A0A] p-8 shadow-2xl overflow-hidden aspect-square flex flex-col gap-6"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent pointer-events-none" />
             <div className="h-12 flex items-center justify-between border-b border-white/5 px-2">
-              <span className="text-xs font-mono text-indigo-400">SESSION_EXPORT_001.PDF</span>
+              <span className="text-xs font-mono text-amber-400">SESSION_EXPORT_001.PDF</span>
               <div className="flex gap-2">
                 <div className="w-3 h-3 rounded-full bg-white/10" />
                 <div className="w-3 h-3 rounded-full bg-white/10" />
@@ -583,7 +784,7 @@ export default function Lander() {
             </div>
           </motion.div>
           {/* Decorative Element */}
-          <div className="absolute -z-10 -right-20 -bottom-20 w-80 h-80 bg-indigo-500/20 blur-[100px] rounded-full" />
+          <div className="absolute -z-10 -right-20 -bottom-20 w-80 h-80 bg-amber-500/20 blur-[100px] rounded-full" />
         </div>
       </section>
 
@@ -598,11 +799,11 @@ export default function Lander() {
             viewport={{ once: true }}
             className="w-32 h-32 mb-16 relative"
           >
-            <div className="absolute -inset-12 bg-indigo-600/20 blur-3xl rounded-full animate-pulse" />
-            <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-[2.5rem] opacity-20 blur-xl animate-gradient-x" />
+            <div className="absolute -inset-12 bg-amber-600/20 blur-3xl rounded-full animate-pulse" />
+            <div className="absolute -inset-4 bg-gradient-to-r from-amber-500 to-blue-600 rounded-[2.5rem] opacity-20 blur-xl animate-gradient-x" />
             <div className="relative w-full h-full rounded-[2.5rem] bg-[#0A0A0A] flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden group">
               <Image src="/avatar.svg" alt="SNUGPT" width={128} height={128} className="transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-indigo-500/10 mix-blend-overlay" />
+              <div className="absolute inset-0 bg-amber-500/10 mix-blend-overlay" />
             </div>
           </motion.div>
 
@@ -612,7 +813,7 @@ export default function Lander() {
             viewport={{ once: true }}
             className="text-4xl md:text-[4rem] font-black tracking-tighter mb-8 leading-none"
           >
-            Start resolving queries<br /><span className="text-indigo-400">today.</span>
+            Start resolving queries<br /><span className="text-amber-400">today.</span>
           </motion.h2>
 
           <motion.div
@@ -622,7 +823,7 @@ export default function Lander() {
           >
             <button
               onClick={() => setIsWaitlistOpen(true)}
-              className="px-12 py-6 rounded-[2rem] bg-white text-black font-black text-lg md:text-xl hover:bg-indigo-50 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(255,255,255,0.2)] inline-flex items-center gap-4 group"
+              className="px-12 py-6 rounded-[2rem] bg-white text-black font-black text-lg md:text-xl hover:bg-amber-50 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(255,255,255,0.2)] inline-flex items-center gap-4 group"
             >
               INITIALIZE INTERFACE
               <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-500" />

@@ -40,6 +40,18 @@ export default function ChatInterface() {
     ta.style.height = Math.min(ta.scrollHeight, 180) + "px";
   }, [input]);
 
+  // Keyboard shortcuts (Cmd+K / Ctrl+K for a new chat)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        handleNew();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [conversations]);
+
   const handleSubmit = async (e?: React.FormEvent, customQuery?: string) => {
     e?.preventDefault();
     const queryText = (customQuery || input).trim();
@@ -177,6 +189,12 @@ export default function ChatInterface() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
+    } else if (e.key === "ArrowUp" && !input.trim()) {
+      const userMessages = messages.filter((m) => m.role === "user");
+      if (userMessages.length > 0) {
+        e.preventDefault();
+        setInput(userMessages[userMessages.length - 1].content);
+      }
     }
   };
 
@@ -293,10 +311,10 @@ export default function ChatInterface() {
                   </div>
 
                   <h2 className="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">
-                    How can I help you today?
+                    How can I assist your SNU journey today?
                   </h2>
                   <p className="text-xs md:text-sm mb-6 md:mb-10" style={{ color: "var(--color-muted)" }}>
-                    Ask about admissions, academics, campus life, fees, or anything SNU.
+                    Query university student handbooks, policy manuals, and ERP guides in real-time.
                   </p>
 
                   {/* Quick prompts */}

@@ -113,7 +113,7 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
                       <span
                         key={i}
                         title={preview}
-                        className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border transition-colors cursor-default"
+                        className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border transition-all cursor-default hover:border-yellow-500/30 hover:text-white"
                         style={{
                           background: "var(--color-surface)",
                           borderColor: "var(--color-border)",

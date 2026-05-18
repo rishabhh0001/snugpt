@@ -25,6 +25,7 @@ function timeAgo(ts: number): string {
 
 export default function Sidebar({ conversations, activeId, onSelect, onNew, onDelete, mobile, onClose }: SidebarProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   return (
     <aside className={`flex flex-col h-full ${mobile ? "w-full" : "w-64"}`}
@@ -74,7 +75,10 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
                 background: conv.id === activeId ? "var(--color-surface-hover)" : "transparent",
               }}
               onMouseEnter={() => setHoveredId(conv.id)}
-              onMouseLeave={() => setHoveredId(null)}
+              onMouseLeave={() => {
+                setHoveredId(null);
+                setDeletingId(null);
+              }}
               onClick={() => onSelect(conv.id)}
             >
               <div className="flex items-start gap-2.5 px-3 py-2.5 flex-1 min-w-0">
@@ -91,14 +95,30 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
               </div>
 
               {/* Delete button */}
-              {(hoveredId === conv.id || conv.id === activeId) && (
+              {(hoveredId === conv.id || conv.id === activeId || deletingId === conv.id) && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); onDelete(conv.id); }}
-                  className="absolute right-2 p-1 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:text-red-400"
-                  style={{ color: "var(--color-muted)" }}
-                  title="Delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (deletingId === conv.id) {
+                      onDelete(conv.id);
+                      setDeletingId(null);
+                    } else {
+                      setDeletingId(conv.id);
+                    }
+                  }}
+                  className={`absolute right-2 py-1 px-1.5 rounded-lg transition-all ${
+                    deletingId === conv.id
+                      ? "bg-red-500/10 text-red-400 scale-100 opacity-100 z-10"
+                      : "opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-400"
+                  }`}
+                  style={deletingId !== conv.id ? { color: "var(--color-muted)" } : undefined}
+                  title={deletingId === conv.id ? "Click again to confirm" : "Delete conversation"}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  {deletingId === conv.id ? (
+                    <span className="text-[9px] font-black tracking-wider uppercase">Confirm?</span>
+                  ) : (
+                    <Trash2 className="w-3.5 h-3.5" />
+                  )}
                 </button>
               )}
             </div>
