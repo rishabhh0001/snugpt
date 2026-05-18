@@ -19,5 +19,6 @@ class ChatResponse(BaseModel):
     sources: Optional[List[SourceDocument]] = None
 
 class WaitlistRequest(BaseModel):
-    name: str
-    email: str
+    first_name: str
+    mobile_number: str
+    email_address: str

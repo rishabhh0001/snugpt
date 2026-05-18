@@ -104,11 +104,15 @@ async def chat(request: ChatRequest, fastapi_request: Request):
 @app.post("/api/waitlist")
 async def waitlist(request: WaitlistRequest):
     try:
-        await add_to_waitlist(request.name, request.email)
+        await add_to_waitlist(
+            first_name=request.first_name,
+            mobile_number=request.mobile_number,
+            email_address=request.email_address
+        )
         return {"message": "Successfully joined the waitlist"}
     except Exception as e:
         error_str = str(e).lower()
-        if "unique constraint" in error_str or "already exists" in error_str or "duplicate" in error_str:
+        if "unique constraint" in error_str or "already exists" in error_str or "duplicate" in error_str or "email_address" in error_str:
             raise HTTPException(status_code=400, detail="This email is already on the waitlist.") from e
         logger.error("Waitlist error: %s", e)
         raise HTTPException(status_code=500, detail="Could not save waitlist entry. Please try again.") from e
