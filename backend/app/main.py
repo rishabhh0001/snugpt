@@ -8,10 +8,13 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
-from app.models.database import connect_database, disconnect_database, is_database_connected
-from app.models.schemas import ChatRequest, WaitlistRequest
+from app.models.database import connect_database, disconnect_database, is_database_connected, get_database
+from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest
 from app.models.waitlist import add_to_waitlist
+from app.models.chat_log import save_chat_feedback
 from app.rag.pipeline import generate_streaming_response
+from app.rag.vectorstore import add_qa_pair
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -116,3 +119,33 @@ async def waitlist(request: WaitlistRequest):
             raise HTTPException(status_code=400, detail="This email is already on the waitlist.") from e
         logger.error("Waitlist error: %s", e)
         raise HTTPException(status_code=500, detail="Could not save waitlist entry. Please try again.") from e
+
+
+@app.post("/api/chat/feedback")
+async def chat_feedback(request: FeedbackRequest):
+    try:
+        # 1. Save feedback event to SQL database
+        await save_chat_feedback(
+            chat_id=request.chat_id,
+            action=request.action,
+            message_id=request.message_id
+        )
+
+        # 2. Reinforce Vector store (ChromaDB) if the feedback is positive or negative
+        if request.action in ("up", "down") and request.message_id:
+            db = get_database()
+            query_select = "SELECT user_query, ai_response FROM chat_logs WHERE id = :id"
+            row = await db.fetch_one(query=query_select, values={"id": request.message_id})
+            if row:
+                user_query = row["user_query"]
+                ai_response = row["ai_response"]
+                # Save to vector store in a background thread to prevent request blocking
+                await asyncio.to_thread(add_qa_pair, user_query, ai_response, request.action)
+                print(f"[Feedback Vectorstore] Reinforced vector DB for log {request.message_id} with action {request.action}")
+            else:
+                logger.warning("Could not find chat log %s for reinforcing vector store.", request.message_id)
+
+        return {"message": f"Successfully captured feedback: {request.action}"}
+    except Exception as e:
+        logger.error("Feedback submission error: %s", e)
+        raise HTTPException(status_code=500, detail="Could not capture feedback. Please try again.") from e

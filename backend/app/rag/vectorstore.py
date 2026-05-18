@@ -1,6 +1,6 @@
 import logging
 import uuid
-from typing import List
+from typing import List, Any, cast
 
 import chromadb
 from langchain_core.documents import Document
@@ -70,15 +70,15 @@ def retrieve_documents(query: str, k: int = 4) -> List[Document]:
     return docs
 
 
-def add_qa_pair(query: str, answer: str) -> None:
-    """Persist a learned Q&A pair to Chroma."""
+def add_qa_pair(query: str, answer: str, feedback: str = "up") -> None:
+    """Persist a learned Q&A pair to Chroma with feedback type (up or down)."""
     text = f"Q: {query}\nA: {answer}"
     embedding = get_embeddings().embed_documents([text])[0]
     _get_collection().add(
         ids=[str(uuid.uuid4())],
         documents=[text],
-        metadatas=[{"source": "chat_learning", "type": "learned_qa"}],
-        embeddings=[embedding],
+        metadatas=cast(Any, [{"source": "chat_learning", "type": "learned_qa", "feedback": feedback}]),
+        embeddings=cast(Any, [embedding]),
     )
 
 
@@ -92,6 +92,6 @@ def add_documents(documents: List[Document]) -> None:
     _get_collection().add(
         ids=[str(uuid.uuid4()) for _ in texts],
         documents=texts,
-        metadatas=metadatas,
-        embeddings=vectors,
+        metadatas=cast(Any, metadatas),
+        embeddings=cast(Any, vectors),
     )

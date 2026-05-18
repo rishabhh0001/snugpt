@@ -35,7 +35,7 @@ export default function ChatInterface() {
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
   }, [conversations]);
 
-  const handleSubmit = async (e?: React.FormEvent, customQuery?: string) => {
+  const handleSubmit = async (e?: React.FormEvent, customQuery?: string, historyOverride?: MessageProps[]) => {
     e?.preventDefault();
     const queryText = (customQuery || "").trim();
     if (!queryText || isLoading) return;
@@ -45,7 +45,8 @@ export default function ChatInterface() {
 
     const userMsg: MessageProps = { role: "user", content: queryText };
     const placeholderMsg: MessageProps = { role: "assistant", content: "", sources: [] };
-    const nextMessages: MessageProps[] = [...messages, userMsg, placeholderMsg];
+    const baseMessages = historyOverride !== undefined ? historyOverride : messages;
+    const nextMessages: MessageProps[] = [...baseMessages, userMsg, placeholderMsg];
 
     updateMessages(convId, nextMessages);
     setIsLoading(true);
@@ -63,7 +64,7 @@ export default function ChatInterface() {
         body: JSON.stringify({
           query: queryText,
           session_id: convId,
-          history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          history: baseMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
@@ -76,7 +77,7 @@ export default function ChatInterface() {
           body: JSON.stringify({
             query: queryText,
             session_id: convId,
-            history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+            history: baseMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
           }),
         });
       }
@@ -127,7 +128,8 @@ export default function ChatInterface() {
               const last = updated[updated.length - 1];
               if (!last || last.role !== "assistant") continue;
 
-              if (data.type === "sources") last.sources = data.data;
+              if (data.type === "message_id") last.id = data.id;
+              else if (data.type === "sources") last.sources = data.data;
               else if (data.type === "chunk" && data.text) last.content += data.text;
 
               current = updated;
@@ -293,7 +295,22 @@ export default function ChatInterface() {
               ) : (
                 <motion.div key="messages" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {messages.map((msg, i) => (
-                    <MessageBubble key={i} message={msg} />
+                    <MessageBubble
+                      key={i}
+                      message={msg}
+                      chatId={activeId || undefined}
+                      onRegenerate={
+                        msg.role === "assistant" && i > 0
+                          ? () => {
+                              const userPrompt = messages[i - 1];
+                              if (userPrompt && userPrompt.role === "user") {
+                                const baseHistory = messages.slice(0, i - 1);
+                                handleSubmit(undefined, userPrompt.content, baseHistory);
+                              }
+                            }
+                          : undefined
+                      }
+                    />
                   ))}
                   <div ref={messagesEndRef} />
                 </motion.div>

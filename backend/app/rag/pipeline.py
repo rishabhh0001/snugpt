@@ -21,7 +21,7 @@ def get_llm():
             model="meta/llama-3.1-8b-instruct",
             nvidia_api_key=api_key,
             temperature=0.1,
-            max_tokens=4096
+            max_tokens=8192
         )
     return _llm
 
@@ -73,6 +73,9 @@ def save_qa_to_vectorstore(query: str, answer: str):
 
 
 async def generate_streaming_response(query: str, history: list = [], session_id: Optional[str] = None, user_ip: Optional[str] = None):
+    import uuid
+    log_id = str(uuid.uuid4())
+
     # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
     blocked = check_safety(query)
     if blocked:
@@ -81,17 +84,41 @@ async def generate_streaming_response(query: str, history: list = [], session_id
         yield f'data: {{"type": "done"}}\n\n'
         return
 
+    # Yield the message_id at the absolute start of the stream
+    yield f'data: {{"type": "message_id", "id": "{log_id}"}}\n\n'
+
     try:
-        # Get relevant documents from DB
+        # Get relevant documents from DB (fetch slightly more to identify feedback)
         try:
-            docs = retrieve_documents(query, k=4)
+            docs = retrieve_documents(query, k=6)
         except Exception as e:
             print(f"Retriever error: {e}")
             docs = []
 
+        # Filter out positive vs negative feedback documents
+        positive_docs = []
+        negative_docs = []
+        for doc in docs:
+            # Check metadata for chat_learning source and thumbs down
+            if doc.metadata.get("source") == "chat_learning" and doc.metadata.get("feedback") == "down":
+                negative_docs.append(doc)
+            else:
+                positive_docs.append(doc)
+
+        # Slice positive docs back to top 4 for context density
+        positive_docs = positive_docs[:4]
+
         # Format DB docs for the prompt
         context_str = "--- DATABASE DOCUMENTS ---\n"
-        context_str += format_docs(docs) if docs else "(No documents retrieved)"
+        context_str += format_docs(positive_docs) if positive_docs else "(No documents retrieved)"
+
+        # Add negative feedback reinforcement if present to guide the model
+        if negative_docs:
+            context_str += "\n\n--- CRITICAL: AVOID THESE ANSWERS (STUDENT NEGATIVE FEEDBACK) ---\n"
+            context_str += "The following answers previously received negative student feedback for this or similar queries. Do NOT repeat these responses or replicate their structure/errors:\n"
+            for ndoc in negative_docs:
+                context_str += f"- {ndoc.page_content}\n"
+
         web_results = ""
 
         # Build conversation history (last 6 turns max)
@@ -106,10 +133,10 @@ async def generate_streaming_response(query: str, history: list = [], session_id
 
         full_context = context_str + history_str
 
-        # Build sources — deduped by filename, max 8, Web Search only if useful
+        # Build sources — deduped by filename, max 8
         seen_sources: set = set()
         sources_data = []
-        for doc in docs:
+        for doc in positive_docs:
             src = doc.metadata.get("source", "")
             key = src.split("/")[-1].split("\\")[-1]
             if key and key not in seen_sources and len(sources_data) < 8:
@@ -118,11 +145,6 @@ async def generate_streaming_response(query: str, history: list = [], session_id
                     "content": doc.page_content[:120],
                     "metadata": doc.metadata
                 })
-        # if web_results and len(web_results.strip()) > 50:
-        #     sources_data.append({
-        #         "content": web_results[:120],
-        #         "metadata": {"source": "Web Search"}
-        #     })
 
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 
@@ -150,7 +172,7 @@ async def generate_streaming_response(query: str, history: list = [], session_id
             import asyncio
             from app.models.chat_log import save_chat_log
 
-            # Persist concurrently before stream ends (serverless may freeze after response)
+            # Persist concurrently before stream ends
             async def _log_chat():
                 try:
                     await save_chat_log(
@@ -159,17 +181,13 @@ async def generate_streaming_response(query: str, history: list = [], session_id
                         session_id=session_id,
                         context={"sources": sources_data},
                         user_ip=user_ip,
+                        log_id=log_id,
                     )
                 except Exception as log_err:
                     print(f"Chat log save failed: {log_err}")
 
-            async def _learn_qa():
-                try:
-                    await asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
-                except Exception as learn_err:
-                    print(f"Vectorstore learning failed: {learn_err}")
-
-            await asyncio.gather(_log_chat(), _learn_qa())
+            # Vector learning is now triggered on explicit user feedback (thumbs up / thumbs down)
+            await asyncio.gather(_log_chat())
 
     except Exception as e:
         import traceback
