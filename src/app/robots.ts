@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/", "/_next/"],
     },
-    sitemap: "https://snugpt.org/sitemap.xml",
+    sitemap: "https://snugpt.rishabhj.in/sitemap.xml",
   };
 }
