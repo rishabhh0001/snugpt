@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
       {/* Top Header navbar simplified */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-2xl border-b border-white/5 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-6">
-          <Link href="/lander" className="flex items-center gap-3 group cursor-pointer">
+          <Link href="/" className="flex items-center gap-3 group cursor-pointer">
             <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-300">
               <Image src="/avatar.svg" alt="SNUGPT" width={32} height={32} className="object-cover" />
             </div>
@@ -51,7 +51,7 @@ export default function PrivacyPolicyPage() {
             </div>
           </Link>
 
-          <Link href="/lander" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-white/50 hover:text-white transition-colors">
+          <Link href="/" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-white/50 hover:text-white transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
           </Link>
         </div>

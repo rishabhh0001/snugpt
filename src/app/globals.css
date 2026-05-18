@@ -11,7 +11,8 @@
   --color-border: rgba(255,255,255,0.08);
   --color-text: #ececec;
   --color-muted: #8a8a8a;
-  --font-inter: "Inter", sans-serif;
+  --font-inter: var(--font-inter);
+  --font-jakarta: var(--font-jakarta);
 }
 
 @layer base {

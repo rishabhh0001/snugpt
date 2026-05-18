@@ -67,7 +67,7 @@ export function Header() {
 					},
 				)}
 			>
-				<Link href="/lander" className="hover:bg-accent rounded-md p-2">
+				<Link href="/" className="hover:bg-accent rounded-md p-2">
 					<WordmarkIcon className="h-4" />
 				</Link>
 				
