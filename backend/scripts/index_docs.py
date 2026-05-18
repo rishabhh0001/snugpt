@@ -72,7 +72,7 @@ def index_documents(docs_dir: str):
         add_documents(batch)
         print(f"Progress: {min(i + batch_size, len(chunks))}/{len(chunks)} chunks uploaded.")
 
-    print("Indexing complete! SnuGPT is now smarter.")
+    print("Indexing complete! SNUGPT is now smarter.")
 
 if __name__ == "__main__":
     # Path to the docs directory relative to the project root

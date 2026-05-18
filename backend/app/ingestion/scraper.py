@@ -115,7 +115,7 @@ def scrape_snu():
 
     print(f"Starting recursive crawl (limit: {max_pages} pages) -> {scraped_dir}")
 
-    headers = {"User-Agent": "SnuGPT-Scraper/1.0 (educational bot; contact: rishabhh0001@github)"}
+    headers = {"User-Agent": "SNUGPT-Scraper/1.0 (educational bot; contact: rishabhh0001@github)"}
 
     while to_visit and count < max_pages:
         url = to_visit.pop()
@@ -152,7 +152,10 @@ def scrape_snu():
 
             # Discover more links
             for link in soup.find_all("a", href=True):
-                next_url = urljoin(url, link["href"]).split("#")[0].rstrip("/")
+                href = link["href"]
+                if isinstance(href, list):
+                    href = href[0] if href else ""
+                next_url = urljoin(url, href).split("#")[0].rstrip("/")
                 parsed   = urlparse(next_url)
                 if (
                     any(d in parsed.netloc for d in ALLOWED_DOMAINS)

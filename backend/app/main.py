@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI):
         pass
 
 
-app = FastAPI(title="SnuGPT API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="SNUGPT API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

@@ -130,7 +130,7 @@ async def save_shared_chat(
     values = {
         "id": share_id,
         "session_id": session_id,
-        "title": title or "Shared SnuGPT Chat",
+        "title": title or "Shared SNUGPT Chat",
         "messages": messages,
     }
 

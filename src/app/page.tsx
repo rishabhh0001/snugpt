@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { useScroll as useNavbarScroll } from '@/components/ui/use-scroll';
 import { cn } from '@/lib/utils';
+import Preloader from '@/components/ui/preloader';
 
 const fadeInUp: any = {
   hidden: { opacity: 0, y: 15, filter: 'blur(4px)' },
@@ -649,7 +650,13 @@ export default function Lander() {
   const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [showPreloader, setShowPreloader] = useState(true);
   const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const infoLinks = [
     {
@@ -685,11 +692,21 @@ export default function Lander() {
     };
   }, [mobileMenuOpen]);
 
+  if (!mounted) {
+    return (
+      <div className="fixed inset-0 w-screen h-screen bg-[#050505] z-[99999999999]" />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#050505] text-[#ededed] font-jakarta overflow-x-hidden selection:bg-amber-500/30 tracking-tight">
-      <MouseFollowGlow />
-      <GridBackground />
-      <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
+    <>
+      <AnimatePresence mode="wait">
+        {showPreloader && <Preloader onComplete={() => setShowPreloader(false)} />}
+      </AnimatePresence>
+      <div className="min-h-screen bg-[#050505] text-[#ededed] font-jakarta overflow-x-hidden selection:bg-amber-500/30 tracking-tight">
+        <MouseFollowGlow />
+        <GridBackground />
+        <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
 
       {/* Navigation */}
       <header
@@ -1286,5 +1303,6 @@ export default function Lander() {
       `}} />
 
     </div>
+    </>
   );
 }

@@ -19,6 +19,9 @@ export const metadata: Metadata = {
     description: "AI assistant for Shiv Nadar University students and parents.",
     type: "website",
   },
+  verification: {
+    google: "google-site-verification-placeholder", // Replace with your actual Google Search Console code
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
