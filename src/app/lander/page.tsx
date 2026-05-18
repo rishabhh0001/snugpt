@@ -566,14 +566,16 @@ export default function Lander() {
       {/* Navigation */}
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 transition-all duration-300 ease-out flex flex-col items-center gap-3',
-          scrolled ? 'py-2 md:py-3' : 'py-4 md:py-6'
+          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl',
+          scrolled && !mobileMenuOpen
+            ? 'top-4 bg-black/80 border-white/10 backdrop-blur-lg max-w-4xl shadow-[0_0_50px_rgba(0,0,0,0.8)]'
+            : 'top-0 border-b border-white/5 bg-transparent'
         )}
       >
         <nav
           className={cn(
-            'max-w-7xl w-full mx-auto flex items-center justify-between px-4 md:px-8 py-3 rounded-xl md:rounded-3xl border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl transition-all duration-300 ease-out',
-            scrolled && 'max-w-5xl bg-black/80 border-white/10 md:py-2.5 shadow-2xl'
+            'flex h-16 w-full items-center justify-between px-4 transition-all ease-out duration-300',
+            scrolled ? 'h-14 px-6' : 'h-20 px-8'
           )}
         >
           <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
@@ -587,12 +589,12 @@ export default function Lander() {
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden items-center gap-4 lg:flex">
             {['Capabilities', 'Intelligence', 'Security'].map((item) => (
               <Link
                 key={item}
                 href="#"
-                className="relative inline-block group py-2.5 px-5 overflow-hidden rounded-lg transition-all duration-300"
+                className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
               >
                 {/* Link text */}
                 <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
@@ -609,12 +611,12 @@ export default function Lander() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsWaitlistOpen(true)}
-              className="hidden sm:inline-block px-5 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+              className="px-5 py-2 md:px-6 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
             >
               Access Intelligence
             </button>
 
-            {/* Mobile Burger Toggle Button using MenuToggleIcon */}
+            {/* Mobile menu toggle button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
@@ -624,31 +626,14 @@ export default function Lander() {
           </div>
         </nav>
 
-        {/* Ecosystem Sub-bar */}
-        <div
-          className={cn(
-            'flex items-center justify-center gap-3 py-1.5 px-5 rounded-full bg-black/30 border border-white/5 backdrop-blur-2xl shadow-xl text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] select-none transition-all duration-300',
-            scrolled ? 'opacity-0 scale-95 pointer-events-none h-0 py-0 overflow-hidden' : 'opacity-100 scale-100'
-          )}
-        >
-          <span className="text-white/20">Built for the SNU Ecosystem:</span>
-          <div className="flex items-center gap-2.5 text-white/60">
-            <span className="font-black text-white hover:text-amber-400 transition-colors">SNU, DELHI-NCR</span>
-            <span className="text-white/10 font-light">•</span>
-            <span className="font-black text-white hover:text-amber-400 transition-colors">RESEARCH</span>
-            <span className="text-white/10 font-light">•</span>
-            <span className="font-black text-white hover:text-amber-400 transition-colors">ACADEMICS</span>
-          </div>
-        </div>
-
-        {/* Mobile Navigation Drawer */}
+        {/* Mobile menu drawer overlay */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="fixed inset-x-4 top-[84px] z-[99] bg-[#0A0A0A] border border-white/10 rounded-2xl flex flex-col p-6 gap-6 lg:hidden shadow-2xl backdrop-blur-3xl"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="w-full bg-black/95 border-t border-white/10 overflow-hidden flex flex-col p-6 gap-6 lg:hidden backdrop-blur-3xl"
             >
               <div className="flex flex-col gap-4">
                 {['Capabilities', 'Intelligence', 'Security'].map((item) => (
@@ -656,9 +641,13 @@ export default function Lander() {
                     key={item}
                     href="#"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-xs uppercase tracking-[0.2em] font-black text-white/40 hover:text-white py-3 border-b border-white/5 transition-all"
+                    className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300"
                   >
-                    {item}
+                    <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                      {item}
+                    </span>
+                    <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+                    <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
                   </Link>
                 ))}
               </div>
