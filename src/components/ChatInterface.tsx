@@ -36,7 +36,13 @@ export default function ChatInterface() {
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
   }, [conversations]);
 
-  const handleSubmit = async (e?: React.FormEvent, customQuery?: string, historyOverride?: MessageProps[]) => {
+  const handleSubmit = async (
+    e?: React.FormEvent,
+    customQuery?: string,
+    historyOverride?: MessageProps[],
+    isRegenerate?: boolean,
+    previousResponse?: string
+  ) => {
     e?.preventDefault();
     const queryText = (customQuery || "").trim();
     if (!queryText || isLoading) return;
@@ -67,6 +73,8 @@ export default function ChatInterface() {
           query: queryText,
           session_id: convId,
           history: baseMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          regenerate: !!isRegenerate,
+          previous_response: previousResponse || undefined,
         }),
       });
 
@@ -80,6 +88,8 @@ export default function ChatInterface() {
             query: queryText,
             session_id: convId,
             history: baseMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+            regenerate: !!isRegenerate,
+            previous_response: previousResponse || undefined,
           }),
         });
       }
@@ -313,7 +323,7 @@ export default function ChatInterface() {
                               const userPrompt = messages[i - 1];
                               if (userPrompt && userPrompt.role === "user") {
                                 const baseHistory = messages.slice(0, i - 1);
-                                handleSubmit(undefined, userPrompt.content, baseHistory);
+                                handleSubmit(undefined, userPrompt.content, baseHistory, true, msg.content);
                               }
                             }
                           : undefined

@@ -105,6 +105,8 @@ async def chat(request: ChatRequest, fastapi_request: Request):
             history=history,
             session_id=request.session_id,
             user_ip=user_ip,
+            regenerate=request.regenerate,
+            previous_response=request.previous_response,
         ),
         media_type="text/event-stream",
     )

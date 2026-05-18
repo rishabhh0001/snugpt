@@ -72,7 +72,14 @@ def save_qa_to_vectorstore(query: str, answer: str):
         print(f"[Learning] Failed to save Q&A: {e}")
 
 
-async def generate_streaming_response(query: str, history: list = [], session_id: Optional[str] = None, user_ip: Optional[str] = None):
+async def generate_streaming_response(
+    query: str,
+    history: list = [],
+    session_id: Optional[str] = None,
+    user_ip: Optional[str] = None,
+    regenerate: Optional[bool] = False,
+    previous_response: Optional[str] = None,
+):
     import uuid
     log_id = str(uuid.uuid4())
 
@@ -90,7 +97,8 @@ async def generate_streaming_response(query: str, history: list = [], session_id
     try:
         # Get relevant documents from DB (fetch slightly more to identify feedback)
         try:
-            docs = retrieve_documents(query, k=6)
+            import asyncio
+            docs = await asyncio.to_thread(retrieve_documents, query, k=6)
         except Exception as e:
             print(f"Retriever error: {e}")
             docs = []
@@ -133,6 +141,19 @@ async def generate_streaming_response(query: str, history: list = [], session_id
 
         full_context = context_str + history_str
 
+        if regenerate:
+            full_context += "\n\n--- REGENERATE DIRECTIVE ---"
+            full_context += "\nThe user has explicitly requested to REGENERATE this response because the previous attempt was unsatisfactory."
+            if previous_response:
+                full_context += f"\n\nHere is the rejected PREVIOUS response:\n[PREVIOUS RESPONSE]\n{previous_response}\n[END PREVIOUS RESPONSE]"
+                full_context += "\n\nCRITICAL INSTRUCTIONS FOR RE-CHECKING, RE-FRAMING, & REVALIDATING:"
+                full_context += "\n1. Carefully read and re-check all retrieved database documents above for the correct information."
+                full_context += "\n2. Revalidate all claims, links, dates, and names from the previous response against the database documents."
+                full_context += "\n3. Completely re-frame the answer. Structure it more clearly, use concise bullet points, and address any missing context or errors."
+                full_context += "\n4. DO NOT repeat the previous response or copy-paste major parts of it. Re-write the content to be significantly better and more accurate."
+            else:
+                full_context += "\n\nPlease re-read the database documents carefully, revalidate the information, and re-frame the answer with improved structure, clarity, and precision."
+
         # Build sources — deduped by filename, max 8
         seen_sources: set = set()
         sources_data = []
@@ -149,11 +170,26 @@ async def generate_streaming_response(query: str, history: list = [], session_id
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 
         # Prepare and stream LLM response
-        llm = get_llm()
-        if not llm:
+        api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
+        if not api_key:
             yield f'data: {{"type": "chunk", "text": "NVIDIA API Key is not configured. Please contact the administrator."}}\n\n'
             yield f'data: {{"type": "done"}}\n\n'
             return
+
+        # Elevate temperature slightly for regeneration to encourage creative re-framing and detailed revalidation
+        if regenerate:
+            llm = ChatNVIDIA(
+                model="meta/llama-3.1-8b-instruct",
+                nvidia_api_key=api_key,
+                temperature=0.4,
+                max_tokens=8192
+            )
+        else:
+            llm = get_llm()
+            if not llm:
+                yield f'data: {{"type": "chunk", "text": "NVIDIA API Key is not configured. Please contact the administrator."}}\n\n'
+                yield f'data: {{"type": "done"}}\n\n'
+                return
 
         messages = qa_prompt.format_messages(context=full_context, question=query)
 
