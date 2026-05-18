@@ -9,11 +9,17 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.models.database import connect_database, disconnect_database, is_database_connected, get_database
-from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest
+from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest, ShareChatRequest, ShareChatResponse
 from app.models.waitlist import add_to_waitlist
-from app.models.chat_log import save_chat_feedback
+from app.models.chat_log import save_chat_feedback, save_shared_chat, get_shared_chat
 from app.rag.pipeline import generate_streaming_response
 from app.rag.vectorstore import add_qa_pair
+import uuid
+import io
+import base64
+import qrcode
+import qrcode.image.svg
+
 import asyncio
 
 logger = logging.getLogger(__name__)
@@ -149,3 +155,66 @@ async def chat_feedback(request: FeedbackRequest):
     except Exception as e:
         logger.error("Feedback submission error: %s", e)
         raise HTTPException(status_code=500, detail="Could not capture feedback. Please try again.") from e
+
+
+@app.post("/api/share", response_model=ShareChatResponse)
+async def share_chat(request: ShareChatRequest, fastapi_request: Request):
+    try:
+        share_id = str(uuid.uuid4())
+        
+        # Determine origin for construction of frontend URL
+        origin = fastapi_request.headers.get("origin")
+        if not origin:
+            # Fallback to host header if origin isn't present
+            host = fastapi_request.headers.get("host") or "snugpt.org"
+            scheme = fastapi_request.url.scheme
+            origin = f"{scheme}://{host}"
+            
+        share_url = f"{origin}/share/{share_id}"
+        
+        # Generate clean base64 SVG QR code using vector rendering
+        qr = qrcode.QRCode(
+            version=1,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(share_url)
+        qr.make(fit=True)
+        img = qr.make_image(image_factory=qrcode.image.svg.SvgPathImage)
+        
+        stream = io.BytesIO()
+        img.save(stream)
+        svg_bytes = stream.getvalue()
+        base64_qr = f"data:image/svg+xml;base64,{base64.b64encode(svg_bytes).decode('utf-8')}"
+        
+        # Serialize messages to dictionary format for database JSON field
+        serialized_messages = [m.model_dump() for m in request.messages]
+        
+        # Save chat snapshot to SQL database
+        success = await save_shared_chat(
+            share_id=share_id,
+            messages=serialized_messages,
+            title=request.title,
+            session_id=request.session_id
+        )
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Database failure saving shared chat snapshot.")
+            
+        return ShareChatResponse(
+            share_id=share_id,
+            share_url=share_url,
+            qr_code_base64=base64_qr
+        )
+    except Exception as e:
+        logger.error("Error creating shared chat: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to share chat: {str(e)}")
+
+
+@app.get("/api/share/{share_id}")
+async def get_share(share_id: str):
+    shared = await get_shared_chat(share_id)
+    if not shared:
+        raise HTTPException(status_code=404, detail="Shared chat not found.")
+    return shared
+

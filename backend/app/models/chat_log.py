@@ -2,7 +2,7 @@ import logging
 import uuid
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, JSON, String, Text
+from sqlalchemy import Column, DateTime, JSON, String, Text, Integer
 from sqlalchemy.sql import func
 
 from app.models.database import Base, get_database, is_database_connected
@@ -96,4 +96,78 @@ async def save_chat_feedback(
         print(f"[Feedback] Saved {action} feedback for chat {chat_id}")
     except Exception as e:
         logger.error("Failed to save chat feedback: %s", e)
+
+
+class SharedChat(Base):
+    __tablename__ = "shared_chats"
+
+    id = Column(String(36), primary_key=True)  # unique share token/id
+    session_id = Column(String(64), index=True, nullable=True)
+    title = Column(String(255), nullable=True)
+    messages = Column(JSON, nullable=False)    # frozen messages array
+    views = Column(Integer, server_default="0", nullable=False)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+
+async def save_shared_chat(
+    share_id: str,
+    messages: list,
+    title: Optional[str] = None,
+    session_id: Optional[str] = None,
+) -> bool:
+    """Save a snapshot of a conversation to shared_chats table."""
+    if not is_database_connected():
+        logger.warning("Database not connected; skipping shared chat save.")
+        return False
+
+    db = get_database()
+
+    query_insert = """
+    INSERT INTO shared_chats (id, session_id, title, messages, views, timestamp)
+    VALUES (:id, :session_id, :title, :messages, 0, CURRENT_TIMESTAMP)
+    """
+
+    values = {
+        "id": share_id,
+        "session_id": session_id,
+        "title": title or "Shared SnuGPT Chat",
+        "messages": messages,
+    }
+
+    try:
+        await db.execute(query=query_insert, values=values)
+        return True
+    except Exception as e:
+        logger.error("Failed to save shared chat: %s", e)
+        return False
+
+
+async def get_shared_chat(share_id: str) -> Optional[dict]:
+    """Retrieve shared chat and increment view count."""
+    if not is_database_connected():
+        logger.warning("Database not connected; cannot fetch shared chat.")
+        return None
+
+    db = get_database()
+
+    query_select = """
+    SELECT id, session_id, title, messages, views, timestamp 
+    FROM shared_chats 
+    WHERE id = :id
+    """
+    try:
+        row = await db.fetch_one(query=query_select, values={"id": share_id})
+        if row:
+            # Increment view count in the background asynchronously
+            query_update = "UPDATE shared_chats SET views = views + 1 WHERE id = :id"
+            await db.execute(query=query_update, values={"id": share_id})
+            
+            data = dict(row)
+            # Make sure views count in returned data represents the incremented value
+            data["views"] += 1
+            return data
+    except Exception as e:
+        logger.error("Failed to fetch shared chat: %s", e)
+    return None
+
 

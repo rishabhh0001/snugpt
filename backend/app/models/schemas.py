@@ -28,3 +28,15 @@ class FeedbackRequest(BaseModel):
     message_id: Optional[str] = None
     action: str  # "up", "down", "copy", "regenerate"
 
+
+class ShareChatRequest(BaseModel):
+    messages: List[HistoryMessage]
+    title: Optional[str] = None
+    session_id: Optional[str] = None
+
+
+class ShareChatResponse(BaseModel):
+    share_id: str
+    share_url: str
+    qr_code_base64: str
+
