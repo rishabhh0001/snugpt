@@ -18,7 +18,7 @@ def get_llm():
             # We don't raise here to avoid crashing the worker, but we'll fail gracefully during generation
             return None
         _llm = ChatNVIDIA(
-            model="meta/llama-3.3-70b-instruct",
+            model="meta/llama-3.1-8b-instruct",
             nvidia_api_key=api_key,
             temperature=0.1,
             max_tokens=4096
@@ -150,22 +150,26 @@ async def generate_streaming_response(query: str, history: list = [], session_id
             import asyncio
             from app.models.chat_log import save_chat_log
 
-            # Persist before stream ends (serverless may freeze after response)
-            try:
-                await save_chat_log(
-                    query,
-                    full_response,
-                    session_id=session_id,
-                    context={"sources": sources_data},
-                    user_ip=user_ip,
-                )
-            except Exception as log_err:
-                print(f"Chat log save failed: {log_err}")
+            # Persist concurrently before stream ends (serverless may freeze after response)
+            async def _log_chat():
+                try:
+                    await save_chat_log(
+                        query,
+                        full_response,
+                        session_id=session_id,
+                        context={"sources": sources_data},
+                        user_ip=user_ip,
+                    )
+                except Exception as log_err:
+                    print(f"Chat log save failed: {log_err}")
 
-            try:
-                await asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
-            except Exception as learn_err:
-                print(f"Vectorstore learning failed: {learn_err}")
+            async def _learn_qa():
+                try:
+                    await asyncio.to_thread(save_qa_to_vectorstore, query, full_response)
+                except Exception as learn_err:
+                    print(f"Vectorstore learning failed: {learn_err}")
+
+            await asyncio.gather(_log_chat(), _learn_qa())
 
     except Exception as e:
         import traceback
