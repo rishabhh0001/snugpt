@@ -10,12 +10,12 @@ import { useScroll as useNavbarScroll } from '@/components/ui/use-scroll';
 import { cn } from '@/lib/utils';
 
 const fadeInUp: any = {
-  hidden: { opacity: 0, y: 30, filter: 'blur(8px)' },
+  hidden: { opacity: 0, y: 15, filter: 'blur(4px)' },
   visible: {
     opacity: 1,
     y: 0,
     filter: 'blur(0px)',
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] }
   }
 };
 
@@ -405,11 +405,11 @@ const HeroMockupWindow = () => {
         <div className="w-20" />
       </div>
 
-      <div className="aspect-[16/10] bg-black/40 relative overflow-hidden flex flex-col justify-center items-center p-6 md:p-12">
+      <div className="aspect-auto min-h-[380px] md:aspect-[16/10] bg-black/40 relative overflow-hidden flex flex-col justify-center items-center p-3 sm:p-6 md:p-12">
         {/* Dynamic Grid Background in Mockup */}
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1e1e1e_1px,transparent_1px)] [background-size:20px_20px]" />
 
-        <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl p-6 md:p-8 shadow-2xl relative z-10 flex flex-col justify-between min-h-[75%]">
+        <div className="w-full max-w-3xl rounded-2xl md:rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl p-4 sm:p-6 md:p-8 shadow-2xl relative z-10 flex flex-col justify-between min-h-[85%] sm:min-h-[75%]">
           
           {/* Simulated Messaging Area */}
           <div className="flex-1 flex flex-col justify-center">
