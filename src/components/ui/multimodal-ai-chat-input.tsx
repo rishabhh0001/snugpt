@@ -179,31 +179,78 @@ interface SuggestedActionsProps {
   selectedVisibilityType: VisibilityType;
 }
 
+const ALL_SUGGESTED_ACTIONS = [
+  {
+    title: 'Hostel & Housing',
+    label: 'how do I apply for hostels?',
+    action: 'How do I apply for hostels?',
+  },
+  {
+    title: 'Fee & Policy',
+    label: 'what is the tuition waiver policy?',
+    action: 'What is the tuition waiver policy?',
+  },
+  {
+    title: 'Admission Info',
+    label: 'what are the CS requirements?',
+    action: 'What are the Computer Science admission requirements?',
+  },
+  {
+    title: 'IT Helpdesk',
+    label: 'how do I contact tech support?',
+    action: 'How do I contact the SNU IT helpdesk?',
+  },
+  {
+    title: 'Library Hours',
+    label: 'what are the library timings?',
+    action: 'What are the library timings and rules?',
+  },
+  {
+    title: 'Dining & Mess',
+    label: 'what is the mess menu today?',
+    action: 'What is the mess dining timing and menu?',
+  },
+  {
+    title: 'Campus Clinic',
+    label: 'where is the campus medical center?',
+    action: 'Where is the campus medical clinic and how do I contact them?',
+  },
+  {
+    title: 'Sports Facilities',
+    label: 'how to book the indoor sports court?',
+    action: 'How do I book or access the indoor sports facilities?',
+  },
+  {
+    title: 'Academic Calendar',
+    label: 'when do semester breaks start?',
+    action: 'When are the semester breaks and summer vacations scheduled?',
+  },
+  {
+    title: 'SNU Shuttle',
+    label: 'what is the shuttle bus schedule?',
+    action: 'What is the shuttle bus schedule to the nearest metro station?',
+  },
+  {
+    title: 'Placement Cell',
+    label: 'how to contact the CDC team?',
+    action: 'How do I contact the Career Development Centre (CDC)?',
+  },
+  {
+    title: 'Club Activities',
+    label: 'how do I join student clubs?',
+    action: 'How do I register for student clubs and societies?',
+  },
+];
+
 function PureSuggestedActions({
+  chatId,
   onSelectAction,
 }: SuggestedActionsProps) {
-  const suggestedActions = [
-    {
-      title: 'Hostel & Housing',
-      label: 'how do I apply for hostels?',
-      action: 'How do I apply for hostels?',
-    },
-    {
-      title: 'Fee & Policy',
-      label: 'what is the tuition waiver policy?',
-      action: 'What is the tuition waiver policy?',
-    },
-    {
-      title: 'Admission Info',
-      label: 'what are the CS requirements?',
-      action: 'What are the Computer Science admission requirements?',
-    },
-    {
-      title: 'IT Helpdesk',
-      label: 'how do I contact tech support?',
-      action: 'How do I contact the SNU IT helpdesk?',
-    },
-  ];
+  const suggestedActions = React.useMemo(() => {
+    return [...ALL_SUGGESTED_ACTIONS]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 4);
+  }, [chatId]);
 
   return (
     <div
