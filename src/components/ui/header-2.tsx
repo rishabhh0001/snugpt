@@ -14,7 +14,7 @@ export function Header() {
 
 	const infoLinks = [
 		{
-			title: "About SnuGPT",
+			title: "About SNUGPT",
 			description: "Learn more about our RAG architecture & vision",
 			href: "/about",
 			icon: BookOpen,

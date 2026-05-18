@@ -547,7 +547,7 @@ export default function Lander() {
 
   const infoLinks = [
     {
-      title: "About SnuGPT",
+      title: "About SNUGPT",
       description: "Learn more about our RAG architecture & vision",
       href: "/about",
       icon: BookOpen,
@@ -1037,7 +1037,7 @@ export default function Lander() {
           {/* Logo / Brand */}
           <Link
             href="/lander"
-            aria-label="SnuGPT Home"
+            aria-label="SNUGPT Home"
             className="flex items-center gap-3 group cursor-pointer mb-8"
           >
             <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-300">
@@ -1054,7 +1054,7 @@ export default function Lander() {
           <div className="my-6 flex flex-wrap justify-center gap-x-8 gap-y-4 text-xs font-semibold uppercase tracking-widest text-white/40">
             {[
               { title: 'Features', href: '#features' },
-              { title: 'About SnuGPT', href: '/about' },
+              { title: 'About SNUGPT', href: '/about' },
               { title: 'Privacy Policy', href: '/privacy-policy' },
               { title: 'Apache License', href: '/license' }
             ].map((link, index) => (

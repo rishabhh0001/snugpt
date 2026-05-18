@@ -74,7 +74,7 @@ export default function PrivacyPolicyPage() {
           </motion.h1>
 
           <motion.p variants={fadeInUp} className="text-base md:text-lg text-white/40 max-w-2xl mx-auto leading-relaxed font-medium">
-            At SnuGPT, we prioritize student confidentiality. Read our exhaustive disclosures regarding data collection, vector embeddings, database encryption, and academic alignment.
+            At SNUGPT, we prioritize student confidentiality. Read our exhaustive disclosures regarding data collection, vector embeddings, database encryption, and academic alignment.
           </motion.p>
         </motion.div>
 
@@ -201,7 +201,7 @@ export default function PrivacyPolicyPage() {
         >
           <span>&copy; {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.</span>
           <div className="flex gap-6">
-            <Link href="/about" className="hover:text-white transition-colors">About SnuGPT</Link>
+            <Link href="/about" className="hover:text-white transition-colors">About SNUGPT</Link>
             <Link href="/license" className="hover:text-white transition-colors">Apache License</Link>
           </div>
         </motion.footer>

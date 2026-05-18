@@ -202,7 +202,7 @@ export default function LicensePage() {
                 Copyright <strong>2026 Rishabh Joshi</strong>.
               </p>
               <p>
-                Licensed under the Apache License, Version 2.0 (the "License"); you may not use SnuGPT files except in compliance with the License. You may obtain a copy of the License at <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">http://www.apache.org/licenses/LICENSE-2.0</a>.
+                Licensed under the Apache License, Version 2.0 (the "License"); you may not use SNUGPT files except in compliance with the License. You may obtain a copy of the License at <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">http://www.apache.org/licenses/LICENSE-2.0</a>.
               </p>
               <p>
                 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
@@ -220,7 +220,7 @@ export default function LicensePage() {
         >
           <span>&copy; {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.</span>
           <div className="flex gap-6">
-            <Link href="/about" className="hover:text-white transition-colors">About SnuGPT</Link>
+            <Link href="/about" className="hover:text-white transition-colors">About SNUGPT</Link>
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
           </div>
         </motion.footer>
