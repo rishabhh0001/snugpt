@@ -3,7 +3,16 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-const words = ["Hello", "Bonjour", "Ciao", "Olà", "やあ", "Hallå", "Guten tag", "হ্যালো"];
+const words = [
+  "Hello",          // English
+  "नमस्ते",         // Hindi
+  "வணக்கம்",        // Tamil
+  "Bonjour",        // French
+  "Guten Tag",      // German
+  "Hola",           // Spanish
+  "Ciao",           // Italian
+  "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ"   // Punjabi
+];
 
 const opacity: any = {
   initial: {

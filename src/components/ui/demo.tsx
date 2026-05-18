@@ -26,7 +26,7 @@ const DemoOne = () => {
         >
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">Welcome</h1>
           <p className="text-xl text-muted-foreground">
-            Your content has loaded successfully. The preloader animation has completed.
+            Your content has successfully loaded, Click below to access
           </p>
           <button
             onClick={handleReplay}
