@@ -96,22 +96,22 @@
 /* ── AI Loader Styling ─────────────────────────────────────────────────────── */
 @keyframes loader-rotate {
   0% {
-    transform: rotate(90deg);
-    box-shadow: 0 10px 20px 0 #fff inset,
-      0 20px 30px 0 #ad5fff inset,
-      0 60px 60px 0 #471eec inset;
+    transform: translate(-50%, -50%) rotate(90deg);
+    box-shadow: 0 10px 25px 0 rgba(255,255,255,0.9) inset,
+      0 20px 40px 0 rgba(173,95,255,0.7) inset,
+      0 60px 80px 0 rgba(71,30,236,0.6) inset;
   }
   50% {
-    transform: rotate(270deg);
-    box-shadow: 0 10px 20px 0 #fff inset,
-      0 20px 10px 0 #d60a47 inset,
-      0 40px 60px 0 #311e80 inset;
+    transform: translate(-50%, -50%) rotate(270deg);
+    box-shadow: 0 10px 25px 0 rgba(255,255,255,0.9) inset,
+      0 20px 30px 0 rgba(214,10,71,0.7) inset,
+      0 50px 80px 0 rgba(49,30,128,0.6) inset;
   }
   100% {
-    transform: rotate(450deg);
-    box-shadow: 0 10px 20px 0 #fff inset,
-      0 20px 30px 0 #ad5fff inset,
-      0 60px 60px 0 #471eec inset;
+    transform: translate(-50%, -50%) rotate(450deg);
+    box-shadow: 0 10px 25px 0 rgba(255,255,255,0.9) inset,
+      0 20px 40px 0 rgba(173,95,255,0.7) inset,
+      0 60px 80px 0 rgba(71,30,236,0.6) inset;
   }
 }
 
@@ -125,7 +125,7 @@
     opacity: 1;
     transform: scale(1.18) translateY(-4px);
     color: var(--color-snu-yellow);
-    text-shadow: 0 0 8px rgba(242,169,0,0.6);
+    text-shadow: 0 0 12px rgba(242,169,0,0.8);
   }
   40% {
     opacity: 0.6;
@@ -138,18 +138,20 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.15em;
+  gap: 0.12em;
   position: relative;
-  padding: 2.5rem;
+  padding: 8rem 4rem;
+  z-index: 10;
 }
 
 .loader-letter {
-  font-size: 1.65rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-size: clamp(1.2rem, 3.8vw, 1.85rem);
+  font-weight: 850;
+  letter-spacing: 0.06em;
   color: var(--color-text);
   animation: loader-letter-anim 2.2s infinite ease-in-out;
   display: inline-block;
+  z-index: 10;
 }
 
 /* Delay configurations for waves */
@@ -174,8 +176,8 @@
 .loader-letter:nth-child(19) { animation-delay: 0.95s; }
 
 .loader {
-  width: 130px;
-  height: 130px;
+  width: clamp(320px, 86vw, 460px);
+  height: clamp(320px, 86vw, 460px);
   border-radius: 50%;
   position: absolute;
   left: 50%;
@@ -183,7 +185,8 @@
   transform: translate(-50%, -50%);
   z-index: 0;
   opacity: 0.38;
-  filter: blur(8px);
-  animation: loader-rotate 3.6s infinite linear;
+  filter: blur(6px);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  animation: loader-rotate 3.8s infinite linear;
   pointer-events: none;
 }
