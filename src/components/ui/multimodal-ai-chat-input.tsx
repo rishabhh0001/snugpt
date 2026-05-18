@@ -246,11 +246,20 @@ function PureSuggestedActions({
   chatId,
   onSelectAction,
 }: SuggestedActionsProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const suggestedActions = React.useMemo(() => {
+    if (!mounted) {
+      return ALL_SUGGESTED_ACTIONS.slice(0, 4);
+    }
     return [...ALL_SUGGESTED_ACTIONS]
       .sort(() => 0.5 - Math.random())
       .slice(0, 4);
-  }, [chatId]);
+  }, [chatId, mounted]);
 
   return (
     <div

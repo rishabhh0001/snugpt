@@ -5,12 +5,16 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionV
 import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, ChevronRight, Layers, LayoutDashboard, Globe, Download, Mail, ExternalLink, X, Shield, Lock, CheckCircle2, Cpu } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
+import { useScroll as useNavbarScroll } from '@/components/ui/use-scroll';
+import { cn } from '@/lib/utils';
 
 const fadeInUp: any = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 30, filter: 'blur(8px)' },
   visible: {
     opacity: 1,
     y: 0,
+    filter: 'blur(0px)',
     transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
   }
 };
@@ -375,8 +379,8 @@ const HeroMockupWindow = () => {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      initial={{ opacity: 0, y: 40, rotateX: 6 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      initial={{ opacity: 0, y: 40, filter: "blur(6px)", rotateX: 6 }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", rotateX: 0 }}
       transition={{ type: "spring", duration: 0.85, bounce: 0.05 }}
       viewport={{ once: true }}
       style={{
@@ -413,8 +417,8 @@ const HeroMockupWindow = () => {
             {/* Step 0: User Query Bubble */}
             {typedQuery && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ type: "spring", duration: 0.5, bounce: 0 }}
                 className="flex gap-4 items-start mb-6 justify-end w-full"
               >
@@ -433,8 +437,8 @@ const HeroMockupWindow = () => {
             {/* Step 1: Matching and Indexing Sources */}
             {currentStep >= 1 && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ type: "spring", duration: 0.5, bounce: 0 }}
                 className="w-full rounded-2xl border border-white/5 bg-white/[0.02] p-4 md:p-5 mb-6"
               >
@@ -487,8 +491,8 @@ const HeroMockupWindow = () => {
             {/* Step 2: SNUGPT Intelligent Response */}
             {currentStep === 2 && typedResponse && (
               <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ type: "spring", duration: 0.6, bounce: 0 }}
                 className="flex gap-4 items-start w-full"
               >
@@ -510,8 +514,8 @@ const HeroMockupWindow = () => {
 
                   {typedResponse.length === responseText.length && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                       transition={{ type: "spring", duration: 0.5 }}
                       className="flex items-center gap-4 text-[10px] text-white/30 uppercase tracking-widest font-black"
                     >
@@ -538,6 +542,20 @@ export default function Lander() {
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
   const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const scrolled = useNavbarScroll(10);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#ededed] font-jakarta overflow-x-hidden selection:bg-amber-500/30 tracking-tight">
@@ -546,8 +564,18 @@ export default function Lander() {
       <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
 
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 py-4 md:py-6 flex flex-col items-center gap-3 pointer-events-none">
-        <nav className="max-w-7xl w-full mx-auto flex items-center justify-between px-4 md:px-8 py-3 rounded-xl md:rounded-3xl border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl pointer-events-auto">
+      <header
+        className={cn(
+          'fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 transition-all duration-300 ease-out flex flex-col items-center gap-3',
+          scrolled ? 'py-2 md:py-3' : 'py-4 md:py-6'
+        )}
+      >
+        <nav
+          className={cn(
+            'max-w-7xl w-full mx-auto flex items-center justify-between px-4 md:px-8 py-3 rounded-xl md:rounded-3xl border border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl transition-all duration-300 ease-out',
+            scrolled && 'max-w-5xl bg-black/80 border-white/10 md:py-2.5 shadow-2xl'
+          )}
+        >
           <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
             <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500">
               <Image src="/avatar.svg" alt="SNUGPT" width={44} height={44} className="object-cover" priority />
@@ -567,16 +595,31 @@ export default function Lander() {
             ))}
           </div>
 
-          <button
-            onClick={() => setIsWaitlistOpen(true)}
-            className="px-5 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
-          >
-            Access Intelligence
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsWaitlistOpen(true)}
+              className="hidden sm:inline-block px-5 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+            >
+              Access Intelligence
+            </button>
+
+            {/* Mobile Burger Toggle Button using MenuToggleIcon */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
+            >
+              <MenuToggleIcon open={mobileMenuOpen} className="w-5 h-5" duration={300} />
+            </button>
+          </div>
         </nav>
 
         {/* Ecosystem Sub-bar */}
-        <div className="flex items-center justify-center gap-3 py-1.5 px-5 rounded-full bg-black/30 border border-white/5 backdrop-blur-2xl shadow-xl text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] pointer-events-auto select-none">
+        <div
+          className={cn(
+            'flex items-center justify-center gap-3 py-1.5 px-5 rounded-full bg-black/30 border border-white/5 backdrop-blur-2xl shadow-xl text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] select-none transition-all duration-300',
+            scrolled ? 'opacity-0 scale-95 pointer-events-none h-0 py-0 overflow-hidden' : 'opacity-100 scale-100'
+          )}
+        >
           <span className="text-white/20">Built for the SNU Ecosystem:</span>
           <div className="flex items-center gap-2.5 text-white/60">
             <span className="font-black text-white hover:text-amber-400 transition-colors">SNU, DELHI-NCR</span>
@@ -586,6 +629,40 @@ export default function Lander() {
             <span className="font-black text-white hover:text-amber-400 transition-colors">ACADEMICS</span>
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed inset-x-4 top-[84px] z-[99] bg-[#0A0A0A] border border-white/10 rounded-2xl flex flex-col p-6 gap-6 lg:hidden shadow-2xl backdrop-blur-3xl"
+            >
+              <div className="flex flex-col gap-4">
+                {['Capabilities', 'Intelligence', 'Security'].map((item) => (
+                  <Link
+                    key={item}
+                    href="#"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-xs uppercase tracking-[0.2em] font-black text-white/40 hover:text-white py-3 border-b border-white/5 transition-all"
+                  >
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsWaitlistOpen(true);
+                }}
+                className="w-full py-4 rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-amber-50 active:scale-95 transition-all"
+              >
+                Access Intelligence
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Hero Section */}
