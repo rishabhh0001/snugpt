@@ -376,8 +376,8 @@ const HeroMockupWindow = () => {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      initial={{ opacity: 0, y: 40, filter: "blur(6px)", rotateX: 6 }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", rotateX: 0 }}
+      initial={{ opacity: 0, y: 40, rotateX: 6 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       transition={{ type: "spring", duration: 0.85, bounce: 0.05 }}
       viewport={{ once: true }}
       style={{
@@ -414,8 +414,8 @@ const HeroMockupWindow = () => {
             {/* Step 0: User Query Bubble */}
             {typedQuery && (
               <motion.div
-                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", duration: 0.5, bounce: 0 }}
                 className="flex gap-4 items-start mb-6 justify-end w-full"
               >
@@ -434,8 +434,8 @@ const HeroMockupWindow = () => {
             {/* Step 1: Matching and Indexing Sources */}
             {currentStep >= 1 && (
               <motion.div
-                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", duration: 0.5, bounce: 0 }}
                 className="w-full rounded-2xl border border-white/5 bg-white/[0.02] p-4 md:p-5 mb-6"
               >
@@ -488,8 +488,8 @@ const HeroMockupWindow = () => {
             {/* Step 2: SNUGPT Intelligent Response */}
             {currentStep === 2 && typedResponse && (
               <motion.div
-                initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", duration: 0.6, bounce: 0 }}
                 className="flex gap-4 items-start w-full"
               >
@@ -511,8 +511,8 @@ const HeroMockupWindow = () => {
 
                   {typedResponse.length === responseText.length && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ type: "spring", duration: 0.5 }}
                       className="flex items-center gap-4 text-[10px] text-white/30 uppercase tracking-widest font-black"
                     >
