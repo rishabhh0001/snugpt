@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ShiningText } from "@/components/ui/shining-text";
 
 export interface SourceDocument {
   content: string;
@@ -76,14 +77,8 @@ export default function MessageBubble({ message }: { message: MessageProps }) {
             </div>
           ) : (
             /* Typing indicator */
-            <div className="flex gap-1 py-1">
-              {[0, 1, 2].map((i) => (
-                <span
-                  key={i}
-                  className="w-1.5 h-1.5 rounded-full animate-blink"
-                  style={{ background: "var(--color-snu-yellow)", animationDelay: `${i * 0.2}s` }}
-                />
-              ))}
+            <div className="py-1 min-w-[120px]">
+              <ShiningText text="SnuGPT is thinking..." />
             </div>
           )}
         </div>

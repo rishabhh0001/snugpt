@@ -1,44 +1,27 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, Loader2, SquarePen, ArrowUp } from "lucide-react";
+import { SquarePen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MessageBubble, { MessageProps } from "./MessageBubble";
 import { useConversations } from "./useConversations";
 import Sidebar from "./Sidebar";
-
-const QUICK_PROMPTS = [
-  "What are the B.Tech admission requirements?",
-  "How do I apply for hostels?",
-  "What is the fee structure for 2024?",
-  "Tell me about campus life at SNU",
-  "What courses are offered in Computer Science?",
-  "How do I contact the IT helpdesk?",
-];
+import { PureMultimodalInput } from "@/components/ui/multimodal-ai-chat-input";
 
 export default function ChatInterface() {
   const { conversations, activeId, activeConversation, setActiveId, createNew, updateMessages, deleteConversation } =
     useConversations();
 
-  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [attachments, setAttachments] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const messages: MessageProps[] = activeConversation?.messages ?? [];
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   useEffect(scrollToBottom, [messages]);
-
-  // Auto-resize textarea
-  useEffect(() => {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    ta.style.height = "auto";
-    ta.style.height = Math.min(ta.scrollHeight, 180) + "px";
-  }, [input]);
 
   // Keyboard shortcuts (Cmd+K / Ctrl+K for a new chat)
   useEffect(() => {
@@ -54,7 +37,7 @@ export default function ChatInterface() {
 
   const handleSubmit = async (e?: React.FormEvent, customQuery?: string) => {
     e?.preventDefault();
-    const queryText = (customQuery || input).trim();
+    const queryText = (customQuery || "").trim();
     if (!queryText || isLoading) return;
 
     let convId = activeId;
@@ -65,7 +48,6 @@ export default function ChatInterface() {
     const nextMessages: MessageProps[] = [...messages, userMsg, placeholderMsg];
 
     updateMessages(convId, nextMessages);
-    setInput("");
     setIsLoading(true);
 
     const abortController = new AbortController();
@@ -185,22 +167,13 @@ export default function ChatInterface() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
-    } else if (e.key === "ArrowUp" && !input.trim()) {
-      const userMessages = messages.filter((m) => m.role === "user");
-      if (userMessages.length > 0) {
-        e.preventDefault();
-        setInput(userMessages[userMessages.length - 1].content);
-      }
-    }
-  };
-
   const handleNew = () => {
     createNew();
     setSidebarOpen(false);
+  };
+
+  const handleSendMessage = ({ input: queryText }: { input: string }) => {
+    handleSubmit(undefined, queryText);
   };
 
   const handleSelect = (id: string) => {
@@ -297,7 +270,7 @@ export default function ChatInterface() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8"
+                  className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8 pt-20"
                 >
                   {/* SNU Logo large */}
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden mb-4 md:mb-6 border-2 shadow-xl"
@@ -316,24 +289,6 @@ export default function ChatInterface() {
                   <p className="text-xs md:text-sm mb-6 md:mb-10" style={{ color: "var(--color-muted)" }}>
                     Query university student handbooks, policy manuals, and ERP guides in real-time.
                   </p>
-
-                  {/* Quick prompts */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl">
-                    {QUICK_PROMPTS.map((p, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleSubmit(undefined, p)}
-                        className="text-left text-xs px-4 py-3 rounded-xl border transition-all hover:border-yellow-500/40 hover:text-white"
-                        style={{
-                          background: "var(--color-surface)",
-                          borderColor: "var(--color-border)",
-                          color: "var(--color-muted)",
-                        }}
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
                 </motion.div>
               ) : (
                 <motion.div key="messages" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -351,61 +306,19 @@ export default function ChatInterface() {
         <div className="flex-shrink-0 px-4 pb-4 pt-2 relative"
           style={{ background: "linear-gradient(to top, var(--color-bg) 70%, transparent)" }}>
           <div className="max-w-3xl mx-auto relative">
-
-            {/* Stop Generating Button */}
-            <AnimatePresence>
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute -top-12 left-0 right-0 flex justify-center z-10"
-                >
-                  <button
-                    onClick={handleStop}
-                    className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium border shadow-lg transition-all hover:bg-white/[0.05]"
-                    style={{ background: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text)" }}
-                  >
-                    <div className="w-2 h-2 rounded-sm bg-gray-400" />
-                    Stop generating
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div
-              className="relative flex items-end gap-2 rounded-2xl border pl-1 pr-2 py-2 transition-all"
-              style={{
-                background: "var(--color-surface)",
-                borderColor: "var(--color-border)",
-              }}
-              onFocus={() => { }}
-            >
-              <textarea
-                ref={textareaRef}
-                rows={1}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Message SnuGPT..."
-                disabled={isLoading}
-                className="flex-1 resize-none bg-transparent border-none text-sm text-white placeholder:text-gray-500 focus:outline-none leading-relaxed px-3 py-1.5"
-                style={{ maxHeight: "180px" }}
-              />
-              <button
-                onClick={() => handleSubmit()}
-                disabled={!input.trim() || isLoading}
-                className="p-2 mb-0.5 rounded-xl flex-shrink-0 transition-all disabled:opacity-30"
-                style={{ background: "var(--color-snu-yellow)" }}
-              >
-                {isLoading
-                  ? <Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--color-snu-blue)" }} />
-                  : <ArrowUp className="w-4 h-4" style={{ color: "var(--color-snu-blue)" }} />
-                }
-              </button>
-            </div>
+            <PureMultimodalInput
+              chatId={activeId || "new-chat"}
+              messages={messages.map((m, i) => ({ id: `${i}`, content: m.content, role: m.role }))}
+              attachments={attachments}
+              setAttachments={setAttachments}
+              onSendMessage={handleSendMessage}
+              onStopGenerating={handleStop}
+              isGenerating={isLoading}
+              canSend={!isLoading}
+              selectedVisibilityType="private"
+            />
             <p className="text-center text-[10px] mt-2" style={{ color: "var(--color-muted)" }}>
-              SnuGPT can make mistakes. Verify critical info on{" "}
+              SnuGPT is an unofficial student assistant and can make mistakes. Verify critical info on{" "}
               <a href="https://snu.edu.in" target="_blank" rel="noopener noreferrer"
                 className="underline underline-offset-2 hover:text-white transition-colors">
                 snu.edu.in
