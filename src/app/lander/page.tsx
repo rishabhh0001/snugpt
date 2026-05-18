@@ -587,10 +587,21 @@ export default function Lander() {
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-12">
+          <div className="hidden lg:flex items-center gap-8">
             {['Capabilities', 'Intelligence', 'Security'].map((item) => (
-              <Link key={item} href="#" className="text-[10px] uppercase tracking-[0.25em] font-black text-white/20 hover:text-white transition-all hover:translate-y-[-1px]">
-                {item}
+              <Link
+                key={item}
+                href="#"
+                className="relative inline-block group py-2.5 px-5 overflow-hidden rounded-lg transition-all duration-300"
+              >
+                {/* Link text */}
+                <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                  {item}
+                </span>
+                {/* Top & bottom border animation */}
+                <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+                {/* Background fill animation */}
+                <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
               </Link>
             ))}
           </div>
