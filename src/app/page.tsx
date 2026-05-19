@@ -735,10 +735,10 @@ export default function Lander() {
         <GridBackground />
         <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
 
-      {/* Navigation */}
       <header
         className={cn(
-          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl overflow-hidden',
+          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl',
+          mobileMenuOpen ? 'overflow-hidden' : 'overflow-visible',
           scrolled && !mobileMenuOpen
             ? 'top-4 bg-black/80 border-white/10 backdrop-blur-lg max-w-4xl shadow-[0_0_50px_rgba(0,0,0,0.8)]'
             : 'top-0 border-b border-white/5 bg-transparent'
@@ -835,7 +835,7 @@ export default function Lander() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-black/95 border border-white/10 backdrop-blur-2xl rounded-2xl p-3 shadow-2xl z-50 flex flex-col gap-1"
+                    className="absolute top-[calc(100%-4px)] left-1/2 -translate-x-1/2 w-72 bg-black/95 border border-white/10 backdrop-blur-2xl rounded-2xl p-3 shadow-2xl z-50 flex flex-col gap-1 before:content-[''] before:absolute before:inset-x-0 before:-top-6 before:h-6"
                   >
                     {infoLinks.map((item, i) => {
                       const Icon = item.icon;
@@ -878,7 +878,7 @@ export default function Lander() {
  
            <div className="flex items-center gap-2">
              <Link
-                href="/chat"
+                href="/login"
                 className="px-5 py-2 md:px-6 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
               >
                 Login
@@ -961,7 +961,7 @@ export default function Lander() {
                 })}
               </div>
                 <Link
-                  href="/chat"
+                  href="/login"
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full py-4 text-center block rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-amber-50 active:scale-95 transition-all"
                 >

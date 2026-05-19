@@ -24,6 +24,26 @@ class Settings(BaseSettings):
 
     google_apps_script_url: str | None = None
 
+    # Auth & OAuth Settings
+    github_client_id: str | None = None
+    github_client_secret: str | None = None
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
+
+    # Optional Backend JWT FALLBACK settings
+    jwt_secret_key: str | None = None
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 1440
+
+    # SMTP Mail server settings
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_from_email: str | None = None
+    smtp_from_name: str | None = None
+
+
 
 settings = Settings()
 

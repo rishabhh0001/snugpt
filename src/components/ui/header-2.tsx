@@ -96,7 +96,7 @@ export function Header() {
 						</button>
 
 						{infoDropdownOpen && (
-							<div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-black/95 border border-white/10 backdrop-blur-2xl rounded-2xl p-2.5 shadow-2xl z-50 flex flex-col gap-1">
+							<div className="absolute top-[calc(100%-4px)] left-1/2 -translate-x-1/2 w-72 bg-black/95 border border-white/10 backdrop-blur-2xl rounded-2xl p-2.5 shadow-2xl z-50 flex flex-col gap-1 before:content-[''] before:absolute before:inset-x-0 before:-top-6 before:h-6">
 								{infoLinks.map((item, i) => {
 									const Icon = item.icon;
 									return (
@@ -123,8 +123,12 @@ export function Header() {
 						)}
 					</div>
 
-					<Button variant="outline">Sign In</Button>
-					<Button>Get Started</Button>
+					<Link href="/login" passHref legacyBehavior>
+						<Button variant="outline">Sign In</Button>
+					</Link>
+					<Link href="/login" passHref legacyBehavior>
+						<Button>Get Started</Button>
+					</Link>
 				</div>
 
 				<Button size="icon" variant="outline" onClick={() => setOpen(!open)} className="md:hidden">
@@ -189,10 +193,14 @@ export function Header() {
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<Button variant="outline" className="w-full">
-							Sign In
-						</Button>
-						<Button className="w-full">Get Started</Button>
+						<Link href="/login" passHref legacyBehavior>
+							<Button variant="outline" className="w-full" onClick={() => setOpen(false)}>
+								Sign In
+							</Button>
+						</Link>
+						<Link href="/login" passHref legacyBehavior>
+							<Button className="w-full" onClick={() => setOpen(false)}>Get Started</Button>
+						</Link>
 					</div>
 				</div>
 			</div>
