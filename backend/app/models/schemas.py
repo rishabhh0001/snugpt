@@ -42,3 +42,11 @@ class ShareChatResponse(BaseModel):
     share_url: str
     qr_code_base64: str
 
+
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    subject: Optional[str] = None
+    message: str
+
+

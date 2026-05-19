@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Mail, 
-  MessageSquare, 
-  MapPin, 
-  ArrowLeft, 
-  Send, 
-  CheckCircle2, 
+import {
+  Mail,
+  MessageSquare,
+  MapPin,
+  ArrowLeft,
+  Send,
+  CheckCircle2,
   AlertCircle,
   Sparkles
 } from 'lucide-react';
@@ -22,6 +22,8 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { getPublicBackendApiUrl } from '@/lib/backend';
+
 
 // Page animations
 const fadeInUp = {
@@ -176,7 +178,7 @@ export default function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       setStatus('error');
@@ -185,12 +187,28 @@ export default function ContactPage() {
     }
 
     setStatus('submitting');
-    
-    // Simulate high-speed premium submission transition
-    setTimeout(() => {
+
+    try {
+      const response = await fetch(getPublicBackendApiUrl('/api/contact'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        throw new Error('Signal transmission failed.');
+      }
+
       setStatus('success');
-    }, 1800);
+    } catch (err) {
+      console.error('Contact submission error:', err);
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 4000);
+    }
   };
+
 
   const handleReset = () => {
     setForm({
@@ -207,17 +225,17 @@ export default function ContactPage() {
     {
       icon: Mail,
       label: 'Developer Support',
-      value: 'support@snugpt.tech',
+      value: '',
     },
     {
       icon: MessageSquare,
       label: 'Policy Corrections',
-      value: 'rj910@snu.edu.in',
+      value: '',
     },
     {
       icon: MapPin,
-      label: 'Campus HQ Address',
-      value: 'NH91, Dadri, Gautam Buddha Nagar, UP - 201314',
+      label: 'Campus Address',
+      value: 'Shiv  Nadar  University,  Dadri',
       className: 'col-span-2',
     }
   ];
@@ -248,9 +266,9 @@ export default function ContactPage() {
 
       {/* Page Body content container */}
       <main className="relative max-w-5xl mx-auto px-6 pt-32 pb-24 z-10 flex flex-col items-center">
-        
+
         {/* Page Hero Introduction */}
-        <motion.div 
+        <motion.div
           initial="hidden" animate="visible" variants={staggerContainer}
           className="w-full text-center mb-16"
         >
@@ -263,7 +281,7 @@ export default function ContactPage() {
           </motion.h1>
 
           <motion.p variants={fadeInUp} className="text-base text-white/40 max-w-2xl mx-auto leading-relaxed font-medium">
-            Have questions regarding **SNUGPT** institutional intelligence or noticed handbook inaccuracies? Fill out the secure form below. We respond within 1 business day.
+            Have questions regarding SNUGPT institutional intelligence, want to join us or noticed handbook inaccuracies? Fill out the secure form below. We respond within 1 business day.
           </motion.p>
         </motion.div>
 
@@ -284,16 +302,16 @@ export default function ContactPage() {
             <div className="w-full relative z-10">
               <AnimatePresence mode="wait">
                 {status !== 'success' ? (
-                  <motion.form 
+                  <motion.form
                     key="contact-form"
-                    onSubmit={handleSubmit} 
+                    onSubmit={handleSubmit}
                     className="space-y-4 w-full"
                     exit={{ opacity: 0, y: -20, filter: 'blur(6px)' }}
                     transition={{ duration: 0.3 }}
                   >
                     {/* Form errors */}
                     {status === 'error' && (
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="p-3.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 text-xs font-bold font-inter flex items-center gap-2.5"
@@ -307,8 +325,8 @@ export default function ContactPage() {
                     <div className="flex flex-col gap-1.5">
                       <Label className="text-[10px] uppercase tracking-wider font-black text-white/50 pl-0.5">Name</Label>
                       <div className="relative">
-                        <Input 
-                          type="text" 
+                        <Input
+                          type="text"
                           required
                           placeholder="Your Name"
                           value={form.name}
@@ -324,8 +342,8 @@ export default function ContactPage() {
                     <div className="flex flex-col gap-1.5">
                       <Label className="text-[10px] uppercase tracking-wider font-black text-white/50 pl-0.5">Email</Label>
                       <div className="relative">
-                        <Input 
-                          type="email" 
+                        <Input
+                          type="email"
                           required
                           placeholder="username@snu.edu.in"
                           value={form.email}
@@ -341,8 +359,8 @@ export default function ContactPage() {
                     <div className="flex flex-col gap-1.5">
                       <Label className="text-[10px] uppercase tracking-wider font-black text-white/50 pl-0.5">Subject</Label>
                       <div className="relative">
-                        <Input 
-                          type="text" 
+                        <Input
+                          type="text"
                           placeholder="Brief topic"
                           value={form.subject}
                           onChange={(e) => setForm({ ...form, subject: e.target.value })}
@@ -357,7 +375,7 @@ export default function ContactPage() {
                     <div className="flex flex-col gap-1.5">
                       <Label className="text-[10px] uppercase tracking-wider font-black text-white/50 pl-0.5">Message</Label>
                       <div className="relative">
-                        <Textarea  
+                        <Textarea
                           required
                           rows={4}
                           placeholder="Your message here..."
@@ -371,8 +389,8 @@ export default function ContactPage() {
                     </div>
 
                     {/* Submit Button */}
-                    <Button 
-                      className="w-full relative flex items-center justify-center gap-2 py-4 rounded-xl bg-white hover:bg-amber-50 text-black font-black text-[10px] uppercase tracking-wider transition-all duration-300 active:scale-[0.98] disabled:opacity-75 disabled:pointer-events-none mt-2" 
+                    <Button
+                      className="w-full relative flex items-center justify-center gap-2 py-4 rounded-xl bg-white hover:bg-amber-50 text-black font-black text-[10px] uppercase tracking-wider transition-all duration-300 active:scale-[0.98] disabled:opacity-75 disabled:pointer-events-none mt-2"
                       type="submit"
                       disabled={status === 'submitting'}
                     >
@@ -392,7 +410,7 @@ export default function ContactPage() {
                     </Button>
                   </motion.form>
                 ) : (
-                  <motion.div 
+                  <motion.div
                     key="success-container"
                     initial={{ opacity: 0, scale: 0.95, y: 15 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -402,7 +420,7 @@ export default function ContactPage() {
                     <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
                       <CheckCircle2 className="w-7 h-7" />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <h3 className="text-xl font-black text-white tracking-tight">Transmission Complete!</h3>
                       <p className="text-[11px] text-white/40 font-medium font-inter leading-relaxed">
@@ -439,7 +457,7 @@ export default function ContactPage() {
         </motion.section>
 
         {/* Legal links footer */}
-        <motion.footer 
+        <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}

@@ -22,5 +22,8 @@ class Settings(BaseSettings):
     chroma_host: str = "localhost"
     chroma_port: int = 8000
 
+    google_apps_script_url: str | None = None
+
 
 settings = Settings()
+

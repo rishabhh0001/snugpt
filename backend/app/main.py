@@ -9,9 +9,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.models.database import connect_database, disconnect_database, is_database_connected, get_database
-from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest, ShareChatRequest, ShareChatResponse
+from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest, ShareChatRequest, ShareChatResponse, ContactRequest
 from app.models.waitlist import add_to_waitlist
 from app.models.chat_log import save_chat_feedback, save_shared_chat, get_shared_chat
+from app.models.contact import save_contact_message
 from app.rag.pipeline import generate_streaming_response
 from app.rag.vectorstore import add_qa_pair
 import uuid
@@ -127,6 +128,46 @@ async def waitlist(request: WaitlistRequest):
             raise HTTPException(status_code=400, detail="This email is already on the waitlist.") from e
         logger.error("Waitlist error: %s", e)
         raise HTTPException(status_code=500, detail="Could not save waitlist entry. Please try again.") from e
+
+
+@app.post("/api/contact")
+async def contact(request: ContactRequest):
+    try:
+        # 1. Save contact message to Neon SQL Database
+        message_id = await save_contact_message(
+            name=request.name,
+            email=request.email,
+            subject=request.subject,
+            message=request.message
+        )
+
+        # 2. Initiate Google Apps Script to send emails if URL is configured
+        if settings.google_apps_script_url:
+            import requests
+            def send_email_webhook():
+                payload = {
+                    "name": request.name,
+                    "email": request.email,
+                    "subject": request.subject or "New Contact Message",
+                    "message": request.message
+                }
+                try:
+                    # POST to Google Apps Script Web App URL
+                    response = requests.post(settings.google_apps_script_url, json=payload, timeout=12)
+                    logger.info("Google Apps Script webhook trigger response: %s", response.status_code)
+                except Exception as ex:
+                    logger.error("Failed to call Google Apps Script webhook: %s", ex)
+
+            # Fire-and-forget in background thread to keep API response sub-second
+            await asyncio.to_thread(send_email_webhook)
+        else:
+            logger.warning("GOOGLE_APPS_SCRIPT_URL not configured. Direct logging completed without email dispatch.")
+
+        return {"message": "Message successfully received and logged.", "id": message_id}
+    except Exception as e:
+        logger.error("Contact form error: %s", e)
+        raise HTTPException(status_code=500, detail="Failed to log message. Please try again.") from e
+
 
 
 @app.post("/api/chat/feedback")
