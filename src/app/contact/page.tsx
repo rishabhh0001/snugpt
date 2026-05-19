@@ -294,7 +294,7 @@ export default function ContactPage() {
         >
           <ContactCard
             title="Secure Signal Core"
-            description="Broadcast your message directly to the engineering team. Every transmission is securely verified and instantly routed to the appropriate campus coordinator."
+            description="Broadcast your message directly to the development team. Every transmission is securely verified and instantly routed to the admin."
             contactInfo={snugptContactInfo}
             className="border-white/5 bg-black/40 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden"
             formSectionClassName="bg-white/[0.01] border-white/5 flex items-center justify-center p-8 md:p-10"
