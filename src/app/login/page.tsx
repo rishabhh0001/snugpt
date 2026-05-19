@@ -64,7 +64,7 @@ export default function AuthPage() {
 	return (
 		<main className="relative md:h-screen md:overflow-hidden lg:grid lg:grid-cols-2 bg-[#050505] text-[#ededed]">
 			{/* Left Branding Side (Desktop view only) */}
-			<div className="bg-neutral-950/60 relative hidden h-full flex-col border-r border-white/5 p-10 lg:flex">
+			<div className="bg-neutral-950/60 relative hidden h-full flex-col border-r border-white/15 p-10 lg:flex">
 				<div className="from-[#050505] absolute inset-0 z-10 bg-gradient-to-t to-transparent pointer-events-none" />
 				
 				{/* SNUGPT Brand Logo/Title */}
@@ -163,7 +163,7 @@ export default function AuthPage() {
 							type="button" 
 							size="lg" 
 							variant="outline"
-							className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white font-semibold cursor-pointer active:scale-98 transition-all"
+							className="w-full bg-white/5 hover:bg-white/10 border-white/20 text-white font-semibold cursor-pointer active:scale-98 transition-all"
 							disabled={isLoading !== null}
 							onClick={() => handleOAuthSignIn('google')}
 						>
@@ -179,7 +179,7 @@ export default function AuthPage() {
 							type="button" 
 							size="lg" 
 							variant="outline"
-							className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white font-semibold cursor-pointer active:scale-98 transition-all"
+							className="w-full bg-white/5 hover:bg-white/10 border-white/20 text-white font-semibold cursor-pointer active:scale-98 transition-all"
 							disabled={isLoading !== null}
 							onClick={() => handleOAuthSignIn('github')}
 						>
@@ -203,7 +203,7 @@ export default function AuthPage() {
 							<div className="relative h-max">
 								<Input
 									placeholder="e.g. rj910 or rj910@snu.edu.in"
-									className="peer ps-9 bg-white/5 border-white/10 text-white placeholder-white/30 h-10 rounded-xl"
+									className="peer ps-9 bg-white/5 border-white/20 text-white placeholder-white/30 h-10 rounded-xl"
 									type="text"
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
@@ -223,7 +223,7 @@ export default function AuthPage() {
 							<div className="relative h-max">
 								<Input
 									placeholder="Min. 6 characters"
-									className="peer ps-9 pe-10 bg-white/5 border-white/10 text-white placeholder-white/30 h-10 rounded-xl w-full"
+									className="peer ps-9 pe-10 bg-white/5 border-white/20 text-white placeholder-white/30 h-10 rounded-xl w-full"
 									type={showPassword ? "text" : "password"}
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
@@ -392,9 +392,9 @@ const AtSign = (props: React.ComponentProps<'svg'>) => (
 const AuthSeparator = () => {
 	return (
 		<div className="flex w-full items-center justify-center py-2">
-			<div className="bg-white/10 h-px w-full" />
-			<span className="text-white/20 px-3 text-xs font-mono font-bold">OR</span>
-			<div className="bg-white/10 h-px w-full" />
+			<div className="bg-white/20 h-px w-full" />
+			<span className="text-white/30 px-3 text-xs font-mono font-bold">OR</span>
+			<div className="bg-white/20 h-px w-full" />
 		</div>
 	);
 };
