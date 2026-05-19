@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // --- Liquid Morphing Text Configuration ---
@@ -168,33 +167,28 @@ interface PreloaderProps {
 
 export default function Preloader({ onComplete }: PreloaderProps) {
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
-  const [isLoaded, setIsLoaded] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     setDimension({ width: window.innerWidth, height: window.innerHeight });
   }, []);
 
-  // Preload cycle timer to trigger transition to the initialized card
+  // Preload cycle timer to trigger transition directly to the website
   useEffect(() => {
-    if (isLoaded) return;
+    if (isExiting) return;
 
     // Calculate total duration for one full cycle through the words array
     const totalDuration = words.length * (morphTime + cooldownTime) * 1000 - 200;
     
     const timer = setTimeout(() => {
-      setIsLoaded(true);
+      setIsExiting(true);
+      setTimeout(() => {
+        onComplete?.();
+      }, 1100);
     }, totalDuration);
 
     return () => clearTimeout(timer);
-  }, [isLoaded]);
-
-  const handleAccess = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      onComplete?.();
-    }, 1100);
-  };
+  }, [isExiting, onComplete]);
 
   const initialPath = `M0 0 L${dimension.width} 0 L${dimension.width} ${dimension.height
     } Q${dimension.width / 2} ${dimension.height + 300} 0 ${dimension.height} L0 0`;
@@ -225,7 +219,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 w-full max-w-2xl">
         <AnimatePresence mode="wait">
-          {!isLoaded ? (
+          {!isExiting && (
             <motion.div
               key="greeting-container"
               initial={{ opacity: 0 }}
@@ -242,75 +236,6 @@ export default function Preloader({ onComplete }: PreloaderProps) {
               
               {/* Liquid Morphing Text Animation */}
               <MorphingText texts={words} className="w-full" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="access-screen"
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.215, 0.610, 0.355, 1.000] }}
-              className="flex flex-col items-center gap-6"
-            >
-              {/* Glowing Icon Container */}
-              <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.15)] mb-2">
-                <CheckCircle2 className="w-8 h-8" />
-                <span className="absolute inset-0 rounded-full border border-amber-500/40 animate-ping opacity-25" />
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="text-white text-2xl md:text-3xl font-semibold tracking-tight">
-                  System Initialized
-                </h2>
-                <p className="text-zinc-400 text-sm md:text-base max-w-sm">
-                  Your content has successfully loaded. Click below to access.
-                </p>
-              </div>
-
-              {/* Premium glowing access button */}
-              <motion.button
-                onClick={handleAccess}
-                initial="initial"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center gap-3 px-10 py-4 rounded-full bg-white text-black font-semibold text-sm md:text-base tracking-wide overflow-hidden border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-colors duration-300"
-              >
-                {/* Background amber glow gradient */}
-                <span className="absolute inset-0 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                {/* Shimmer light sweep reflection */}
-                <motion.span
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
-                  variants={{
-                    initial: { left: "-100%" },
-                    hover: { left: "100%" }
-                  }}
-                  transition={{ duration: 0.55, ease: "easeInOut" }}
-                />
-
-                {/* Button Content */}
-                <span className="relative z-10 flex items-center gap-2 font-bold tracking-wider">
-                  <span>ENTER</span>
-                  <motion.span
-                    variants={{
-                      initial: { x: 0 },
-                      hover: { x: 5 }
-                    }}
-                    transition={{ type: "spring", stiffness: 300, damping: 12 }}
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                  </motion.span>
-                </span>
-
-                {/* Ambient glowing outer halo */}
-                <motion.span
-                  className="absolute inset-0 rounded-full border border-amber-400/0 opacity-0"
-                  variants={{
-                    initial: { scale: 0.95, opacity: 0 },
-                    hover: { scale: 1.05, opacity: 1, borderColor: "rgba(245,158,11,0.5)" }
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>
