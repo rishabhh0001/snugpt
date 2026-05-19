@@ -9,6 +9,7 @@ import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { useScroll as useNavbarScroll } from '@/components/ui/use-scroll';
 import { cn } from '@/lib/utils';
 import Preloader from '@/components/ui/preloader';
+import { Banner } from '@/components/ui/banner';
 
 const fadeInUp: any = {
   hidden: { opacity: 0, y: 15, filter: 'blur(4px)' },
@@ -678,6 +679,7 @@ export default function Lander() {
   const [mounted, setMounted] = useState(false);
   const [showPreloader, setShowPreloader] = useState(true);
   const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -736,12 +738,47 @@ export default function Lander() {
       {/* Navigation */}
       <header
         className={cn(
-          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl',
+          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl overflow-hidden',
           scrolled && !mobileMenuOpen
             ? 'top-4 bg-black/80 border-white/10 backdrop-blur-lg max-w-4xl shadow-[0_0_50px_rgba(0,0,0,0.8)]'
             : 'top-0 border-b border-white/5 bg-transparent'
         )}
       >
+        {/* Release Announcement Banner */}
+        <AnimatePresence>
+          {showBanner && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full overflow-hidden border-b border-white/[0.06] bg-black/40"
+            >
+              <div className="p-1.5 md:p-2">
+                <Banner
+                  show={showBanner}
+                  onHide={() => setShowBanner(false)}
+                  variant="premium"
+                  size="sm"
+                  showShade={true}
+                  closable={true}
+                  title="SnuGPT Chat is Now Live!"
+                  description="Experience ultra-fast, contextual university intelligence with real-time semantic query processing."
+                  icon={<Sparkles className="h-4.5 w-4.5 text-indigo-400 animate-pulse" />}
+                  action={
+                    <Link
+                      href="/chat"
+                      className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-white/90 text-black font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.15)] whitespace-nowrap"
+                    >
+                      Chat Now
+                    </Link>
+                  }
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <nav
           className={cn(
             'flex h-16 w-full items-center justify-between px-4 transition-all ease-out duration-300',
