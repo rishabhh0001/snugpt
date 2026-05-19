@@ -9,7 +9,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.models.database import connect_database, disconnect_database, is_database_connected, get_database
-from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest, ShareChatRequest, ShareChatResponse, ContactRequest
+from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest, ShareChatRequest, ShareChatResponse, ContactRequest, AuthRequest
+from app.models.user import get_user_by_email, create_user, hash_password
 from app.models.waitlist import add_to_waitlist
 from app.models.chat_log import save_chat_feedback, save_shared_chat, get_shared_chat
 from app.models.contact import save_contact_message
@@ -168,6 +169,45 @@ async def contact(request: ContactRequest):
         logger.error("Contact form error: %s", e)
         raise HTTPException(status_code=500, detail="Failed to log message. Please try again.") from e
 
+
+@app.post("/api/auth/authenticate")
+async def authenticate(request: AuthRequest):
+    email = request.email.strip().lower()
+    password = request.password
+    
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email/User ID and password are required.")
+    
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long.")
+    
+    try:
+        user = await get_user_by_email(email)
+        if user:
+            # Login check
+            hashed = hash_password(password)
+            if user["password_hash"] == hashed:
+                return {
+                    "id": user["id"],
+                    "email": user["email"],
+                    "name": user["name"] or email.split("@")[0]
+                }
+            else:
+                raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
+        else:
+            # Registration check (Auto Sign up)
+            new_user = await create_user(email, password)
+            return {
+                "id": new_user["id"],
+                "email": new_user["email"],
+                "name": new_user["name"],
+                "is_new": True
+            }
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        logger.error("Authentication error: %s", e)
+        raise HTTPException(status_code=500, detail="Internal server error during authentication.")
 
 
 @app.post("/api/chat/feedback")

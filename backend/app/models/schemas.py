@@ -50,3 +50,8 @@ class ContactRequest(BaseModel):
     message: str
 
 
+class AuthRequest(BaseModel):
+    email: str
+    password: str
+
+

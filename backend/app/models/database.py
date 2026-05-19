@@ -101,6 +101,7 @@ def init_db():
         import app.models.chat_log  # noqa: F401
         import app.models.waitlist  # noqa: F401
         import app.models.contact   # noqa: F401
+        import app.models.user      # noqa: F401
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables initialized.")
     except Exception as e:

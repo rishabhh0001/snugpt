@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils';
 
 export default function AuthPage() {
 	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState<string | null>(null);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -28,8 +30,12 @@ export default function AuthPage() {
 
 	const handleEmailSignIn = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!email.trim() || !email.includes('@')) {
-			setErrorMessage('Please enter a valid university or personal email address.');
+		if (!email.trim() || email.trim().length < 3) {
+			setErrorMessage('Please enter a valid User ID or Email address.');
+			return;
+		}
+		if (!password || password.length < 6) {
+			setErrorMessage('Password must be at least 6 characters long.');
 			return;
 		}
 
@@ -38,12 +44,15 @@ export default function AuthPage() {
 		try {
 			const res = await signIn('credentials', {
 				email: email.trim(),
+				password: password,
+				redirect: false,
 				callbackUrl: '/chat',
-				redirect: true,
 			});
 			if (res?.error) {
 				setErrorMessage(res.error);
 				setIsLoading(null);
+			} else {
+				window.location.href = '/chat';
 			}
 		} catch (error) {
 			console.error("Email sign in error:", error);
@@ -185,35 +194,73 @@ export default function AuthPage() {
 
 					<AuthSeparator />
 
-					{/* Passwordless Email sign-in form */}
-					<form className="space-y-3" onSubmit={handleEmailSignIn}>
-						<p className="text-white/40 text-start text-xs font-inter font-medium leading-normal">
-							Enter your email address to sign in or create an account
-						</p>
-						<div className="relative h-max">
-							<Input
-								placeholder="your.email@example.com"
-								className="peer ps-9 bg-white/5 border-white/10 text-white placeholder-white/30 h-10 rounded-xl"
-								type="email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-								disabled={isLoading !== null}
-							/>
-							<div className="text-white/30 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-								<AtSign className="size-4" aria-hidden="true" />
+					{/* Email and Password Credentials sign-in form */}
+					<form className="space-y-4" onSubmit={handleEmailSignIn}>
+						<div className="space-y-1">
+							<p className="text-white/40 text-start text-xs font-inter font-medium leading-normal">
+								User ID or Email
+							</p>
+							<div className="relative h-max">
+								<Input
+									placeholder="e.g. rj910 or rj910@snu.edu.in"
+									className="peer ps-9 bg-white/5 border-white/10 text-white placeholder-white/30 h-10 rounded-xl"
+									type="text"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									required
+									disabled={isLoading !== null}
+								/>
+								<div className="text-white/30 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+									<AtSign className="size-4" aria-hidden="true" />
+								</div>
 							</div>
 						</div>
 
+						<div className="space-y-1">
+							<p className="text-white/40 text-start text-xs font-inter font-medium leading-normal">
+								Password
+							</p>
+							<div className="relative h-max">
+								<Input
+									placeholder="Min. 6 characters"
+									className="peer ps-9 pe-10 bg-white/5 border-white/10 text-white placeholder-white/30 h-10 rounded-xl w-full"
+									type={showPassword ? "text" : "password"}
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									required
+									disabled={isLoading !== null}
+								/>
+								<div className="text-white/30 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+									<LockIcon className="size-4" aria-hidden="true" />
+								</div>
+								<button
+									type="button"
+									onClick={() => setShowPassword(!showPassword)}
+									className="absolute inset-y-0 end-0 flex items-center justify-center pe-3 text-white/35 hover:text-white/70 transition-colors focus:outline-none cursor-pointer"
+									disabled={isLoading !== null}
+								>
+									{showPassword ? (
+										<EyeOffIcon className="size-4" />
+									) : (
+										<EyeIcon className="size-4" />
+									)}
+								</button>
+							</div>
+						</div>
+
+						<p className="text-[10px] text-white/30 text-start leading-normal">
+							First time here? Entering a new password will automatically register your account!
+						</p>
+
 						<Button 
 							type="submit" 
-							className="w-full bg-white hover:bg-white/95 text-black font-bold h-10 rounded-xl cursor-pointer active:scale-98 transition-all"
+							className="w-full bg-white hover:bg-white/95 text-black font-bold h-10 rounded-xl cursor-pointer active:scale-98 transition-all mt-2"
 							disabled={isLoading !== null}
 						>
 							{isLoading === 'email' ? (
 								<div className="animate-spin rounded-full h-4 w-4 border-2 border-black border-t-transparent me-2" />
 							) : null}
-							<span>Continue With Email</span>
+							<span>Continue with Password</span>
 						</Button>
 					</form>
 
@@ -351,3 +398,53 @@ const AuthSeparator = () => {
 		</div>
 	);
 };
+
+const LockIcon = (props: React.ComponentProps<'svg'>) => (
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		{...props}
+	>
+		<rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+		<path d="M7 11V7a5 5 0 0 1 10 0v4" />
+	</svg>
+);
+
+const EyeIcon = (props: React.ComponentProps<'svg'>) => (
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		{...props}
+	>
+		<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z" />
+		<circle cx="12" cy="12" r="3" />
+	</svg>
+);
+
+const EyeOffIcon = (props: React.ComponentProps<'svg'>) => (
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		{...props}
+	>
+		<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+		<path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+		<path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+		<line x1="2" x2="22" y1="2" y2="22" />
+	</svg>
+);
