@@ -289,7 +289,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
 
                 {/* Button Content */}
                 <span className="relative z-10 flex items-center gap-2 font-bold tracking-wider">
-                  <span>ACCESS SNUGPT</span>
+                  <span>ENTER</span>
                   <motion.span
                     variants={{
                       initial: { x: 0 },
