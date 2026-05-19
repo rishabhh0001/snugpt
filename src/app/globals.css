@@ -190,3 +190,27 @@
   animation: loader-rotate 3.8s infinite linear;
   pointer-events: none;
 }
+
+/* ── Light Mode Color Variable Overrides ───────────────────────────────────── */
+.light {
+  --color-bg: #f8f9fa;
+  --color-sidebar: #f1f3f5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #e9ecef;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-text: #1a1a1b;
+  --color-muted: #5c5f62;
+  
+  /* Additional text overrides if necessary */
+  background-color: #f8f9fa;
+  color: #1a1a1b;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(242, 169, 0, 0.4);
+}
+

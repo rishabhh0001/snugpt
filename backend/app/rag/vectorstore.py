@@ -15,35 +15,49 @@ _client = None
 _collection = None
 
 
+import threading
+
+_client_lock = threading.Lock()
+_collection_lock = threading.Lock()
+
+
 def _get_client():
     global _client
     if _client is not None:
         return _client
 
-    if settings.chroma_api_key and settings.use_chroma_cloud:
-        logger.info(
-            "Chroma Cloud tenant=%s database=%s",
-            settings.chroma_tenant,
-            settings.chroma_database,
-        )
-        _client = chromadb.CloudClient(
-            api_key=settings.chroma_api_key,
-            tenant=settings.chroma_tenant,
-            database=settings.chroma_database,
-        )
-    else:
-        logger.info("Chroma HTTP %s:%s", settings.chroma_host, settings.chroma_port)
-        _client = chromadb.HttpClient(
-            host=settings.chroma_host,
-            port=settings.chroma_port,
-        )
+    with _client_lock:
+        if _client is not None:
+            return _client
+
+        if settings.chroma_api_key and settings.use_chroma_cloud:
+            logger.info(
+                "Chroma Cloud tenant=%s database=%s",
+                settings.chroma_tenant,
+                settings.chroma_database,
+            )
+            _client = chromadb.CloudClient(
+                api_key=settings.chroma_api_key,
+                tenant=settings.chroma_tenant,
+                database=settings.chroma_database,
+            )
+        else:
+            logger.info("Chroma HTTP %s:%s", settings.chroma_host, settings.chroma_port)
+            _client = chromadb.HttpClient(
+                host=settings.chroma_host,
+                port=settings.chroma_port,
+            )
     return _client
 
 
 def _get_collection():
     global _collection
-    if _collection is None:
-        _collection = _get_client().get_or_create_collection(COLLECTION_NAME)
+    if _collection is not None:
+        return _collection
+
+    with _collection_lock:
+        if _collection is None:
+            _collection = _get_client().get_or_create_collection(COLLECTION_NAME)
     return _collection
 
 

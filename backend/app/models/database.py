@@ -56,10 +56,16 @@ async def connect_database() -> None:
         logger.warning("DATABASE_URL is not set; waitlist and chat logs disabled.")
         return
 
-    _database = Database(async_url)
+    # Configure connection pool limits for high concurrent traffic
+    _database = Database(
+        async_url,
+        min_size=10,
+        max_size=100,
+        pool_recycle=1800
+    )
     await _database.connect()
     init_db()
-    logger.info("Connected to Neon database.")
+    logger.info("Connected to Neon database with optimized connection pool.")
 
 
 async def disconnect_database() -> None:
@@ -79,7 +85,15 @@ def get_sync_engine():
         sync_url = _sync_database_url()
         if not sync_url:
             return None
-        _sync_engine = create_engine(sync_url, pool_pre_ping=True)
+        # Maximize connection reuse and handle up to 70 concurrent transactions gracefully
+        _sync_engine = create_engine(
+            sync_url,
+            pool_size=20,
+            max_overflow=50,
+            pool_timeout=30,
+            pool_recycle=1800,
+            pool_pre_ping=True
+        )
     return _sync_engine
 
 

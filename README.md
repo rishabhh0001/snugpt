@@ -16,17 +16,18 @@
 
 ---
 
-## ⚡ The SNUGPT Overhaul (V1.0.4)
+## ⚡ The SNUGPT Overhaul (V1.0.5)
 
 SNUGPT is an open-source, high-density, conversational intelligence layer built exclusively for the Shiv Nadar University student body. It bridges the gap between fragmented ERP portals, university handbooks, hostel policies, and course prerequisites by consolidating all campus data into a unified, instant-response system.
 
-### ✨ What's New in V1.0.4?
-*   **🌍 Liquid Morphing Preloader**: A premium screen transition effect utilizing dynamic SVG filters that morphs greetings across 8 languages (English: *Hello*, Hindi: *नमस्ते*, Tamil: *வணக்கம்*, French: *Bonjour*, German: *Guten Tag*, Spanish: *Hola*, Italian: *Ciao*, Punjabi: *ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ*) before uncovering the application.
+### ✨ What's New in V1.0.5?
+*   **👥 Multi-User Authentication Ecosystem**: Beautiful, seamless NextAuth.js dropdown trigger integration featuring popovers for user profile routes, notification feeds, customized developer settings, and authentication handlers.
+*   **⚙️ Account Profile & Preferences Panel (`/profile`)**: Tailored client route built to let students manage academic profiles, adjust theme controls, and toggle the SVG liquid preloader on/off per user via scoped `localStorage` parameters.
+*   **🔒 Double-Checked Thread-Safe Initialization**: Upgraded FastAPI gateways with standard library dynamic threading locks (`threading.Lock`) preventing pipeline initialization collisions for NVIDIA Embeddings, ChatNVIDIA LLMs, and ChromaDB clients.
+*   **🏎️ High-Performance SQL Connection Pools**: Database configurations tuned with pool recycle routines, automated query pre-pings, and scaling thresholds supporting up to 100 concurrent Postgres channels and up to 70 parallel connection threads.
+*   **🎯 SEO & Sitemap Pre-Renders**: Static metadata rendering configuration (`force-static`) applied to Next.js dynamic sitemaps and rules, optimizing loading latency and crawler indexability for Googlebot.
+*   **🌍 Liquid Morphing Preloader**: A premium screen transition effect utilizing dynamic SVG filters that morphs greetings across 8 languages before uncovering the application.
 *   **📱 Active State Scaling**: Improved UI fluidness with physical micro-animations, active state scale translations, and hover properties applied to input bars, sidebar menus, and control cards.
-*   **✍️ Typography Refinement**: Unified brand identification employing modern type scales (Plus Jakarta Sans for headers and primary controls, Inter for content blocks and readability grids).
-*   **🧠 Model Upgrades**: Integration of Meta Llama 3.1 8B Instruct (running over high-speed NVIDIA AI Foundation endpoints) for lightning-fast token-by-token streaming.
-*   **⚡ Concurrency Refactoring**: Fully asynchronous backend logging pipelines, non-blocking DB session state writes, and isolated waitlist request processing.
-*   **🎯 SEO Optimization**: Canonical metadata bases, Google Search Console metadata, and structured robots/sitemap integrations pointed directly to `https://snugpt.rishabhj.in`.
 
 ---
 

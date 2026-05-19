@@ -202,6 +202,7 @@ export default function PrivacyPolicyPage() {
           <span>&copy; {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.</span>
           <div className="flex gap-6">
             <Link href="/about" className="hover:text-white transition-colors">About SNUGPT</Link>
+            <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
             <Link href="/license" className="hover:text-white transition-colors">Apache License</Link>
           </div>
         </motion.footer>

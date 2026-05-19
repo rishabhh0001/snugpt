@@ -136,20 +136,20 @@ export default function AboutPage() {
               </div>
             </motion.div>
 
-            {/* Spec Card 3: Backend Gateway */}
+            {/* Spec Card 3: Concurrent Scalability */}
             <motion.div variants={fadeInUp} className="p-6 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex flex-col justify-between h-full group hover:border-white/10 transition-colors">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-300">
                   <Layers className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-white uppercase tracking-wider">Asynchronous Gateway</h3>
+                <h3 className="text-base font-bold text-white uppercase tracking-wider">Concurrency Scaling</h3>
                 <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter">
-                  Asynchronous python architecture built on <strong>FastAPI (Python 3.12+)</strong> with optimized middleware pipelines to handle high-throughput query requests without lag.
+                  FastAPI backend is optimized with thread-safe double-checked lock patterns (`threading.Lock`) and recycled PostgreSQL connection pools supporting up to 100 concurrent channels.
                 </p>
               </div>
             </motion.div>
 
-            {/* Spec Card 4: Memory Storage */}
+            {/* Spec Card 4: Persistent Memory */}
             <motion.div variants={fadeInUp} className="p-6 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex flex-col justify-between h-full group hover:border-white/10 transition-colors">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
@@ -225,6 +225,7 @@ export default function AboutPage() {
           <span>&copy; {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.</span>
           <div className="flex gap-6">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
             <Link href="/license" className="hover:text-white transition-colors">Apache License</Link>
           </div>
         </motion.footer>

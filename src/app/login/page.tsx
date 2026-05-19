@@ -67,12 +67,12 @@ export default function AuthPage() {
 			<div className="bg-neutral-950/60 relative hidden h-full flex-col border-r border-white/5 p-10 lg:flex">
 				<div className="from-[#050505] absolute inset-0 z-10 bg-gradient-to-t to-transparent pointer-events-none" />
 				
-				{/* SnuGPT Brand Logo/Title */}
+				{/* SNUGPT Brand Logo/Title */}
 				<div className="z-10 flex items-center gap-3">
 					<div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow-lg">
 						<Image 
 							src="/avatar.svg" 
-							alt="SnuGPT Logo" 
+							alt="SNUGPT Logo" 
 							width={32} 
 							height={32} 
 							className="object-cover"
@@ -124,12 +124,12 @@ export default function AuthPage() {
 				</Button>
 
 				<div className="mx-auto space-y-6 sm:w-sm w-full max-w-md">
-					{/* SnuGPT Brand Header (Mobile view only) */}
+					{/* SNUGPT Brand Header (Mobile view only) */}
 					<div className="flex items-center gap-3 lg:hidden">
 						<div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow-lg">
 							<Image 
 								src="/avatar.svg" 
-								alt="SnuGPT Logo" 
+								alt="SNUGPT Logo" 
 								width={32} 
 								height={32} 
 								className="object-cover"
@@ -147,7 +147,7 @@ export default function AuthPage() {
 							Sign In or Join Now!
 						</h1>
 						<p className="text-white/40 text-sm md:text-base font-inter">
-							Sign in or create your SnuGPT account.
+							Sign in or create your SNUGPT account.
 						</p>
 					</div>
 
@@ -297,14 +297,14 @@ function FloatingPaths({ position }: { position: number }) {
 		} ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
 			684 - i * 5 * position
 		} ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-		color: `rgba(242, 169, 0, ${0.01 + i * 0.005})`,
+		color: `rgba(242, 169, 0, ${0.1 + i * 0.03})`,
 		width: 0.5 + i * 0.03,
 	}));
 
 	return (
 		<div className="pointer-events-none absolute inset-0">
 			<svg
-				className="h-full w-full text-amber-500/20"
+				className="h-full w-full text-amber-500/30"
 				viewBox="0 0 696 316"
 				fill="none"
 			>
@@ -315,7 +315,7 @@ function FloatingPaths({ position }: { position: number }) {
 						d={path.d}
 						stroke="currentColor"
 						strokeWidth={path.width}
-						strokeOpacity={0.05 + path.id * 0.01}
+						strokeOpacity={0.1 + path.id * 0.03}
 						initial={{ pathLength: 0.3, opacity: 0.6 }}
 						animate={{
 							pathLength: 1,

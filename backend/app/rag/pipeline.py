@@ -7,22 +7,29 @@ from app.rag.prompts import qa_prompt
 from app.rag.vectorstore import add_qa_pair, retrieve_documents
 from app.config import settings
 
+import threading
+
 # Lazy initialization of LLM to prevent startup crashes
 _llm = None
+_llm_lock = threading.Lock()
 
 def get_llm():
     global _llm
-    if _llm is None:
-        api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
-        if not api_key:
-            # We don't raise here to avoid crashing the worker, but we'll fail gracefully during generation
-            return None
-        _llm = ChatNVIDIA(
-            model="meta/llama-3.1-8b-instruct",
-            nvidia_api_key=api_key,
-            temperature=0.1,
-            max_tokens=8192
-        )
+    if _llm is not None:
+        return _llm
+        
+    with _llm_lock:
+        if _llm is None:
+            api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
+            if not api_key:
+                # We don't raise here to avoid crashing the worker, but we'll fail gracefully during generation
+                return None
+            _llm = ChatNVIDIA(
+                model="meta/llama-3.1-8b-instruct",
+                nvidia_api_key=api_key,
+                temperature=0.1,
+                max_tokens=8192
+            )
     return _llm
 
 # ── Safety Guardrail ─────────────────────────────────────────────────────────
