@@ -765,7 +765,7 @@ export default function Lander() {
               className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
             >
               {/* Link text */}
-              <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+              <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
                 Features
               </span>
               {/* Top & bottom border animation */}
@@ -783,7 +783,7 @@ export default function Lander() {
               <button
                 className="relative inline-flex items-center gap-1 group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
               >
-                <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
                   Info
                 </span>
                 <ChevronDown className="w-3 h-3 text-white/40 relative z-10 group-hover:text-black transition-colors duration-300 group-hover:rotate-180 transition-transform duration-300" />
@@ -826,6 +826,28 @@ export default function Lander() {
                 )}
               </AnimatePresence>
             </div>
+
+            <Link
+              href="mailto:support@snugpt.tech"
+              className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
+            >
+              <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
+                Contact Us
+              </span>
+              <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+              <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+            </Link>
+
+            <Link
+              href="/chat"
+              className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
+            >
+              <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
+                Login
+              </span>
+              <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+              <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+            </Link>
           </div>
  
            <div className="flex items-center gap-2">
@@ -833,7 +855,7 @@ export default function Lander() {
                 href="/chat"
                 className="px-5 py-2 md:px-6 md:py-2.5 rounded-lg md:rounded-xl bg-white text-black font-black text-[8px] md:text-[9px] uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
               >
-                Access Intelligence
+                Login
               </Link>
  
              {/* Mobile menu toggle button */}
@@ -869,6 +891,32 @@ export default function Lander() {
                   <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
                 </Link>
 
+                {/* Mobile Contact Us */}
+                <Link
+                  href="mailto:support@snugpt.tech"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300 font-jakarta"
+                >
+                  <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                    Contact Us
+                  </span>
+                  <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+                  <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+                </Link>
+
+                {/* Mobile Login Nav Link */}
+                <Link
+                  href="/chat"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300 font-jakarta"
+                >
+                  <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                    Login
+                  </span>
+                  <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+                  <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+                </Link>
+
                 {/* Mobile Info Header */}
                 <div className="px-4 pt-4 pb-2 border-t border-white/5 mt-2">
                   <span className="text-[10px] uppercase tracking-[0.3em] font-black text-white/20">University Info</span>
@@ -888,7 +936,7 @@ export default function Lander() {
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="flex flex-col items-start text-left">
-                        <span className="text-xs font-bold text-white/60 group-hover:text-white transition-colors">
+                        <span className="text-xs font-bold text-white/60 group-hover:text-white transition-colors font-jakarta">
                           {item.title}
                         </span>
                         <span className="text-[9px] text-white/20 font-medium font-inter mt-0.5 leading-tight">
@@ -904,7 +952,7 @@ export default function Lander() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full py-4 text-center block rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-amber-50 active:scale-95 transition-all"
                 >
-                  Access Intelligence
+                  Login
                 </Link>
              </motion.div>
            )}
