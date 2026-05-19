@@ -1,7 +1,7 @@
 # <img src="./public/avatar.svg" width="48" align="center" style="vertical-align: middle;" /> SNUGPT — Delhi-NCR
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Release-V1.0.4_Neural-indigo?style=for-the-badge&logo=rocket" />
+  <img src="https://img.shields.io/badge/Release-v1.2%20(%2B74)-indigo?style=for-the-badge&logo=rocket" />
   <img src="https://img.shields.io/badge/Architecture-RAG-indigo?style=for-the-badge&logo=ai" />
   <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge&logo=fastapi" />
   <img src="https://img.shields.io/badge/Frontend-Next.js_16.2-black?style=for-the-badge&logo=nextdotjs" />
@@ -16,11 +16,11 @@
 
 ---
 
-## ⚡ The SNUGPT Overhaul (V1.0.5)
+## ⚡ The SNUGPT Overhaul (v1.2)
 
 SNUGPT is an open-source, high-density, conversational intelligence layer built exclusively for the Shiv Nadar University student body. It bridges the gap between fragmented ERP portals, university handbooks, hostel policies, and course prerequisites by consolidating all campus data into a unified, instant-response system.
 
-### ✨ What's New in V1.0.5?
+### ✨ What's New in v1.2 (+74)?
 *   **👥 Multi-User Authentication Ecosystem**: Beautiful, seamless NextAuth.js dropdown trigger integration featuring popovers for user profile routes, notification feeds, customized developer settings, and authentication handlers.
 *   **⚙️ Account Profile & Preferences Panel (`/profile`)**: Tailored client route built to let students manage academic profiles, adjust theme controls, and toggle the SVG liquid preloader on/off per user via scoped `localStorage` parameters.
 *   **🔒 Double-Checked Thread-Safe Initialization**: Upgraded FastAPI gateways with standard library dynamic threading locks (`threading.Lock`) preventing pipeline initialization collisions for NVIDIA Embeddings, ChatNVIDIA LLMs, and ChromaDB clients.
