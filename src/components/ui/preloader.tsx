@@ -6,8 +6,8 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // --- Liquid Morphing Text Configuration ---
-const morphTime = 0.4;
-const cooldownTime = 0.15;
+const morphTime = 0.32;
+const cooldownTime = 0.12;
 
 const words = [
   "Hello",          // English
