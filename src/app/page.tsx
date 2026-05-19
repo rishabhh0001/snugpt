@@ -71,16 +71,40 @@ type BGPatternProps = React.ComponentProps<'div'> & {
 	fill?: string;
 };
 
-const maskClasses: Record<BGMaskType, string> = {
-	'fade-edges': '[mask-image:radial-gradient(ellipse_at_center,black,transparent)]',
-	'fade-center': '[mask-image:radial-gradient(ellipse_at_center,transparent,black)]',
-	'fade-top': '[mask-image:linear-gradient(to_bottom,transparent,black)]',
-	'fade-bottom': '[mask-image:linear-gradient(to_bottom,black,transparent)]',
-	'fade-left': '[mask-image:linear-gradient(to_right,transparent,black)]',
-	'fade-right': '[mask-image:linear-gradient(to_right,black,transparent)]',
-	'fade-x': '[mask-image:linear-gradient(to_right,transparent,black,transparent)]',
-	'fade-y': '[mask-image:linear-gradient(to_bottom,transparent,black,transparent)]',
-	none: '',
+const maskStyles: Record<BGMaskType, React.CSSProperties> = {
+	'fade-edges': {
+		WebkitMaskImage: 'radial-gradient(ellipse at center, black, transparent)',
+		maskImage: 'radial-gradient(ellipse at center, black, transparent)',
+	},
+	'fade-center': {
+		WebkitMaskImage: 'radial-gradient(ellipse at center, transparent, black)',
+		maskImage: 'radial-gradient(ellipse at center, transparent, black)',
+	},
+	'fade-top': {
+		WebkitMaskImage: 'linear-gradient(to bottom, transparent, black)',
+		maskImage: 'linear-gradient(to bottom, transparent, black)',
+	},
+	'fade-bottom': {
+		WebkitMaskImage: 'linear-gradient(to bottom, black, transparent)',
+		maskImage: 'linear-gradient(to bottom, black, transparent)',
+	},
+	'fade-left': {
+		WebkitMaskImage: 'linear-gradient(to right, transparent, black)',
+		maskImage: 'linear-gradient(to right, transparent, black)',
+	},
+	'fade-right': {
+		WebkitMaskImage: 'linear-gradient(to right, black, transparent)',
+		maskImage: 'linear-gradient(to right, black, transparent)',
+	},
+	'fade-x': {
+		WebkitMaskImage: 'linear-gradient(to right, transparent, black, transparent)',
+		maskImage: 'linear-gradient(to right, transparent, black, transparent)',
+	},
+	'fade-y': {
+		WebkitMaskImage: 'linear-gradient(to bottom, transparent, black, transparent)',
+		maskImage: 'linear-gradient(to bottom, transparent, black, transparent)',
+	},
+	none: {},
 };
 
 function geBgImage(variant: BGVariantType, fill: string, size: number) {
@@ -106,7 +130,7 @@ const BGPattern = ({
 	variant = 'grid',
 	mask = 'none',
 	size = 24,
-	fill = '#252525',
+	fill = '#ffffff',
 	className,
 	style,
 	...props
@@ -116,10 +140,11 @@ const BGPattern = ({
 
 	return (
 		<div
-			className={cn('absolute inset-0 z-0 size-full', maskClasses[mask], className)}
+			className={cn('absolute inset-0 z-0 size-full', className)}
 			style={{
 				backgroundImage,
 				backgroundSize: bgSize,
+				...maskStyles[mask],
 				...style,
 			}}
 			{...props}
@@ -131,7 +156,7 @@ BGPattern.displayName = 'BGPattern';
 
 const GridBackground = () => (
   <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-    <BGPattern variant="grid" mask="fade-center" fill="#ffffff10" size={40} className="opacity-[0.05]" />
+    <BGPattern variant="grid" mask="fade-edges" fill="#ffffff" size={40} className="opacity-[0.08]" />
     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/10 to-transparent h-40 w-full z-0 opacity-20 animate-scanline" />
     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-amber-500/5 blur-[120px] rounded-full opacity-50" />
     <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-blue-600/10 blur-[100px] rounded-full animate-pulse-slow" />
