@@ -60,8 +60,7 @@ async def connect_database() -> None:
     _database = Database(
         async_url,
         min_size=10,
-        max_size=100,
-        pool_recycle=1800
+        max_size=100
     )
     await _database.connect()
     init_db()

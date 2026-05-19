@@ -176,11 +176,13 @@ export default function ContactPage() {
   });
 
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
+      setErrorMessage('Required fields missing (Name, Email, Message).');
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
       return;
@@ -202,8 +204,9 @@ export default function ContactPage() {
       }
 
       setStatus('success');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Contact submission error:', err);
+      setErrorMessage(err.message || 'Failed to transmit message. Please try again.');
       setStatus('error');
       setTimeout(() => setStatus('idle'), 4000);
     }
@@ -317,7 +320,7 @@ export default function ContactPage() {
                         className="p-3.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 text-xs font-bold font-inter flex items-center gap-2.5"
                       >
                         <AlertCircle className="w-4 h-4 shrink-0" />
-                        Required fields missing (Name, Email, Message).
+                        {errorMessage || 'Required fields missing (Name, Email, Message).'}
                       </motion.div>
                     )}
 
