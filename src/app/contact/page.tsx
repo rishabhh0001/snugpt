@@ -10,8 +10,7 @@ import {
   Send, 
   CheckCircle2, 
   AlertCircle,
-  Sparkles,
-  ChevronDown
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 // Page animations
 const fadeInUp = {
@@ -51,6 +51,120 @@ type FormState = {
   message: string;
 };
 
+// --- Complete Background Grid Components from Homepage ---
+type BGVariantType = 'dots' | 'diagonal-stripes' | 'grid' | 'horizontal-lines' | 'vertical-lines' | 'checkerboard';
+type BGMaskType =
+  | 'fade-center'
+  | 'fade-edges'
+  | 'fade-top'
+  | 'fade-bottom'
+  | 'fade-left'
+  | 'fade-right'
+  | 'fade-x'
+  | 'fade-y'
+  | 'none';
+
+type BGPatternProps = React.ComponentProps<'div'> & {
+  variant?: BGVariantType;
+  mask?: BGMaskType;
+  size?: number;
+  fill?: string;
+};
+
+const maskStyles: Record<BGMaskType, React.CSSProperties> = {
+  'fade-edges': {
+    WebkitMaskImage: 'radial-gradient(ellipse at center, black, transparent)',
+    maskImage: 'radial-gradient(ellipse at center, black, transparent)',
+  },
+  'fade-center': {
+    WebkitMaskImage: 'radial-gradient(ellipse at center, transparent, black)',
+    maskImage: 'radial-gradient(ellipse at center, transparent, black)',
+  },
+  'fade-top': {
+    WebkitMaskImage: 'linear-gradient(to bottom, transparent, black)',
+    maskImage: 'linear-gradient(to bottom, transparent, black)',
+  },
+  'fade-bottom': {
+    WebkitMaskImage: 'linear-gradient(to bottom, black, transparent)',
+    maskImage: 'linear-gradient(to bottom, black, transparent)',
+  },
+  'fade-left': {
+    WebkitMaskImage: 'linear-gradient(to right, transparent, black)',
+    maskImage: 'linear-gradient(to right, transparent, black)',
+  },
+  'fade-right': {
+    WebkitMaskImage: 'linear-gradient(to right, black, transparent)',
+    maskImage: 'linear-gradient(to right, black, transparent)',
+  },
+  'fade-x': {
+    WebkitMaskImage: 'linear-gradient(to right, transparent, black, transparent)',
+    maskImage: 'linear-gradient(to right, transparent, black, transparent)',
+  },
+  'fade-y': {
+    WebkitMaskImage: 'linear-gradient(to bottom, transparent, black, transparent)',
+    maskImage: 'linear-gradient(to bottom, transparent, black, transparent)',
+  },
+  none: {},
+};
+
+function geBgImage(variant: BGVariantType, fill: string, size: number) {
+  switch (variant) {
+    case 'dots':
+      return `radial-gradient(${fill} 1px, transparent 1px)`;
+    case 'grid':
+      return `linear-gradient(to right, ${fill} 1px, transparent 1px), linear-gradient(to bottom, ${fill} 1px, transparent 1px)`;
+    case 'diagonal-stripes':
+      return `repeating-linear-gradient(45deg, ${fill}, ${fill} 1px, transparent 1px, transparent ${size}px)`;
+    case 'horizontal-lines':
+      return `linear-gradient(to bottom, ${fill} 1px, transparent 1px)`;
+    case 'vertical-lines':
+      return `linear-gradient(to right, ${fill} 1px, transparent 1px)`;
+    case 'checkerboard':
+      return `linear-gradient(45deg, ${fill} 25%, transparent 25%), linear-gradient(-45deg, ${fill} 25%, transparent 25%), linear-gradient(45deg, transparent 75%, ${fill} 75%), linear-gradient(-45deg, transparent 75%, ${fill} 75%)`;
+    default:
+      return undefined;
+  }
+}
+
+const BGPattern = ({
+  variant = 'grid',
+  mask = 'none',
+  size = 24,
+  fill = '#ffffff',
+  className,
+  style,
+  ...props
+}: BGPatternProps) => {
+  const bgSize = `${size}px ${size}px`;
+  const backgroundImage = geBgImage(variant, fill, size);
+
+  return (
+    <div
+      className={cn('absolute inset-0 z-0 size-full', className)}
+      style={{
+        backgroundImage,
+        backgroundSize: bgSize,
+        ...maskStyles[mask],
+        ...style,
+      }}
+      {...props}
+    />
+  );
+};
+
+BGPattern.displayName = 'BGPattern';
+
+const GridBackground = () => (
+  <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+    <BGPattern variant="grid" mask="fade-edges" fill="#ffffff" size={40} className="opacity-[0.08]" />
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/10 to-transparent h-40 w-full z-0 opacity-20 animate-scanline" />
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-amber-500/5 blur-[120px] rounded-full opacity-50" />
+    <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-blue-600/10 blur-[100px] rounded-full animate-pulse-slow" />
+    <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-yellow-500/10 blur-[100px] rounded-full animate-pulse-slower" />
+  </div>
+);
+
+// --- Contact Page ---
 export default function ContactPage() {
   const [form, setForm] = useState<FormState>({
     name: '',
@@ -110,14 +224,8 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#ededed] font-jakarta overflow-x-hidden selection:bg-amber-500/30 tracking-tight relative">
-      {/* Background Ambient Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[15%] w-[700px] h-[400px] rounded-full bg-gradient-to-br from-indigo-500/10 via-indigo-600/5 to-transparent blur-[130px] pointer-events-none animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute top-[20%] right-[10%] w-[500px] h-[300px] rounded-full bg-gradient-to-br from-amber-500/5 via-amber-600/5 to-transparent blur-[110px] pointer-events-none animate-pulse" style={{ animationDuration: '12s' }} />
-      </div>
-
-      {/* Grid Pattern overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f0f11_1px,transparent_1px),linear-gradient(to_bottom,#0f0f11_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none opacity-40 z-0" />
+      {/* Background Complete Grid & Glows Overlay */}
+      <GridBackground />
 
       {/* Top Header navbar simplified */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-2xl border-b border-white/5 py-4">
