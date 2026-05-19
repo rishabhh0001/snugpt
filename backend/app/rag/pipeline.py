@@ -28,7 +28,7 @@ def get_llm():
                 model="meta/llama-3.1-8b-instruct",
                 nvidia_api_key=api_key,
                 temperature=0.1,
-                max_tokens=8192
+                max_tokens=2048
             )
     return _llm
 
@@ -189,7 +189,7 @@ async def generate_streaming_response(
                 model="meta/llama-3.1-8b-instruct",
                 nvidia_api_key=api_key,
                 temperature=0.4,
-                max_tokens=8192
+                max_tokens=2048
             )
         else:
             llm = get_llm()

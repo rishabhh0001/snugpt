@@ -182,7 +182,7 @@ export default function MessageBubble({
                 <summary className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold uppercase tracking-widest transition-colors list-none select-none"
                   style={{ color: "var(--color-muted)" }}>
                   <BookOpen className="w-3 h-3" />
-                  <span className="group-hover:text-white transition-colors">
+                  <span className="group-hover:text-color-text transition-colors">
                     {message.sources.length} source{message.sources.length !== 1 ? "s" : ""}
                   </span>
                 </summary>
@@ -195,7 +195,7 @@ export default function MessageBubble({
                       <span
                         key={i}
                         title={preview}
-                        className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border transition-all cursor-default hover:border-yellow-500/30 hover:text-white"
+                        className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border transition-all cursor-default hover:border-yellow-500/30 hover:text-color-text"
                         style={{
                           background: "var(--color-surface)",
                           borderColor: "var(--color-border)",
@@ -221,8 +221,8 @@ export default function MessageBubble({
                 <button
                   onClick={handleThumbsUp}
                   title="Helpful"
-                  className={`p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center ${
-                    activeFeedback === "up" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-white"
+                  className={`p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center ${
+                    activeFeedback === "up" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-color-text"
                   }`}
                 >
                   <ThumbsUp className="w-3.5 h-3.5" />
@@ -230,8 +230,8 @@ export default function MessageBubble({
                 <button
                   onClick={handleThumbsDown}
                   title="Not helpful"
-                  className={`p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center ${
-                    activeFeedback === "down" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-white"
+                  className={`p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center ${
+                    activeFeedback === "down" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-color-text"
                   }`}
                 >
                   <ThumbsDown className="w-3.5 h-3.5" />
@@ -242,7 +242,7 @@ export default function MessageBubble({
             <button
               onClick={handleCopy}
               title="Copy answer"
-              className="p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center hover:text-white"
+              className="p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center hover:text-color-text"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-yellow-500" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
@@ -250,7 +250,7 @@ export default function MessageBubble({
               <button
                 onClick={handleRegenerate}
                 title="Regenerate response"
-                className="p-1.5 rounded-md hover:bg-white/[0.06] transition-all duration-150 active:scale-90 flex items-center justify-center hover:text-white"
+                className="p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center hover:text-color-text"
               >
                 <RotateCw className="w-3.5 h-3.5" />
               </button>

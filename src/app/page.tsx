@@ -760,47 +760,13 @@ export default function Lander() {
 
       <header
         className={cn(
-          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl',
+          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl',
           mobileMenuOpen ? 'overflow-hidden' : 'overflow-visible',
           scrolled && !mobileMenuOpen
-            ? 'top-4 bg-black/80 border-white/10 backdrop-blur-lg max-w-4xl shadow-[0_0_50px_rgba(0,0,0,0.8)]'
+            ? 'top-4 bg-black/80 border-white/10 backdrop-blur-lg max-w-5xl shadow-[0_0_50px_rgba(0,0,0,0.8)]'
             : 'top-0 border-b border-white/5 bg-transparent'
         )}
       >
-        {/* Release Announcement Banner */}
-        <AnimatePresence>
-          {showBanner && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full overflow-hidden border-b border-white/[0.06] bg-black/40"
-            >
-              <div className="p-1.5 md:p-2">
-                <Banner
-                  show={showBanner}
-                  onHide={() => setShowBanner(false)}
-                  variant="premium"
-                  size="sm"
-                  showShade={true}
-                  closable={true}
-                  title="SNUGPT Chat is Now Live!"
-                  description="Experience ultra-fast, contextual university intelligence with real-time semantic query processing."
-                  icon={<Sparkles className="h-4.5 w-4.5 text-indigo-400 animate-pulse" />}
-                  action={
-                    <Link
-                      href="/chat"
-                      className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-white/90 text-black font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.15)] whitespace-nowrap"
-                    >
-                      Chat Now
-                    </Link>
-                  }
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <nav
           className={cn(
@@ -975,6 +941,41 @@ export default function Lander() {
              </button>
            </div>
          </nav>
+
+          {/* Release Announcement Banner */}
+          <AnimatePresence>
+            {showBanner && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full overflow-hidden border-t border-white/[0.06] bg-black/40"
+              >
+                <div className="p-1.5 md:p-2">
+                  <Banner
+                    show={showBanner}
+                    onHide={() => setShowBanner(false)}
+                    variant="premium"
+                    size="sm"
+                    showShade={true}
+                    closable={true}
+                    title="SNUGPT Chat is Now Live!"
+                    description="Experience ultra-fast, contextual university intelligence with real-time semantic query processing."
+                    icon={<Sparkles className="h-4.5 w-4.5 text-indigo-400 animate-pulse" />}
+                    action={
+                      <Link
+                        href="/chat"
+                        className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-white/90 text-black font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.15)] whitespace-nowrap"
+                      >
+                        Chat Now
+                      </Link>
+                    }
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
  
          {/* Mobile menu drawer overlay */}
          <AnimatePresence>

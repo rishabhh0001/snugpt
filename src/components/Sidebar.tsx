@@ -40,10 +40,10 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/avatar.svg" alt="SNUGPT" className="w-full h-full object-cover" />
           </div>
-          <span className="font-bold text-sm tracking-tight text-white">SNUGPT</span>
+          <span className="font-bold text-sm tracking-tight text-color-text">SNUGPT</span>
         </Link>
         {mobile && onClose && (
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-all active:scale-90 p-1 rounded-lg">
+          <button onClick={onClose} className="text-color-muted hover:text-color-text transition-all active:scale-90 p-1 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         )}
@@ -53,7 +53,7 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
       <div className="px-3 py-3">
         <button
           onClick={onNew}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] hover:bg-white/[0.06] text-gray-300 hover:text-white border"
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] hover:bg-color-surface-hover text-color-muted hover:text-color-text border"
           style={{ borderColor: "var(--color-border)" }}
         >
           <Plus className="w-4 h-4 flex-shrink-0" />
@@ -86,7 +86,7 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
                 <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
                   style={{ color: conv.id === activeId ? "var(--color-snu-yellow)" : "var(--color-muted)" }} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium truncate text-gray-300 group-hover:text-white transition-colors leading-tight">
+                  <p className="text-xs font-medium truncate text-color-text group-hover:text-color-snu-yellow transition-colors leading-tight">
                     {conv.title}
                   </p>
                   <p className="text-[10px] mt-0.5" style={{ color: "var(--color-muted)" }}>
@@ -110,7 +110,7 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
                   className={`absolute right-2 py-1 px-1.5 rounded-lg transition-all ${
                     deletingId === conv.id
                       ? "bg-red-500/10 text-red-400 scale-100 opacity-100 z-10"
-                      : "opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-400"
+                      : "opacity-0 group-hover:opacity-100 text-color-muted hover:text-red-400"
                   }`}
                   style={deletingId !== conv.id ? { color: "var(--color-muted)" } : undefined}
                   title={deletingId === conv.id ? "Click again to confirm" : "Delete conversation"}
@@ -133,7 +133,7 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
           href="https://github.com/rishabhh0001"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-[10px] transition-colors hover:text-white"
+          className="flex items-center gap-2 text-[10px] transition-colors hover:text-color-text"
           style={{ color: "var(--color-muted)" }}
         >
           <ChevronRight className="w-3 h-3" />
@@ -141,7 +141,7 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
         </a>
         <a
           href="mailto:rj910@snu.edu.in"
-          className="flex items-center gap-2 text-[10px] transition-colors hover:text-white"
+          className="flex items-center gap-2 text-[10px] transition-colors hover:text-color-text"
           style={{ color: "var(--color-muted)" }}
         >
           <Mail className="w-3 h-3" />

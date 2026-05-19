@@ -252,7 +252,7 @@ export default function ChatInterface() {
           style={{ borderColor: "var(--color-border)" }}>
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-1.5 rounded-lg hover:bg-white/[0.06] transition-all active:scale-90 text-gray-400 hover:text-white"
+            className="md:hidden p-1.5 rounded-lg hover:bg-color-surface-hover transition-all active:scale-90 text-color-muted hover:text-color-text"
             onClick={() => setSidebarOpen(true)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,7 +266,7 @@ export default function ChatInterface() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/avatar.svg" alt="SNUGPT" className="w-full h-full object-cover" />
             </div>
-            <span className="text-sm font-semibold text-white">SNUGPT</span>
+            <span className="text-sm font-semibold text-color-text">SNUGPT</span>
           </Link>
 
           <div className="flex-1" />
@@ -274,7 +274,7 @@ export default function ChatInterface() {
           <button
             onClick={handleNew}
             title="New chat"
-            className="p-1.5 rounded-lg transition-all active:scale-90 hover:bg-white/[0.06] text-gray-400 hover:text-white"
+            className="p-1.5 rounded-lg transition-all active:scale-90 hover:bg-color-surface-hover text-color-muted hover:text-color-text"
           >
             <SquarePen className="w-4 h-4" />
           </button>
@@ -303,7 +303,7 @@ export default function ChatInterface() {
                     />
                   </div>
 
-                  <h2 className="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">
+                  <h2 className="text-xl md:text-3xl font-bold text-color-text mb-1 md:mb-2">
                     How can I assist your SNU journey today?
                   </h2>
                   <p className="text-xs md:text-sm mb-6 md:mb-10" style={{ color: "var(--color-muted)" }}>
@@ -355,7 +355,7 @@ export default function ChatInterface() {
             <p className="text-center text-[10px] mt-2" style={{ color: "var(--color-muted)" }}>
               SNUGPT is an unofficial student assistant and can make mistakes. Verify critical info on{" "}
               <a href="https://snu.edu.in" target="_blank" rel="noopener noreferrer"
-                className="underline underline-offset-2 hover:text-white transition-colors">
+                className="underline underline-offset-2 hover:text-color-text transition-colors">
                 snu.edu.in
               </a>
             </p>

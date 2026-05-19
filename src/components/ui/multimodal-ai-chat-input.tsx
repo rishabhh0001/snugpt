@@ -59,7 +59,7 @@ const buttonVariants = cva(
         secondary:
           'bg-gray-200 text-black hover:bg-gray-300',
         // Ghost: dark theme responsive ghost styling
-        ghost: 'text-zinc-400 hover:bg-zinc-800/40 hover:text-white', 
+        ghost: 'text-color-muted hover:bg-color-surface-hover hover:text-color-text', 
         // Link: black text
         link: 'text-black underline-offset-4 hover:underline',
       },
@@ -279,11 +279,14 @@ function PureSuggestedActions({
           <Button
             variant="ghost"
             onClick={() => onSelectAction(suggestedAction.action)}
-            className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start
-                       border-zinc-800/40 bg-zinc-900/60 hover:bg-zinc-850/60 text-zinc-300 hover:text-white hover:border-[#f2a900]/40 transition-all duration-200"
+            className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start hover:border-amber-500/40 transition-all duration-200"
+            style={{
+              borderColor: "var(--color-border)",
+              background: "var(--color-surface)",
+            }}
           >
-            <span className="font-medium">{suggestedAction.title}</span>
-            <span className="text-gray-500">
+            <span className="font-medium text-color-text">{suggestedAction.title}</span>
+            <span style={{ color: "var(--color-muted)" }}>
               {suggestedAction.label}
             </span>
           </Button>
@@ -357,16 +360,22 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800/40"
+      className="rounded-md rounded-bl-lg p-[7px] h-fit border transition-all"
+      style={{
+        borderColor: "var(--color-border)",
+        background: "var(--color-surface)",
+      }}
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
       }}
       disabled={disabled}
-      variant="ghost" // ghost variant now has text-black
+      variant="ghost"
       aria-label="Attach files"
     >
-      <PaperclipIcon size={14} />
+      <span style={{ color: "var(--color-muted)" }} className="hover:text-color-text transition-colors">
+        <PaperclipIcon size={14} />
+      </span>
     </Button>
   );
 }
@@ -698,10 +707,9 @@ function PureMultimodalInput({
         onChange={handleInput}
         className={cn(
           'min-h-[24px] max-h-[calc(75dvh)] overflow-y-auto resize-none rounded-2xl !text-base pb-10',
-          'bg-[#161616] border border-orange-950/40 hover:border-orange-900/60 focus:border-[#f2a900]/60 focus-visible:ring-1 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-1 transition-all duration-200', 
+          'bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-amber-500/30 focus:border-[#f2a900]/60 focus-visible:ring-1 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-1 transition-all duration-200 text-color-text placeholder:text-color-muted', 
           className,
         )}
-        style={{color: '#ececec'}}
         rows={1}
         autoFocus
         disabled={!canSend || isGenerating || uploadQueue.length > 0}
