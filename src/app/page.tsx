@@ -865,22 +865,11 @@ export default function Lander() {
             </div>
 
             <Link
-              href="mailto:support@snugpt.tech"
+              href="/contact"
               className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
             >
               <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
                 Contact Us
-              </span>
-              <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
-              <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
-            </Link>
-
-            <Link
-              href="/chat"
-              className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
-            >
-              <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
-                Login
               </span>
               <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
               <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
@@ -930,25 +919,12 @@ export default function Lander() {
 
                 {/* Mobile Contact Us */}
                 <Link
-                  href="mailto:support@snugpt.tech"
+                  href="/contact"
                   onClick={() => setMobileMenuOpen(false)}
                   className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300 font-jakarta"
                 >
                   <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
                     Contact Us
-                  </span>
-                  <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
-                  <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
-                </Link>
-
-                {/* Mobile Login Nav Link */}
-                <Link
-                  href="/chat"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300 font-jakarta"
-                >
-                  <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
-                    Login
                   </span>
                   <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
                   <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
