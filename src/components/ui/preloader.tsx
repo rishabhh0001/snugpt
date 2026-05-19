@@ -33,12 +33,16 @@ const useMorphingText = (texts: string[]) => {
       const [current1, current2] = [text1Ref.current, text2Ref.current];
       if (!current1 || !current2 || !texts || texts.length === 0) return;
 
-      current2.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
-      current2.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
+      // Premium power-based smooth gooey blur curve & subpixel scale transition
+      const blurValue = Math.pow(1 - fraction, 1.5) * 14;
+      current2.style.filter = `blur(${blurValue}px)`;
+      current2.style.opacity = `${Math.pow(fraction, 0.5) * 100}%`;
+      current2.style.transform = `translate3d(0, 0, 0) scale(${0.97 + fraction * 0.03})`;
 
-      const invertedFraction = 1 - fraction;
-      current1.style.filter = `blur(${Math.min(8 / invertedFraction - 8, 100)}px)`;
-      current1.style.opacity = `${Math.pow(invertedFraction, 0.4) * 100}%`;
+      const blurValueInverted = Math.pow(fraction, 1.5) * 14;
+      current1.style.filter = `blur(${blurValueInverted}px)`;
+      current1.style.opacity = `${Math.pow(1 - fraction, 0.5) * 100}%`;
+      current1.style.transform = `translate3d(0, 0, 0) scale(${1.0 - fraction * 0.03})`;
 
       current1.textContent = texts[textIndexRef.current % texts.length];
       current2.textContent = texts[(textIndexRef.current + 1) % texts.length];
@@ -70,8 +74,10 @@ const useMorphingText = (texts: string[]) => {
     if (current1 && current2) {
       current2.style.filter = "none";
       current2.style.opacity = "100%";
+      current2.style.transform = "translate3d(0, 0, 0) scale(1)";
       current1.style.filter = "none";
       current1.style.opacity = "0%";
+      current1.style.transform = "translate3d(0, 0, 0) scale(0.97)";
     }
   }, []);
 
@@ -110,11 +116,23 @@ const Texts: React.FC<Pick<MorphingTextProps, "texts">> = ({ texts }) => {
   return (
     <>
       <span
-        className="absolute inset-x-0 top-0 m-auto inline-block w-full text-center text-white"
+        className="absolute inset-x-0 top-0 m-auto inline-block w-full text-center tracking-tight"
+        style={{
+          color: "#FFFDF5",
+          textShadow: "0 0 25px rgba(245,158,11,0.25)",
+          willChange: "filter, opacity, transform",
+          transform: "translate3d(0, 0, 0) scale(1)",
+        }}
         ref={text1Ref}
       />
       <span
-        className="absolute inset-x-0 top-0 m-auto inline-block w-full text-center text-white"
+        className="absolute inset-x-0 top-0 m-auto inline-block w-full text-center tracking-tight"
+        style={{
+          color: "#FFFDF5",
+          textShadow: "0 0 25px rgba(245,158,11,0.25)",
+          willChange: "filter, opacity, transform",
+          transform: "translate3d(0, 0, 0) scale(0.97)",
+        }}
         ref={text2Ref}
       />
     </>
@@ -131,7 +149,7 @@ const SvgFilters: React.FC = () => (
           values="1 0 0 0 0
                   0 1 0 0 0
                   0 0 1 0 0
-                  0 0 0 255 -140"
+                  0 0 0 19 -9"
         />
       </filter>
     </defs>
@@ -141,7 +159,7 @@ const SvgFilters: React.FC = () => (
 const MorphingText: React.FC<MorphingTextProps> = ({ texts, className }) => (
   <div
     className={cn(
-      "relative mx-auto h-24 w-full max-w-screen-md text-center font-sans text-[28pt] sm:text-[36pt] md:text-[48pt] font-bold leading-none [filter:url(#threshold)_blur(0.6px)] md:h-32 lg:text-[5.5rem] text-white flex items-center justify-center select-none",
+      "relative mx-auto h-24 w-full max-w-screen-md text-center font-jakarta text-[28pt] sm:text-[36pt] md:text-[48pt] font-bold leading-none [filter:url(#threshold)_blur(0.5px)] md:h-32 lg:text-[5.5rem] text-white flex items-center justify-center select-none",
       className,
     )}
   >
@@ -216,6 +234,9 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     >
       {/* Subtle moving abstract radial background light */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.05)_0%,transparent_60%)] animate-pulse-slow pointer-events-none" />
+
+      {/* Premium ambient backdrop glow inspired by cinematic high-end displays */}
+      <div className="absolute w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(245,158,11,0.07)_0%,transparent_70%)] blur-[60px] pointer-events-none animate-pulse-slow" style={{ animationDuration: '6s' }} />
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 w-full max-w-2xl">
         <AnimatePresence mode="wait">
