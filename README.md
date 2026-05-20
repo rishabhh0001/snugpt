@@ -197,36 +197,6 @@ Generates snapshots of chat sessions, returning vector-rendered sharing URLs alo
 
 ---
 
-## ⚙️ Environment Configuration
-
-To run SNUGPT locally or deploy it to Vercel, copy the environment templates and configure the parameters:
-
-### Next.js Frontend Configuration (`.env`)
-```ini
-# Specifies backend URL endpoint (defaults to local FastAPI during development)
-NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
-```
-
-### FastAPI Backend Configuration (`backend/.env`)
-```ini
-# NVIDIA AI Foundation Endpoints API key
-NVIDIA_API_KEY=nvapi-your-key-here
-
-# Serverless Neon PostgreSQL database URL pool
-DATABASE_URL=postgresql://user:password@ep-glowing-pool.us-east-2.aws.neon.tech/snugpt?sslmode=require
-
-# ChromaDB Configurations (Local or cloud)
-USE_CHROMA_CLOUD=true
-CHROMA_API_KEY=your-chroma-cloud-api-key
-CHROMA_TENANT=bf7a99b2-7384-49c8-8710-25dc1baccd97
-CHROMA_DATABASE=SNUGPT
-CHROMA_HOST=localhost
-CHROMA_PORT=8000
-CHROMA_PERSIST_DIR=./chroma_db
-```
-
----
-
 ## 🚀 Step-by-Step Installation & Local Setup
 
 Ensure you have **Node.js (v18+)**, **Python (v3.12+)**, and **Git** installed on your workstation.
