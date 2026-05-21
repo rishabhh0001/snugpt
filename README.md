@@ -16,18 +16,19 @@
 
 ---
 
-## ⚡ The SNUGPT Overhaul (v1.2)
+## ⚡ The SNUGPT Overhaul (v1.3)
 
 SNUGPT is an open-source, high-density, conversational intelligence layer built exclusively for the Shiv Nadar University student body. It bridges the gap between fragmented ERP portals, university handbooks, hostel policies, and course prerequisites by consolidating all campus data into a unified, instant-response system.
 
-### ✨ What's New in v1.2 (+74)?
+### ✨ What's New in v1.3 (+89)?
+*   **🕰️ Temporal Query Expansion Engine**: Features a prompt preprocessor that automatically intercepts student queries and appends real-time context (e.g., `Current Date: May 2026, Semester: Spring 2026`) before query execution, ensuring the retrieval matching targets the active policies instead of obsolete prior handbooks.
+*   **🏎️ Zero-Buffering SSE Streaming**: Refactored backend routing to leverage Server-Sent Events (SSE) combined with a serverless Next.js Edge proxy, routing chunked token-by-token updates in real-time, reducing Time-To-First-Token and visually breathing life into the chat interface.
+*   **📂 Recursive Batch Vector Ingestion**: Re-engineered `backend/scripts/upload_text.py` to recursively scan `docs/` for `.txt`, `.md`, and `.pdf` files, splitting documents dynamically via custom langchain loaders and recursive separators, uploading to ChromaDB in fast batches of 100.
+*   **📈 Dynamic GitHub Commit & Deployment Timeline**: A stunning public updates selector (`/updates` & `/changelog`) loaded dynamically via parallel client-side requests using standard HSL Conventional Commits style and caching repo state in `localStorage` with offline fallback triggers.
+*   **🌐 Interactive WebGL Draggable Globe**: Beautiful, responsive WebGL globe inside the cosmic 404 page created using `cobe` with velocity momentum solvers via `framer-motion` springs.
+*   **🔄 Cross-Tab Settings & Theme Sync**: Synchronizes all customized names, bios, preloader flags, and visual modes in real-time across parallel browser tabs using native browser `storage` context events.
+*   **🎨 HSL Theme Hardening & Ripples**: Transformed text input layers to standard CSS variables (`bg-[var(--color-surface)]`, etc.) and integrated Pointer Event ripple animations relative to tap vectors.
 *   **👥 Multi-User Authentication Ecosystem**: Beautiful, seamless NextAuth.js dropdown trigger integration featuring popovers for user profile routes, notification feeds, customized developer settings, and authentication handlers.
-*   **⚙️ Account Profile & Preferences Panel (`/profile`)**: Tailored client route built to let students manage academic profiles, adjust theme controls, and toggle the SVG liquid preloader on/off per user via scoped `localStorage` parameters.
-*   **🔒 Double-Checked Thread-Safe Initialization**: Upgraded FastAPI gateways with standard library dynamic threading locks (`threading.Lock`) preventing pipeline initialization collisions for NVIDIA Embeddings, ChatNVIDIA LLMs, and ChromaDB clients.
-*   **🏎️ High-Performance SQL Connection Pools**: Database configurations tuned with pool recycle routines, automated query pre-pings, and scaling thresholds supporting up to 100 concurrent Postgres channels and up to 70 parallel connection threads.
-*   **🎯 SEO & Sitemap Pre-Renders**: Static metadata rendering configuration (`force-static`) applied to Next.js dynamic sitemaps and rules, optimizing loading latency and crawler indexability for Googlebot.
-*   **🌍 Liquid Morphing Preloader**: A premium screen transition effect utilizing dynamic SVG filters that morphs greetings across 8 languages before uncovering the application.
-*   **📱 Active State Scaling**: Improved UI fluidness with physical micro-animations, active state scale translations, and hover properties applied to input bars, sidebar menus, and control cards.
 
 ---
 

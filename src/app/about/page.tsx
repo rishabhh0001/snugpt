@@ -136,7 +136,33 @@ export default function AboutPage() {
               </div>
             </motion.div>
 
-            {/* Spec Card 3: Concurrent Scalability */}
+            {/* Spec Card 3: Temporal Query Expansion */}
+            <motion.div variants={fadeInUp} className="p-6 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex flex-col justify-between h-full group hover:border-white/10 transition-colors">
+              <div className="space-y-4">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-bold text-white uppercase tracking-wider">Temporal Query Engine</h3>
+                <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter">
+                  Intercepts user queries to dynamically append current date and semester parameters (e.g. <strong>Spring 2026</strong>), pinning vector searches to active handbooks instead of obsolete procedures.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Spec Card 4: Zero-Buffering Streaming */}
+            <motion.div variants={fadeInUp} className="p-6 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex flex-col justify-between h-full group hover:border-white/10 transition-colors">
+              <div className="space-y-4">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-bold text-white uppercase tracking-wider">SSE Proxy Streams</h3>
+                <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter">
+                  Refactored FastAPI routes combined with a Next.js Edge proxy to forward Server-Sent Events (SSE) stream chunks instantly to the browser, minimizing Time-To-First-Token.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Spec Card 5: Concurrent Scalability */}
             <motion.div variants={fadeInUp} className="p-6 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex flex-col justify-between h-full group hover:border-white/10 transition-colors">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-300">
@@ -149,7 +175,7 @@ export default function AboutPage() {
               </div>
             </motion.div>
 
-            {/* Spec Card 4: Persistent Memory */}
+            {/* Spec Card 6: Persistent Memory */}
             <motion.div variants={fadeInUp} className="p-6 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex flex-col justify-between h-full group hover:border-white/10 transition-colors">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
