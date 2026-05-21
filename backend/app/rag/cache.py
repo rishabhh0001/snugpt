@@ -87,9 +87,9 @@ def search_cache(query: str) -> Optional[str]:
             
         distance, cache_data = results[0]
         # Cosine similarity roughly corresponds to distance. 
-        # For a 96% similarity (cosine similarity >= 0.92), distance should be <= 0.04 (if normalized 1-cosine)
+        # For a 92% similarity (cosine similarity >= 0.92), distance should be <= 0.08 (if normalized 1-cosine)
         # or L2 distance threshold depending on the vector base implementation.
-        # Assuming normalized vectors, threshold is 0.04 for 96% similarity.
+        # Assuming normalized vectors, threshold is 0.08 for 92% similarity.
         if distance <= 0.08:
             print(f"[Cache] Hit! Semantic similarity > 92% (Distance: {distance})")
             return cache.data_manager.get_scalar_data(cache_data, "response_text") # pseudo-code

@@ -163,7 +163,7 @@ export default function UpdatesPage() {
     {
       version: "v1.2.0",
       title: "Neural Chat & Branding Alignment",
-      date: "May 21, 2026",
+      date: "May 18, 2026",
       badge: "Major Update",
       badgeColor: "bg-blue-500/10 border-blue-500/30 text-blue-400",
       description: "A major step forward in conversation logic, query streaming, and project branding consistency. Introducing lightning-fast semantic queries and persistent multi-turn chat memory structures.",
@@ -251,7 +251,7 @@ export default function UpdatesPage() {
         cleanRepo = parts[1].split('?')[0].split('#')[0];
       }
     }
-    
+
     // Strip leading or trailing slashes
     cleanRepo = cleanRepo.replace(/^\/+|\/+$/g, '');
 
@@ -339,7 +339,7 @@ export default function UpdatesPage() {
     if (match) {
       const [_, type, scope, isBreaking, subject] = match;
       const typeLower = type.toLowerCase();
-      
+
       let badge = "Update";
       let icon = GitBranch;
       let color = "bg-white/5 border-white/10 text-white/60";
@@ -474,13 +474,13 @@ export default function UpdatesPage() {
                 <div>
                   <h4 className="text-xs font-black text-amber-400 uppercase tracking-widest">GitHub API Notice</h4>
                   <p className="text-[11px] text-white/50 mt-0.5 leading-relaxed font-medium">
-                    {rateLimited 
-                      ? "Unauthenticated rate limits reached. Falling back to offline official milestones." 
+                    {rateLimited
+                      ? "Unauthenticated rate limits reached. Falling back to offline official milestones."
                       : error}
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => fetchCommitsAndDetails(activeRepo)}
                 disabled={isLoading}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-[9px] font-black uppercase text-white/80 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
@@ -497,11 +497,10 @@ export default function UpdatesPage() {
             <button
               onClick={() => setActiveTab('commits')}
               disabled={rateLimited}
-              className={`relative px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 ${
-                activeTab === 'commits' 
-                  ? 'text-black shadow-lg' 
+              className={`relative px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 ${activeTab === 'commits'
+                  ? 'text-black shadow-lg'
                   : 'text-white/40 hover:text-white/80 disabled:opacity-30 disabled:cursor-not-allowed'
-              }`}
+                }`}
             >
               {activeTab === 'commits' && (
                 <motion.div
@@ -512,14 +511,13 @@ export default function UpdatesPage() {
               )}
               <GitBranch className="w-3.5 h-3.5" /> Live Commits
             </button>
-            
+
             <button
               onClick={() => setActiveTab('milestones')}
-              className={`relative px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 ${
-                activeTab === 'milestones' 
-                  ? 'text-black shadow-lg' 
+              className={`relative px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 z-10 flex items-center gap-1.5 ${activeTab === 'milestones'
+                  ? 'text-black shadow-lg'
                   : 'text-white/40 hover:text-white/80'
-              }`}
+                }`}
             >
               {activeTab === 'milestones' && (
                 <motion.div
@@ -594,14 +592,14 @@ export default function UpdatesPage() {
                   className="max-w-2xl mx-auto p-6 rounded-3xl border border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent backdrop-blur-xl relative overflow-hidden shadow-xl mb-12 text-left"
                 >
                   <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-                  
+
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-start gap-4">
                       {repoDetails.owner?.avatar_url && (
-                        <img 
-                          src={repoDetails.owner.avatar_url} 
-                          alt={repoDetails.owner.login} 
-                          className="w-12 h-12 rounded-xl border border-white/10 shadow-lg object-cover shrink-0" 
+                        <img
+                          src={repoDetails.owner.avatar_url}
+                          alt={repoDetails.owner.login}
+                          className="w-12 h-12 rounded-xl border border-white/10 shadow-lg object-cover shrink-0"
                         />
                       )}
                       <div>
@@ -678,7 +676,7 @@ export default function UpdatesPage() {
 
                   return (
                     <div key={commitItem.sha} className="relative grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-start group">
-                      
+
                       {/* Left Block: Committer Profile, Date, and Ref */}
                       <div className="md:col-span-5 text-left md:text-right flex flex-col md:pr-10 shrink-0 relative z-20">
                         <div className="flex items-center md:justify-end gap-3 mb-1">
@@ -689,17 +687,17 @@ export default function UpdatesPage() {
                             {parsed.badge}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center md:justify-end gap-2.5 mt-1.5">
                           <div className="flex flex-col -space-y-0.5 text-left md:text-right">
                             <span className="text-[10px] font-bold text-white/50">{commitItem.commit.author.name}</span>
                             <span className="text-[8px] font-medium text-white/20 uppercase tracking-widest">{commitDate}</span>
                           </div>
-                          
+
                           {commitItem.author?.avatar_url ? (
-                            <a 
-                              href={commitItem.author.html_url} 
-                              target="_blank" 
+                            <a
+                              href={commitItem.author.html_url}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10 shadow-lg shrink-0 hover:scale-105 transition-transform"
                             >
@@ -748,9 +746,9 @@ export default function UpdatesPage() {
                         )}
 
                         <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
-                          <a 
-                            href={commitItem.html_url} 
-                            target="_blank" 
+                          <a
+                            href={commitItem.html_url}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-black text-indigo-400 hover:text-indigo-300 transition-colors group/link"
                           >
