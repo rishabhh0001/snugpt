@@ -21,8 +21,6 @@ import {
   Shield,
   BookOpen,
   Search,
-  Star,
-  GitFork,
   RotateCcw,
   Info
 } from 'lucide-react';
@@ -609,23 +607,7 @@ export default function UpdatesPage() {
                   </div>
 
                   {/* Metadata Indicators Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-white/5">
-                    <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.01]">
-                      <Star className="w-4 h-4 text-amber-400 shrink-0" />
-                      <div className="flex flex-col items-start leading-none">
-                        <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">Stars</span>
-                        <span className="text-xs font-black text-white mt-0.5">{repoDetails.stargazers_count?.toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.01]">
-                      <GitFork className="w-4 h-4 text-indigo-400 shrink-0" />
-                      <div className="flex flex-col items-start leading-none">
-                        <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">Forks</span>
-                        <span className="text-xs font-black text-white mt-0.5">{repoDetails.forks_count?.toLocaleString()}</span>
-                      </div>
-                    </div>
-
+                  <div className="grid grid-cols-2 gap-4 mt-6 pt-5 border-t border-white/5">
                     {repoDetails.language && (
                       <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.01]">
                         <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" style={{ backgroundColor: repoDetails.language === 'TypeScript' ? '#3178c6' : repoDetails.language === 'JavaScript' ? '#f1e05a' : '#f2a900' }} />
