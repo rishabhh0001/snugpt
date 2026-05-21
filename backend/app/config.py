@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     nvidia_api_key: str | None = None
     database_url: str | None = None
+    redis_url: str | None = None
     chroma_persist_dir: str = "./chroma_db"
 
     use_chroma_cloud: bool = True

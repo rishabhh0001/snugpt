@@ -6,6 +6,7 @@ from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from app.rag.prompts import qa_prompt
 from app.rag.vectorstore import add_qa_pair, retrieve_documents
 from app.config import settings
+from app.rag.cache import search_cache, save_to_cache
 
 import threading
 
@@ -128,6 +129,20 @@ async def generate_streaming_response(
 
     # Yield the message_id at the absolute start of the stream
     yield f'data: {{"type": "message_id", "id": "{log_id}"}}\n\n'
+
+    # ── Layer 2: Semantic Cache Check (Redis + GPTCache) ──────────────────────
+    if not regenerate:
+        cached_response = search_cache(query)
+        if cached_response:
+            import asyncio
+            yield f'data: {{"type": "sources", "data": []}}\n\n'
+            # Stream the cached response artificially to preserve UX typing animation
+            words = cached_response.split(" ")
+            for word in words:
+                yield f'data: {{"type": "chunk", "text": {json.dumps(word + " ")}}}\n\n'
+                await asyncio.sleep(0.01) # fast 10ms per word
+            yield f'data: {{"type": "done"}}\n\n'
+            return
 
     try:
         # Get relevant documents from DB (fetch slightly more to identify feedback)
@@ -261,6 +276,10 @@ async def generate_streaming_response(
 
             # Vector learning is now triggered on explicit user feedback (thumbs up / thumbs down)
             await asyncio.gather(_log_chat())
+            
+            # Save the fully generated response to Semantic Cache
+            if full_response.strip() and not regenerate:
+                await save_to_cache(query, full_response.strip())
 
     except Exception as e:
         import traceback

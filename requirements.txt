@@ -12,3 +12,5 @@ databases
 asyncpg
 psycopg2-binary
 qrcode
+redis
+gptcache
