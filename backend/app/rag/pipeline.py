@@ -66,6 +66,34 @@ def check_safety(query: str) -> Optional[str]:
     return None
 
 
+def preprocess_temporal_query(query: str) -> str:
+    """Temporal Query Expansion Engine: Intercepts the prompt and appends temporal metadata context
+    to ensure vector search retrieves active policies rather than outdated handbook pages.
+    """
+    from datetime import datetime
+    now = datetime.now()
+    month = now.month
+    year = now.year
+    
+    # Determine the SNU academic semester
+    # Spring: Jan - May (1-5)
+    # Summer: Jun - Jul (6-7)
+    # Monsoon: Aug - Dec (8-12)
+    if 1 <= month <= 5:
+        semester = f"Spring {year}"
+    elif 6 <= month <= 7:
+        semester = f"Summer {year}"
+    else:
+        semester = f"Monsoon {year}"
+        
+    date_str = now.strftime("%B %Y")
+    temporal_context = f"Current Date: {date_str}, Semester: {semester}"
+    
+    # Append the temporal context to the query before vector store lookup
+    enhanced_query = f"{query} (Context: {temporal_context})"
+    return enhanced_query
+
+
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
@@ -105,7 +133,9 @@ async def generate_streaming_response(
         # Get relevant documents from DB (fetch slightly more to identify feedback)
         try:
             import asyncio
-            docs = await asyncio.to_thread(retrieve_documents, query, k=6)
+            enhanced_query = preprocess_temporal_query(query)
+            print(f"[Temporal Query Expansion] Query: '{query}' -> Enhanced: '{enhanced_query}'")
+            docs = await asyncio.to_thread(retrieve_documents, enhanced_query, k=6)
         except Exception as e:
             print(f"Retriever error: {e}")
             docs = []
