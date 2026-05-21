@@ -26,7 +26,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Header } from '@/components/ui/header-2';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20, filter: 'blur(4px)' },
@@ -391,10 +390,8 @@ export default function UpdatesPage() {
       {/* Grid Pattern overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f0f11_1px,transparent_1px),linear-gradient(to_bottom,#0f0f11_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none opacity-40 z-0" />
 
-      {/* Header Integration */}
-      <Header />
 
-      <main className="relative max-w-[75rem] mx-auto w-full px-6 pt-24 pb-20 z-10 flex-grow">
+      <main className="relative max-w-[75rem] mx-auto w-full px-6 pt-10 pb-20 z-10 flex-grow">
 
         {/* Breadcrumb back navigation */}
         <div className="mb-8">
