@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import { BookOpen, ThumbsUp, ThumbsDown, Copy, Check, RotateCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShiningText } from "@/components/ui/shining-text";
+import CampusMap from "@/components/CampusMap";
 
 export interface SourceDocument {
   content: string;
@@ -39,6 +40,11 @@ export default function MessageBubble({
 }) {
   const isUser = message.role === "user";
   const isLoader = !isUser && !message.content;
+
+  // Regex to detect [MAP: Building, Room] tags in assistant responses
+  const mapRegex = /\[MAP:\s*([^,\s\]][^,\]]*?)(?:,\s*([^\]]+?))?\]/i;
+  const mapMatch = !isUser && message.content ? message.content.match(mapRegex) : null;
+  const cleanContent = !isUser && message.content ? message.content.replace(mapRegex, "").trim() : message.content;
 
   const [activeFeedback, setActiveFeedback] = useState<"up" | "down" | null>(
     message.feedback || null
@@ -163,7 +169,7 @@ export default function MessageBubble({
                   ),
                 }}
               >
-                {message.content}
+                {cleanContent}
               </ReactMarkdown>
             </div>
           ) : (
@@ -173,6 +179,16 @@ export default function MessageBubble({
             </div>
           )}
         </div>
+
+        {/* Interactive Campus Map Integration */}
+        {!isUser && mapMatch && (
+          <div className="mt-3.5 w-full">
+            <CampusMap 
+              highlightedBuilding={mapMatch[1]?.trim()} 
+              highlightedRoom={mapMatch[2]?.trim()} 
+            />
+          </div>
+        )}
 
         {/* Sources */}
         <AnimatePresence>

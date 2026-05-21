@@ -138,16 +138,25 @@ function ProfileContent() {
   }, [globalSettings]);
 
   // Global Save Handler saving directly to context
-  const handleSaveAll = (customSuccessMsg?: string) => {
+  const handleSaveAll = (
+    customSuccessMsg?: string,
+    overrides?: {
+      theme?: 'dark' | 'light';
+      preloader?: boolean;
+      profileData?: ProfileData;
+      notifications?: NotificationSettings;
+      security?: SecuritySettings;
+    }
+  ) => {
     if (!session?.user?.email) return;
 
     // Mutate state inside the unified ProfileSettingsProvider context
     updateSettings({
-      theme,
-      preloader,
-      profileData,
-      notifications,
-      security,
+      theme: overrides?.theme !== undefined ? overrides.theme : theme,
+      preloader: overrides?.preloader !== undefined ? overrides.preloader : preloader,
+      profileData: overrides?.profileData !== undefined ? overrides.profileData : profileData,
+      notifications: overrides?.notifications !== undefined ? overrides.notifications : notifications,
+      security: overrides?.security !== undefined ? overrides.security : security,
     });
 
     // Trigger visual success notification
@@ -162,8 +171,8 @@ function ProfileContent() {
   const handleNotificationToggle = (field: keyof NotificationSettings) => {
     setNotifications((prev) => {
       const updated = { ...prev, [field]: !prev[field] };
-      // Save instantly for convenience
-      setTimeout(() => handleSaveAll("Notification preference updated!"), 50);
+      // Save instantly by passing direct overrides to prevent closure stale state bugs
+      handleSaveAll("Notification preference updated!", { notifications: updated });
       return updated;
     });
   };
@@ -171,7 +180,8 @@ function ProfileContent() {
   const handleSecurityToggle = (field: keyof SecuritySettings) => {
     setSecurity((prev) => {
       const updated = { ...prev, [field]: !prev[field] };
-      setTimeout(() => handleSaveAll("Security state updated!"), 50);
+      // Save instantly by passing direct overrides to prevent closure stale state bugs
+      handleSaveAll("Security state updated!", { security: updated });
       return updated;
     });
   };
@@ -507,7 +517,7 @@ function ProfileContent() {
                           onClick={() => {
                             const newTheme = theme === 'dark' ? 'light' : 'dark';
                             setTheme(newTheme);
-                            setTimeout(() => handleSaveAll(`Theme changed to ${newTheme}!`), 50);
+                            handleSaveAll(`Theme changed to ${newTheme}!`, { theme: newTheme });
                           }}
                           className="w-12 h-6 rounded-full bg-color-border p-1 transition-colors relative cursor-pointer focus:outline-none"
                           style={{
@@ -541,7 +551,7 @@ function ProfileContent() {
                           onClick={() => {
                             const newPreloader = !preloader;
                             setPreloader(newPreloader);
-                            setTimeout(() => handleSaveAll(`Landing preloader ${newPreloader ? 'enabled' : 'disabled'}!`), 50);
+                            handleSaveAll(`Landing preloader ${newPreloader ? 'enabled' : 'disabled'}!`, { preloader: newPreloader });
                           }}
                           className="w-12 h-6 rounded-full bg-color-border p-1 transition-colors relative cursor-pointer focus:outline-none"
                           style={{
