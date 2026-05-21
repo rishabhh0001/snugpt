@@ -287,7 +287,7 @@ function ProfileContent() {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Account Portal</h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[9px] font-mono font-bold tracking-wider uppercase">v1.2 (+74)</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[9px] font-mono font-bold tracking-wider uppercase">v1.2.1 (+164)</span>
               </div>
               <p className="text-sm text-color-muted mt-1 leading-relaxed">
                 Update SNUGPT preferences, notification settings, credential details, and account telemetry.

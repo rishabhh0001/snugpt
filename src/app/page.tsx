@@ -1488,7 +1488,7 @@ export default function Lander() {
                 © {new Date().getFullYear()} SNUGPT ● Made with <Heart className="w-3 h-3 fill-current" /> by Rishabh Joshi
               </span>
               <span className="text-[8px] font-mono tracking-widest text-white/10 uppercase">
-                BUILD_ID: V1.0.4(+78) &bull; Delhi-NCR
+                BUILD_ID: V1.2.1 &bull; Delhi-NCR
               </span>
             </div>
           </div>

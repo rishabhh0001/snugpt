@@ -135,11 +135,36 @@ export default function UpdatesPage() {
 
   const milestones: Milestone[] = [
     {
-      version: "v1.2.0",
-      title: "Neural Chat & Branding Alignment",
+      version: "v1.2.1",
+      title: "Semantic Cache & Vector Campus Maps",
       date: "May 21, 2026",
       badge: "Latest Release",
       badgeColor: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+      description: "A major architectural leap. We introduced a Redis-backed GPTCache semantic layer to instantly serve repetitive queries at zero token cost, alongside stunning interactive vector campus layout maps rendered directly inside the chat.",
+      features: [
+        {
+          title: "Redis Semantic Cache Layer",
+          description: "Implemented GPTCache backed by Redis vector similarity. Drops response latency to <50ms for identical or highly similar (92%+) questions while protecting the LLM from unnecessary token load.",
+          icon: Zap
+        },
+        {
+          title: "Interactive Campus Layout Maps",
+          description: "Seamless inline rendering of lightweight, zoomable SVG maps for SNU campus buildings (Blocks A-E, Dining Halls, Hostels, etc.) allowing students to navigate directly from textual chat responses.",
+          icon: Map
+        },
+        {
+          title: "Perfect Theme Toggling",
+          description: "Re-engineered Tailwind dynamic overrides to guarantee zero-flicker CSS variable transitions when switching between Light and Dark visual preference modes.",
+          icon: Zap
+        }
+      ]
+    },
+    {
+      version: "v1.2.0",
+      title: "Neural Chat & Branding Alignment",
+      date: "May 21, 2026",
+      badge: "Major Update",
+      badgeColor: "bg-blue-500/10 border-blue-500/30 text-blue-400",
       description: "A major step forward in conversation logic, query streaming, and project branding consistency. Introducing lightning-fast semantic queries and persistent multi-turn chat memory structures.",
       features: [
         {
@@ -842,7 +867,7 @@ export default function UpdatesPage() {
               © {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.
             </span>
             <span className="text-[8px] font-mono tracking-widest text-white/10 uppercase">
-              BUILD_ID: V1.0.4(+58) &bull; Delhi-NCR
+              BUILD_ID: V1.2.1 &bull; Delhi-NCR
             </span>
           </div>
         </div>

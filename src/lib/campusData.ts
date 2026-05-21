@@ -390,10 +390,10 @@ export function parseCampusQuery(query: string): SearchResult | null {
     return { building: 'Dining Hall 3', highlightId: 'dh3' };
   }
   if (clean.includes('boys hostel') || clean.includes('boys hostels') || clean.includes('mh')) {
-    return { building: 'Boys Hostels (MH)', highlightId: 'mh-hostels' };
+    return { building: 'Boys Hostels (3C)', highlightId: 'mh-hostels' };
   }
   if (clean.includes('girls hostel') || clean.includes('girls hostels') || clean.includes('lh')) {
-    return { building: 'Girls Hostels (LH)', highlightId: 'lh-hostels' };
+    return { building: 'Girls Hostels (3B)', highlightId: 'lh-hostels' };
   }
   if (clean.includes('sports complex') || clean.includes('sports dome') || clean.includes('isc')) {
     return { building: 'Indoor Sports Complex', highlightId: 'sports-complex' };
