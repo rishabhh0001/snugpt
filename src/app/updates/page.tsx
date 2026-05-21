@@ -22,7 +22,8 @@ import {
   BookOpen,
   Search,
   RotateCcw,
-  Info
+  Info,
+  MapIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -150,7 +151,7 @@ export default function UpdatesPage() {
         {
           title: "Interactive Campus Layout Maps",
           description: "Seamless inline rendering of lightweight, zoomable SVG maps for SNU campus buildings (Blocks A-E, Dining Halls, Hostels, etc.) allowing students to navigate directly from textual chat responses.",
-          icon: Map
+          icon: MapIcon
         },
         {
           title: "Perfect Theme Toggling",
