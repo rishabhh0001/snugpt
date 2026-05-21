@@ -111,6 +111,11 @@ async def chat(request: ChatRequest, fastapi_request: Request):
             previous_response=request.previous_response,
         ),
         media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
 
 

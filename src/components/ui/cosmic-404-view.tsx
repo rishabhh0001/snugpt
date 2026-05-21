@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Globe } from "@/components/ui/cosmic-404";
+import { Globe } from "@/components/ui/globe";
 
 // 🎞️ Animation Variants
 const fadeUp: any = {

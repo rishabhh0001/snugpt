@@ -6,6 +6,7 @@ import { Search, Sparkles, Command, Database, Zap, Share2, MessageSquare, Chevro
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
+import { useProfileSettings } from '@/components/providers';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { useScroll as useNavbarScroll } from '@/components/ui/use-scroll';
@@ -674,7 +675,9 @@ const HeroMockupWindow = () => {
 
 export default function Lander() {
   const { data: session } = useSession();
-  const firstName = session?.user?.name ? session.user.name.split(' ')[0] : 'User';
+  const { settings: profileSettings } = useProfileSettings();
+  const dynamicName = profileSettings?.profileData?.name || session?.user?.name || 'User';
+  const firstName = dynamicName.split(' ')[0];
   const { scrollYProgress } = useScroll();
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
   const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
@@ -687,20 +690,17 @@ export default function Lander() {
 
   useEffect(() => {
     setMounted(true);
-    
-    const userEmail = session?.user?.email || 'guest';
-    const storedSettings = localStorage.getItem(`snugpt-settings-${userEmail}`);
-    if (storedSettings) {
-      try {
-        const parsed = JSON.parse(storedSettings);
-        if (parsed.preloader === false) {
-          setShowPreloader(false);
-        }
-      } catch (e) {
-        console.error(e);
+  }, []);
+
+  useEffect(() => {
+    if (profileSettings) {
+      if (profileSettings.preloader === false) {
+        setShowPreloader(false);
+      } else {
+        setShowPreloader(true);
       }
     }
-  }, [session]);
+  }, [profileSettings]);
 
   const infoLinks = [
     {
@@ -760,10 +760,10 @@ export default function Lander() {
 
       <header
         className={cn(
-          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl',
+          'fixed z-50 mx-auto w-[calc(100%-2rem)] max-w-[75rem] border border-transparent transition-all duration-300 ease-out left-1/2 -translate-x-1/2 md:rounded-2xl',
           mobileMenuOpen ? 'overflow-hidden' : 'overflow-visible',
           scrolled && !mobileMenuOpen
-            ? 'top-4 bg-black/80 border-white/10 backdrop-blur-lg max-w-5xl shadow-[0_0_50px_rgba(0,0,0,0.8)]'
+            ? 'top-4 bg-black/80 border-white/10 backdrop-blur-lg max-w-6xl shadow-[0_0_50px_rgba(0,0,0,0.8)]'
             : 'top-0 border-b border-white/5 bg-transparent'
         )}
       >
@@ -854,6 +854,17 @@ export default function Lander() {
             </div>
 
             <Link
+              href="/updates"
+              className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
+            >
+              <span className="relative z-10 block text-[9px] uppercase tracking-[0.25em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
+                Updates
+              </span>
+              <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+              <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+            </Link>
+
+            <Link
               href="/contact"
               className="relative inline-block group py-2 px-4 overflow-hidden rounded-lg transition-all duration-300"
             >
@@ -879,7 +890,7 @@ export default function Lander() {
                  <PopoverContent align="end" sideOffset={8} className="w-64 bg-neutral-950/98 border border-white/10 backdrop-blur-2xl p-2 rounded-2xl shadow-2xl z-50">
                    <div className="px-3 py-2.5 border-b border-white/5 flex flex-col gap-0.5">
                      <p className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-widest">Active Session</p>
-                     <p className="text-sm font-bold text-white font-jakarta truncate">{session.user?.name}</p>
+                     <p className="text-sm font-bold text-white font-jakarta truncate">{profileSettings?.profileData?.name || session.user?.name}</p>
                      <p className="text-[10px] text-white/40 font-inter truncate">{session.user?.email}</p>
                    </div>
                    
@@ -993,8 +1004,21 @@ export default function Lander() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300"
                 >
-                  <span className="relative z-10 block text-xs uppercase tracking-[0.2em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
+                  <span className="relative z-10 block text-xs uppercase tracking-[0.3em] font-black text-white/40 group-hover:text-black transition-colors duration-300 font-jakarta">
                     Features
+                  </span>
+                  <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
+                  <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
+                </Link>
+
+                {/* Mobile Updates */}
+                <Link
+                  href="/updates"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="relative inline-block group py-3 px-4 overflow-hidden rounded-lg transition-all duration-300 font-jakarta"
+                >
+                  <span className="relative z-10 block text-xs uppercase tracking-[0.3em] font-black text-white/40 group-hover:text-black transition-colors duration-300">
+                    Updates
                   </span>
                   <span className="absolute inset-x-0 top-0 bottom-0 border-t border-b border-white transform scale-y-[2] opacity-0 transition-all duration-300 origin-center group-hover:scale-y-100 group-hover:opacity-100" />
                   <span className="absolute inset-y-[1px] inset-x-0 bg-white transform scale-y-0 opacity-0 transition-all duration-300 origin-top group-hover:scale-y-100 group-hover:opacity-100" />
@@ -1047,7 +1071,7 @@ export default function Lander() {
                  <div className="flex flex-col gap-2 w-full mt-2 pt-4 border-t border-white/5">
                    <div className="px-4 py-2 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between">
                      <div className="flex flex-col text-left">
-                       <span className="text-xs font-bold text-white font-jakarta">{session.user?.name}</span>
+                       <span className="text-xs font-bold text-white font-jakarta">{profileSettings?.profileData?.name || session.user?.name}</span>
                        <span className="text-[9px] text-white/40 font-inter mt-0.5 truncate max-w-[200px]">{session.user?.email}</span>
                      </div>
                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[8px] font-mono font-bold tracking-tight uppercase">Online</span>

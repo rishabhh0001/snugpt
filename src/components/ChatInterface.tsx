@@ -21,8 +21,12 @@ export default function ChatInterface() {
 
   const messages: MessageProps[] = activeConversation?.messages ?? [];
 
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  useEffect(scrollToBottom, [messages]);
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  };
+  useEffect(() => {
+    scrollToBottom(isLoading ? "auto" : "smooth");
+  }, [messages, isLoading]);
 
   // Keyboard shortcuts (Cmd+K / Ctrl+K for a new chat)
   useEffect(() => {
@@ -317,6 +321,8 @@ export default function ChatInterface() {
                       key={i}
                       message={msg}
                       chatId={activeId || undefined}
+                      isLast={i === messages.length - 1}
+                      isTyping={isLoading && i === messages.length - 1}
                       onRegenerate={
                         msg.role === "assistant" && i > 0
                           ? () => {

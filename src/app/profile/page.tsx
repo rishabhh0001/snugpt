@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useProfileSettings } from '@/components/providers';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -54,6 +55,9 @@ function ProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
+  // Expose global settings context
+  const { settings: globalSettings, updateSettings } = useProfileSettings();
+  
   // Tabs: 'profile' | 'preferences' | 'security' | 'billing'
   const initialTab = (searchParams.get('tab') as any) || 'profile';
   const [activeTab, setActiveTab] = React.useState<string>(initialTab);
@@ -101,74 +105,50 @@ function ProfileContent() {
     }
   }, [searchParams]);
 
-  // Load configuration from localStorage keyed per user
+  // Load configuration from the global context provider instead of direct localStorage
   React.useEffect(() => {
-    if (session?.user?.email) {
-      const userKey = `snugpt-settings-${session.user.email}`;
-      const stored = localStorage.getItem(userKey);
-      
-      const defaultName = session.user.name || "SNU Student";
-      const defaultAvatar = session.user.image || `https://avatar.vercel.sh/${session.user.email}.png`;
-      const defaultUsername = session.user.email.split('@')[0];
-
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (parsed.theme) setTheme(parsed.theme);
-          if (parsed.preloader !== undefined) setPreloader(parsed.preloader);
-          setProfileData({
-            name: parsed.profileData?.name || defaultName,
-            username: parsed.profileData?.username || defaultUsername,
-            bio: parsed.profileData?.bio || "Shiv Nadar University student exploring SnuGPT AI workspace.",
-            avatar: parsed.profileData?.avatar || defaultAvatar,
-            phone: parsed.profileData?.phone || "",
-            location: parsed.profileData?.location || "Chhachhrauli, Greater Noida, UP",
-            website: parsed.profileData?.website || "",
-          });
-          if (parsed.notifications) {
-            setNotifications(parsed.notifications);
-          }
-          if (parsed.security) {
-            setSecurity(parsed.security);
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        // Fallback default setup
+    if (globalSettings) {
+      if (globalSettings.theme) setTheme(globalSettings.theme);
+      if (globalSettings.preloader !== undefined) setPreloader(globalSettings.preloader);
+      if (globalSettings.profileData) {
         setProfileData({
-          name: defaultName,
-          username: defaultUsername,
-          bio: "Shiv Nadar University student exploring SnuGPT AI workspace.",
-          avatar: defaultAvatar,
-          phone: "",
-          location: "Chhachhrauli, Greater Noida, UP",
-          website: "",
+          name: globalSettings.profileData.name || "",
+          username: globalSettings.profileData.username || "",
+          bio: globalSettings.profileData.bio || "Shiv Nadar University student exploring SNUGPT AI workspace.",
+          avatar: globalSettings.profileData.avatar || "",
+          phone: globalSettings.profileData.phone || "",
+          location: globalSettings.profileData.location || "Chhachhrauli, Greater Noida, UP",
+          website: globalSettings.profileData.website || "",
+        });
+      }
+      if (globalSettings.notifications) {
+        setNotifications({
+          emailNotifications: globalSettings.notifications.emailNotifications !== undefined ? globalSettings.notifications.emailNotifications : true,
+          pushNotifications: globalSettings.notifications.pushNotifications !== undefined ? globalSettings.notifications.pushNotifications : true,
+          securityAlerts: globalSettings.notifications.securityAlerts !== undefined ? globalSettings.notifications.securityAlerts : true,
+        });
+      }
+      if (globalSettings.security) {
+        setSecurity({
+          twoFactorEnabled: globalSettings.security.twoFactorEnabled !== undefined ? globalSettings.security.twoFactorEnabled : false,
+          sessionTimeout: globalSettings.security.sessionTimeout !== undefined ? globalSettings.security.sessionTimeout : false,
         });
       }
     }
-  }, [session]);
+  }, [globalSettings]);
 
-  // Global Save Handler
+  // Global Save Handler saving directly to context
   const handleSaveAll = (customSuccessMsg?: string) => {
     if (!session?.user?.email) return;
 
-    const userKey = `snugpt-settings-${session.user.email}`;
-    const settings = {
+    // Mutate state inside the unified ProfileSettingsProvider context
+    updateSettings({
       theme,
       preloader,
       profileData,
       notifications,
       security,
-    };
-    localStorage.setItem(userKey, JSON.stringify(settings));
-
-    // Instantly apply theme to DOM
-    if (theme === 'light') {
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.remove('light');
-    }
+    });
 
     // Trigger visual success notification
     setSaveSuccess(customSuccessMsg || "Profile settings saved successfully!");
@@ -300,7 +280,7 @@ function ProfileContent() {
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[9px] font-mono font-bold tracking-wider uppercase">v1.2 (+74)</span>
               </div>
               <p className="text-sm text-color-muted mt-1 leading-relaxed">
-                Update SnuGPT preferences, notification settings, credential details, and account telemetry.
+                Update SNUGPT preferences, notification settings, credential details, and account telemetry.
               </p>
             </div>
             <button
@@ -583,7 +563,7 @@ function ProfileContent() {
                   <div className="border border-color-border bg-color-surface/40 backdrop-blur-xl rounded-3xl p-6 shadow-xl space-y-6">
                     <div className="border-b border-color-border pb-3">
                       <h3 className="text-sm font-black uppercase tracking-wider text-color-text">Notifications Toggles</h3>
-                      <p className="text-xs text-color-muted mt-0.5">Control how and when you receive SnuGPT alerts.</p>
+                      <p className="text-xs text-color-muted mt-0.5">Control how and when you receive SNUGPT alerts.</p>
                     </div>
 
                     <div className="space-y-4">
@@ -670,7 +650,7 @@ function ProfileContent() {
                   <div className="border border-color-border bg-color-surface/40 backdrop-blur-xl rounded-3xl p-6 shadow-xl space-y-6">
                     <div className="border-b border-color-border pb-3">
                       <h3 className="text-sm font-black uppercase tracking-wider text-color-text">Change Password</h3>
-                      <p className="text-xs text-color-muted mt-0.5">Update credentials linked to SnuGPT platform.</p>
+                      <p className="text-xs text-color-muted mt-0.5">Update credentials linked to SNUGPT platform.</p>
                     </div>
 
                     <form onSubmit={handlePasswordUpdate} className="space-y-4">
@@ -820,7 +800,7 @@ function ProfileContent() {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[9px] font-mono font-bold tracking-wider uppercase">Active Allocation</span>
-                          <h4 className="text-lg font-black text-color-text mt-2 font-jakarta">SnuGPT Campus Pro (Unlimited)</h4>
+                          <h4 className="text-lg font-black text-color-text mt-2 font-jakarta">SNUGPT Campus Pro (Unlimited)</h4>
                           <p className="text-xs text-color-muted font-inter">Billed via campus IT subsidy</p>
                         </div>
                         <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Free Allocation</span>

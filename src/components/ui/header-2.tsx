@@ -51,9 +51,9 @@ export function Header() {
 	return (
 		<header
 			className={cn(
-				'sticky top-0 z-50 mx-auto w-full max-w-5xl border-b border-transparent md:rounded-md md:border md:transition-all md:ease-out',
+				'sticky top-0 z-50 mx-auto w-full max-w-[75rem] border-b border-transparent md:rounded-md md:border md:transition-all md:ease-out',
 				{
-					'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg md:top-4 md:max-w-4xl md:shadow':
+					'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg md:top-4 md:max-w-5xl md:shadow':
 						scrolled && !open,
 					'bg-background/90': open,
 				},
@@ -75,6 +75,11 @@ export function Header() {
 					{/* Features Link */}
 					<Link className={buttonVariants({ variant: 'ghost' })} href="/lander#features">
 						Features
+					</Link>
+
+					{/* Updates Link */}
+					<Link className={buttonVariants({ variant: 'ghost' })} href="/updates">
+						Updates
 					</Link>
 
 					{/* Desktop Info Dropdown */}
@@ -160,6 +165,18 @@ export function Header() {
 							href="/lander#features"
 						>
 							Features
+						</Link>
+
+						{/* Mobile Updates */}
+						<Link
+							onClick={() => setOpen(false)}
+							className={buttonVariants({
+								variant: 'ghost',
+								className: 'justify-start',
+							})}
+							href="/updates"
+						>
+							Updates
 						</Link>
 
 						{/* Mobile Info links */}

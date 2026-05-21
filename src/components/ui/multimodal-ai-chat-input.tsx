@@ -59,7 +59,7 @@ const buttonVariants = cva(
         secondary:
           'bg-gray-200 text-black hover:bg-gray-300',
         // Ghost: dark theme responsive ghost styling
-        ghost: 'text-color-muted hover:bg-color-surface-hover hover:text-color-text', 
+        ghost: 'text-[var(--color-muted)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text)]', 
         // Link: black text
         link: 'text-black underline-offset-4 hover:underline',
       },
@@ -106,7 +106,7 @@ const Textarea = React.forwardRef<
   return (
     <textarea
       className={cn(
-        'flex min-h-[80px] w-full rounded-md border border-zinc-850 bg-[#161616] px-3 py-2 text-base ring-offset-zinc-950 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm text-[#ececec]',
+        'flex min-h-[80px] w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-base ring-offset-[var(--color-bg)] placeholder:text-[var(--color-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm text-[var(--color-text)]',
         className,
       )}
       ref={ref}
@@ -285,7 +285,7 @@ function PureSuggestedActions({
               background: "var(--color-surface)",
             }}
           >
-            <span className="font-medium text-color-text">{suggestedAction.title}</span>
+            <span className="font-medium text-[var(--color-text)]">{suggestedAction.title}</span>
             <span style={{ color: "var(--color-muted)" }}>
               {suggestedAction.label}
             </span>
@@ -373,7 +373,7 @@ function PureAttachmentsButton({
       variant="ghost"
       aria-label="Attach files"
     >
-      <span style={{ color: "var(--color-muted)" }} className="hover:text-color-text transition-colors">
+      <span style={{ color: "var(--color-muted)" }} className="hover:text-[var(--color-text)] transition-colors">
         <PaperclipIcon size={14} />
       </span>
     </Button>
@@ -424,7 +424,7 @@ function PureSendButton({
   return (
     <Button
       data-testid="send-button"
-      className="rounded-full p-1.5 h-fit bg-[#f2a900] text-[#002e5b] hover:bg-[#cc8e00] disabled:bg-zinc-800/40 disabled:text-zinc-600 disabled:opacity-40 border-none"
+      className="rounded-full p-1.5 h-fit bg-[#f2a900] text-[#002e5b] hover:bg-[#cc8e00] disabled:bg-[var(--color-border)] disabled:text-[var(--color-muted)] disabled:opacity-40 border-none"
       onClick={(event) => {
         event.preventDefault();
         if (!isDisabled) {
@@ -707,7 +707,7 @@ function PureMultimodalInput({
         onChange={handleInput}
         className={cn(
           'min-h-[24px] max-h-[calc(75dvh)] overflow-y-auto resize-none rounded-2xl !text-base pb-10',
-          'bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-amber-500/30 focus:border-[#f2a900]/60 focus-visible:ring-1 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-1 transition-all duration-200 text-color-text placeholder:text-color-muted', 
+          'bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-amber-500/30 focus:border-[#f2a900]/60 focus-visible:ring-1 focus-visible:ring-[#f2a900]/50 focus-visible:ring-offset-1 transition-all duration-200 text-[var(--color-text)] placeholder:text-[var(--color-muted)]', 
           className,
         )}
         rows={1}

@@ -28,10 +28,14 @@ export default function MessageBubble({
   message,
   chatId,
   onRegenerate,
+  isLast = false,
+  isTyping = false,
 }: {
   message: MessageProps;
   chatId?: string;
   onRegenerate?: () => void;
+  isLast?: boolean;
+  isTyping?: boolean;
 }) {
   const isUser = message.role === "user";
   const isLoader = !isUser && !message.content;
@@ -150,7 +154,7 @@ export default function MessageBubble({
           {isUser ? (
             <p className="whitespace-pre-wrap">{message.content}</p>
           ) : message.content ? (
-            <div className="prose-chat">
+            <div className={`prose-chat ${isTyping ? "typing-cursor" : ""}`}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{

@@ -66,15 +66,15 @@ export default function AuthPage() {
 			{/* Left Branding Side (Desktop view only) */}
 			<div className="bg-neutral-950/60 relative hidden h-full flex-col border-r border-white/15 p-10 lg:flex">
 				<div className="from-[#050505] absolute inset-0 z-10 bg-gradient-to-t to-transparent pointer-events-none" />
-				
+
 				{/* SNUGPT Brand Logo/Title */}
 				<div className="z-10 flex items-center gap-3">
 					<div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow-lg">
-						<Image 
-							src="/avatar.svg" 
-							alt="SNUGPT Logo" 
-							width={32} 
-							height={32} 
+						<Image
+							src="/avatar.svg"
+							alt="SNUGPT Logo"
+							width={32}
+							height={32}
 							className="object-cover"
 							priority
 						/>
@@ -89,10 +89,10 @@ export default function AuthPage() {
 				<div className="z-10 mt-auto max-w-md">
 					<blockquote className="space-y-4">
 						<p className="text-lg font-medium text-white/90 leading-relaxed font-jakarta">
-							&ldquo;SnuGPT has saved me countless hours of digging through academic manuals, department guidelines, and campus handbooks. It is the ultimate digital companion for every Shiv Nadar University student.&rdquo;
+							&ldquo;SNUGPT helps save countless hours of digging through academic manuals, department guidelines, and campus handbooks. It is the ultimate digital companion for every student who is or wants to be a part of SNU.&rdquo;
 						</p>
 						<footer className="font-mono text-xs font-semibold text-amber-500 tracking-wide">
-							— Shiv Nadar University Student
+							— SNU Student
 						</footer>
 					</blockquote>
 				</div>
@@ -127,11 +127,11 @@ export default function AuthPage() {
 					{/* SNUGPT Brand Header (Mobile view only) */}
 					<div className="flex items-center gap-3 lg:hidden">
 						<div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow-lg">
-							<Image 
-								src="/avatar.svg" 
-								alt="SNUGPT Logo" 
-								width={32} 
-								height={32} 
+							<Image
+								src="/avatar.svg"
+								alt="SNUGPT Logo"
+								width={32}
+								height={32}
 								className="object-cover"
 								priority
 							/>
@@ -159,9 +159,9 @@ export default function AuthPage() {
 
 					{/* OAuth login providers */}
 					<div className="space-y-2">
-						<Button 
-							type="button" 
-							size="lg" 
+						<Button
+							type="button"
+							size="lg"
 							variant="outline"
 							className="w-full bg-white/5 hover:bg-white/10 border-white/20 text-white font-semibold cursor-pointer active:scale-98 transition-all"
 							disabled={isLoading !== null}
@@ -174,10 +174,10 @@ export default function AuthPage() {
 							)}
 							Continue with Google
 						</Button>
-						
-						<Button 
-							type="button" 
-							size="lg" 
+
+						<Button
+							type="button"
+							size="lg"
 							variant="outline"
 							className="w-full bg-white/5 hover:bg-white/10 border-white/20 text-white font-semibold cursor-pointer active:scale-98 transition-all"
 							disabled={isLoading !== null}
@@ -252,8 +252,8 @@ export default function AuthPage() {
 							First time here? Entering a new password will automatically register your account!
 						</p>
 
-						<Button 
-							type="submit" 
+						<Button
+							type="submit"
 							className="w-full bg-white hover:bg-white/95 text-black font-bold h-10 rounded-xl cursor-pointer active:scale-98 transition-all mt-2"
 							disabled={isLoading !== null}
 						>
@@ -290,13 +290,10 @@ export default function AuthPage() {
 function FloatingPaths({ position }: { position: number }) {
 	const paths = Array.from({ length: 36 }, (_, i) => ({
 		id: i,
-		d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
-			380 - i * 5 * position
-		} -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
-			152 - i * 5 * position
-		} ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
-			684 - i * 5 * position
-		} ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
+		d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${380 - i * 5 * position
+			} -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${152 - i * 5 * position
+			} ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${684 - i * 5 * position
+			} ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
 		color: `rgba(242, 169, 0, ${0.1 + i * 0.03})`,
 		width: 0.5 + i * 0.03,
 	}));
