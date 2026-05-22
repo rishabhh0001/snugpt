@@ -7,11 +7,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const isDev = process.env.NODE_ENV === "development";
-    const backendUrl = isDev
+    const backendBaseUrl = isDev
       ? (process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000")
-      : `${req.nextUrl.origin}/_/backend`;
+      : (process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000");
 
-    const targetUrl = `${backendUrl}/api/chat`;
+    const parsedBackendUrl = new URL(backendBaseUrl);
+    if (parsedBackendUrl.protocol !== "http:" && parsedBackendUrl.protocol !== "https:") {
+      throw new Error("Invalid backend URL protocol");
+    }
+
+    const targetUrl = new URL("/api/chat", parsedBackendUrl).toString();
 
     // Forward the request to the Python RAG backend
     const response = await fetch(targetUrl, {
