@@ -15,7 +15,7 @@ const STORAGE_KEY = "snugpt_conversations";
 const MAX_CONVERSATIONS = 50;
 
 function genId() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return crypto.randomUUID();
 }
 
 function titleFromMessages(messages: MessageProps[]): string {
