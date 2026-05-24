@@ -228,12 +228,12 @@ export default function ContactPage() {
     {
       icon: Mail,
       label: 'Developer Support',
-      value: '',
+      value: 'rj910@snu.edu.in',
     },
     {
       icon: MessageSquare,
       label: 'Policy Corrections',
-      value: '',
+      value: 'https://snugpt.rishabhj.in/contact',
     },
     {
       icon: MapPin,

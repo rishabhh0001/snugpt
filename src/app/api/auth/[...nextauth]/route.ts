@@ -82,6 +82,8 @@ export const authOptions: NextAuthOptions = {
             action: "welcome",
             email: user.email,
             name: user.name || user.email.split("@")[0],
+            supportEmail: "rj910@snu.edu.in",
+            supportUrl: "https://snugpt.rishabhj.in/contact",
           };
 
           // Trigger the Apps Script Web App in a fire-and-forget server-side fetch
