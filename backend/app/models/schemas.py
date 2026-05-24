@@ -20,11 +20,6 @@ class ChatResponse(BaseModel):
     answer: str
     sources: Optional[List[SourceDocument]] = None
 
-class WaitlistRequest(BaseModel):
-    first_name: str
-    mobile_number: str
-    email_address: str
-
 class FeedbackRequest(BaseModel):
     chat_id: str
     message_id: Optional[str] = None

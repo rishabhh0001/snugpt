@@ -100,7 +100,7 @@ function ProfileSettingsProvider({ children }: { children: React.ReactNode }) {
       try {
         const parsed = JSON.parse(stored);
         const merged: ProfileSettings = {
-          theme: parsed.theme || 'dark',
+          theme: 'dark',
           preloader: parsed.preloader !== undefined ? parsed.preloader : true,
           profileData: {
             ...defaultProfileData(email, name, image),
@@ -117,23 +117,15 @@ function ProfileSettingsProvider({ children }: { children: React.ReactNode }) {
         };
         setSettings(merged);
 
-        // Sync DOM theme
-        if (merged.theme === 'light') {
-          document.documentElement.classList.add('light');
-        } else {
-          document.documentElement.classList.remove('light');
-        }
+        // Sync DOM theme (strictly dark mode)
+        document.documentElement.classList.remove('light');
       } catch (e) {
         console.error('Error parsing settings', e);
       }
     } else {
       const def = defaultSettings(email, name, image);
       setSettings(def);
-      if (def.theme === 'light') {
-        document.documentElement.classList.add('light');
-      } else {
-        document.documentElement.classList.remove('light');
-      }
+      document.documentElement.classList.remove('light');
     }
     setIsLoading(false);
   }, [status, session, getStorageKey]);
@@ -160,11 +152,7 @@ function ProfileSettingsProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(getStorageKey(), JSON.stringify(next));
       window.dispatchEvent(new Event('snugpt-settings-updated'));
 
-      if (next.theme === 'light') {
-        document.documentElement.classList.add('light');
-      } else {
-        document.documentElement.classList.remove('light');
-      }
+      document.documentElement.classList.remove('light');
       return next;
     });
   }, [getStorageKey]);
@@ -220,11 +208,7 @@ function ProfileSettingsProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(stored);
           setSettings((prev) => {
             const next = { ...prev, ...parsed };
-            if (next.theme === 'light') {
-              document.documentElement.classList.add('light');
-            } else {
-              document.documentElement.classList.remove('light');
-            }
+            document.documentElement.classList.remove('light');
             return next;
           });
         } catch (e) {

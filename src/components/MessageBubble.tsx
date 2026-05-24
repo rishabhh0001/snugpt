@@ -6,7 +6,6 @@ import remarkGfm from "remark-gfm";
 import { BookOpen, ThumbsUp, ThumbsDown, Copy, Check, RotateCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShiningText } from "@/components/ui/shining-text";
-import CampusMap from "@/components/CampusMap";
 
 export interface SourceDocument {
   content: string;
@@ -179,16 +178,6 @@ export default function MessageBubble({
             </div>
           )}
         </div>
-
-        {/* Interactive Campus Map Integration */}
-        {!isUser && mapMatch && (
-          <div className="mt-3.5 w-full">
-            <CampusMap 
-              highlightedBuilding={mapMatch[1]?.trim()} 
-              highlightedRoom={mapMatch[2]?.trim()} 
-            />
-          </div>
-        )}
 
         {/* Sources */}
         <AnimatePresence>

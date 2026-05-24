@@ -9,9 +9,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.models.database import connect_database, disconnect_database, is_database_connected, get_database
-from app.models.schemas import ChatRequest, WaitlistRequest, FeedbackRequest, ShareChatRequest, ShareChatResponse, ContactRequest, AuthRequest
-from app.models.user import get_user_by_email, create_user, hash_password
-from app.models.waitlist import add_to_waitlist
+from app.models.schemas import ChatRequest, FeedbackRequest, ShareChatRequest, ShareChatResponse, ContactRequest, AuthRequest
+from app.models.user import get_user_by_email, create_user, verify_and_upgrade_user_password
 from app.models.chat_log import save_chat_feedback, save_shared_chat, get_shared_chat
 from app.models.contact import save_contact_message
 from app.rag.pipeline import generate_streaming_response
@@ -88,7 +87,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error("Unhandled error: %s", exc, exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error", "error": str(exc)},
+        content={"detail": "Internal server error. Please try again later."},
     )
 
 
@@ -118,22 +117,6 @@ async def chat(request: ChatRequest, fastapi_request: Request):
         },
     )
 
-
-@app.post("/api/waitlist")
-async def waitlist(request: WaitlistRequest):
-    try:
-        await add_to_waitlist(
-            first_name=request.first_name,
-            mobile_number=request.mobile_number,
-            email_address=request.email_address
-        )
-        return {"message": "Successfully joined the waitlist"}
-    except Exception as e:
-        error_str = str(e).lower()
-        if "unique constraint" in error_str or "already exists" in error_str or "duplicate" in error_str or "email_address" in error_str:
-            raise HTTPException(status_code=400, detail="This email is already on the waitlist.") from e
-        logger.error("Waitlist error: %s", e)
-        raise HTTPException(status_code=500, detail="Could not save waitlist entry. Please try again.") from e
 
 
 @app.post("/api/contact")
@@ -189,9 +172,9 @@ async def authenticate(request: AuthRequest):
     try:
         user = await get_user_by_email(email)
         if user:
-            # Login check
-            hashed = hash_password(password)
-            if user["password_hash"] == hashed:
+            # Secure dynamic password check
+            is_valid = await verify_and_upgrade_user_password(user, password)
+            if is_valid:
                 return {
                     "id": user["id"],
                     "email": user["email"],
@@ -296,7 +279,7 @@ async def share_chat(request: ShareChatRequest, fastapi_request: Request):
         )
     except Exception as e:
         logger.error("Error creating shared chat: %s", e)
-        raise HTTPException(status_code=500, detail=f"Failed to share chat: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to share chat due to an internal error.")
 
 
 @app.get("/api/share/{share_id}")

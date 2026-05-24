@@ -500,39 +500,7 @@ function ProfileContent() {
                       <p className="text-xs text-color-muted mt-0.5">Control visual state rendering and application interfaces.</p>
                     </div>
 
-                    {/* Dark/Light Mode Row */}
-                    <div className="flex items-center justify-between p-4 bg-color-surface-hover/30 border border-color-border rounded-2xl">
-                      <div className="flex flex-col gap-0.5 max-w-[70%]">
-                        <span className="text-xs font-bold text-color-text inline-flex items-center gap-2">
-                          {theme === 'light' ? <Sun className="w-4 h-4 text-amber-500 animate-spin" style={{ animationDuration: '6s' }} /> : <Moon className="w-4 h-4 text-amber-400" />}
-                          Theme Selection
-                        </span>
-                        <span className="text-[10px] text-color-muted leading-tight font-inter">
-                          Toggle between dark mode (deep space black) and light mode (modern crisp grey).
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            const newTheme = theme === 'dark' ? 'light' : 'dark';
-                            setTheme(newTheme);
-                            handleSaveAll(`Theme changed to ${newTheme}!`, { theme: newTheme });
-                          }}
-                          className="w-12 h-6 rounded-full bg-color-border p-1 transition-colors relative cursor-pointer focus:outline-none"
-                          style={{
-                            backgroundColor: theme === 'light' ? 'var(--color-border)' : '#f2a900'
-                          }}
-                        >
-                          <div 
-                            className="w-4 h-4 rounded-full bg-white shadow-md transition-transform"
-                            style={{
-                              transform: theme === 'dark' ? 'translateX(24px)' : 'translateX(0)'
-                            }}
-                          />
-                        </button>
-                      </div>
-                    </div>
+
 
                     {/* Preloader On/Off Row */}
                     <div className="flex items-center justify-between p-4 bg-color-surface-hover/30 border border-color-border rounded-2xl">

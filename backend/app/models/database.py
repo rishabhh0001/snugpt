@@ -56,11 +56,11 @@ async def connect_database() -> None:
         logger.warning("DATABASE_URL is not set; waitlist and chat logs disabled.")
         return
 
-    # Configure connection pool limits for high concurrent traffic
+    # Configure connection pool limits optimized for Neon serverless postgres
     _database = Database(
         async_url,
-        min_size=10,
-        max_size=100
+        min_size=2,
+        max_size=20
     )
     await _database.connect()
     init_db()
@@ -112,7 +112,6 @@ def init_db():
             logger.warning("DATABASE_URL not set; skipping table creation.")
             return
         import app.models.chat_log  # noqa: F401
-        import app.models.waitlist  # noqa: F401
         import app.models.contact   # noqa: F401
         import app.models.user      # noqa: F401
         Base.metadata.create_all(bind=engine)

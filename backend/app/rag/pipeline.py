@@ -1,10 +1,11 @@
 import os
 import re
+import asyncio
 import json
 from typing import Optional
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from app.rag.prompts import qa_prompt
-from app.rag.vectorstore import add_qa_pair, retrieve_documents
+from app.rag.vectorstore import add_qa_pair, retrieve_documents, rerank_documents
 from app.config import settings
 from app.rag.cache import search_cache, save_to_cache
 
@@ -110,12 +111,14 @@ def save_qa_to_vectorstore(query: str, answer: str):
 
 async def generate_streaming_response(
     query: str,
-    history: list = [],
+    history: Optional[list] = None,
     session_id: Optional[str] = None,
     user_ip: Optional[str] = None,
     regenerate: Optional[bool] = False,
     previous_response: Optional[str] = None,
 ):
+    if history is None:
+        history = []
     import uuid
     log_id = str(uuid.uuid4())
 
@@ -134,7 +137,6 @@ async def generate_streaming_response(
     if not regenerate:
         cached_response = search_cache(query)
         if cached_response:
-            import asyncio
             yield f'data: {{"type": "sources", "data": []}}\n\n'
             # Stream the cached response artificially to preserve UX typing animation
             words = cached_response.split(" ")
@@ -145,12 +147,11 @@ async def generate_streaming_response(
             return
 
     try:
-        # Get relevant documents from DB (fetch slightly more to identify feedback)
+        # Get relevant documents from DB (fetch candidate pool for re-ranking)
         try:
-            import asyncio
             enhanced_query = preprocess_temporal_query(query)
             print(f"[Temporal Query Expansion] Query: '{query}' -> Enhanced: '{enhanced_query}'")
-            docs = await asyncio.to_thread(retrieve_documents, enhanced_query, k=6)
+            docs = await asyncio.to_thread(retrieve_documents, enhanced_query, k=15)
         except Exception as e:
             print(f"Retriever error: {e}")
             docs = []
@@ -165,8 +166,13 @@ async def generate_streaming_response(
             else:
                 positive_docs.append(doc)
 
-        # Slice positive docs back to top 4 for context density
-        positive_docs = positive_docs[:4]
+        # Re-rank positive documents using Cross-Encoder to select top 5 most relevant
+        try:
+            positive_docs = await asyncio.to_thread(rerank_documents, query, positive_docs, top_n=5)
+        except Exception as re_err:
+            print(f"Reranking error: {re_err}")
+            positive_docs = positive_docs[:5]
+
 
         # Format DB docs for the prompt
         context_str = "--- DATABASE DOCUMENTS ---\n"
@@ -257,7 +263,6 @@ async def generate_streaming_response(
         if not got_content:
             yield f'data: {{"type": "chunk", "text": "I could not generate a response. Please try again."}}\n\n'
         elif full_response and len(full_response) > 30:
-            import asyncio
             from app.models.chat_log import save_chat_log
 
             # Persist concurrently before stream ends
@@ -285,7 +290,7 @@ async def generate_streaming_response(
         import traceback
         error_details = traceback.format_exc()
         print(f"Pipeline error: {error_details}")
-        error_msg = f"Neural Engine Error: {str(e)[:100]}"
+        error_msg = "Neural Engine Error: An internal system error occurred. Please try again later."
         yield f'data: {{"type": "chunk", "text": {json.dumps(error_msg)}}}\n\n'
 
     finally:

@@ -45,5 +45,5 @@ async def save_contact_message(name: str, email: str, subject: Optional[str], me
     }
 
     await db.execute(query=query_insert, values=values)
-    logger.info("Contact message saved for %s with ID %s", values["email"], message_id)
+    logger.info("Contact message saved with ID %s", message_id)
     return message_id

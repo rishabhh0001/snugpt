@@ -243,12 +243,20 @@ export default function UpdatesPage() {
     setError(null);
     setRateLimited(false);
 
-    // Clean and parse repo name
+    // Clean and parse repo name securely
     let cleanRepo = repo.trim();
-    if (cleanRepo.includes('github.com/')) {
-      const parts = cleanRepo.split('github.com/');
-      if (parts.length > 1) {
-        cleanRepo = parts[1].split('?')[0].split('#')[0];
+    if (cleanRepo.startsWith("http://") || cleanRepo.startsWith("https://") || cleanRepo.includes("github.com")) {
+      try {
+        const urlString = cleanRepo.startsWith("http") ? cleanRepo : `https://${cleanRepo.replace(/^\/+/g, "")}`;
+        const parsedUrl = new URL(urlString);
+        if (parsedUrl.hostname === "github.com" || parsedUrl.hostname === "www.github.com") {
+          const segments = parsedUrl.pathname.split("/").filter(Boolean);
+          if (segments.length >= 2) {
+            cleanRepo = `${segments[0]}/${segments[1]}`;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse GitHub URL:", e);
       }
     }
 

@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MessageProps } from "./MessageBubble";
+import {
+  type Conversation,
+  getAllConversations,
+  saveConversation,
+  deleteConversationFromDB
+} from "@/lib/db";
 
-export interface Conversation {
-  id: string;
-  title: string;
-  messages: MessageProps[];
-  createdAt: number;
-  updatedAt: number;
-}
+export type { Conversation };
 
 const STORAGE_KEY = "snugpt_conversations";
 const MAX_CONVERSATIONS = 50;
@@ -27,47 +27,66 @@ export function useConversations() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Load from localStorage on mount
+  // Load from IndexedDB on mount with dynamic localStorage fallback migration
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed: Conversation[] = JSON.parse(raw);
-        setConversations(parsed);
-        if (parsed.length > 0) setActiveId(parsed[0].id);
-      } else {
+    async function load() {
+      try {
+        // 1. Fetch from IndexedDB
+        let parsed = await getAllConversations();
+        
+        // 2. Check if IndexedDB is empty and migration is needed
+        if (parsed.length === 0 && typeof window !== "undefined") {
+          const rawLegacy = localStorage.getItem(STORAGE_KEY);
+          if (rawLegacy) {
+            try {
+              const legacyConvs: Conversation[] = JSON.parse(rawLegacy);
+              if (legacyConvs.length > 0) {
+                console.info("Migrating legacy localStorage chat histories to IndexedDB...");
+                // Write all legacy conversations to IndexedDB
+                for (const c of legacyConvs) {
+                  await saveConversation(c);
+                }
+                // Fetch migrated list
+                parsed = await getAllConversations();
+                // Clean up legacy key
+                localStorage.removeItem(STORAGE_KEY);
+              }
+            } catch (err) {
+              console.error("Failed to migrate legacy chat history:", err);
+            }
+          }
+        }
+
+        // 3. Fallback to initializing a blank conversation if empty
+        if (parsed.length > 0) {
+          setConversations(parsed);
+          setActiveId(parsed[0].id);
+        } else {
+          const blank = newConversation();
+          setConversations([blank]);
+          setActiveId(blank.id);
+          await saveConversation(blank);
+        }
+      } catch (err) {
+        console.error("Failed to load conversations from IndexedDB:", err);
+        // Fallback to memory
         const blank = newConversation();
         setConversations([blank]);
         setActiveId(blank.id);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify([blank]));
       }
-    } catch {
-      const blank = newConversation();
-      setConversations([blank]);
-      setActiveId(blank.id);
     }
-    return () => {
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    };
+    load();
   }, []);
 
   function newConversation(): Conversation {
     return { id: genId(), title: "New conversation", messages: [], createdAt: Date.now(), updatedAt: Date.now() };
   }
 
-  const save = useCallback((updated: Conversation[]) => {
-    const trimmed = updated.slice(0, MAX_CONVERSATIONS);
-    setConversations(trimmed);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-  }, []);
-
   const createNew = useCallback(() => {
     const c = newConversation();
     setConversations((prev) => {
-      const next = [c, ...prev];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next.slice(0, MAX_CONVERSATIONS)));
+      const next = [c, ...prev].slice(0, MAX_CONVERSATIONS);
+      saveConversation(c).catch((e) => console.error("Failed to save new conversation:", e));
       return next;
     });
     setActiveId(c.id);
@@ -82,10 +101,10 @@ export function useConversations() {
           : c
       );
       
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = setTimeout(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next.slice(0, MAX_CONVERSATIONS)));
-      }, 500);
+      const updatedConv = next.find((c) => c.id === id);
+      if (updatedConv) {
+        saveConversation(updatedConv).catch((e) => console.error("Failed to update messages in DB:", e));
+      }
       
       return next;
     });
@@ -94,7 +113,8 @@ export function useConversations() {
   const deleteConversation = useCallback((id: string) => {
     setConversations((prev) => {
       const next = prev.filter((c) => c.id !== id);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      
+      deleteConversationFromDB(id).catch((e) => console.error("Failed to delete conversation from DB:", e));
       
       setActiveId((currentActive) => {
         if (currentActive === id) {
@@ -109,5 +129,5 @@ export function useConversations() {
 
   const activeConversation = conversations.find((c) => c.id === activeId) ?? null;
 
-  return { conversations, activeId, activeConversation, setActiveId, createNew, updateMessages, deleteConversation, save };
+  return { conversations, activeId, activeConversation, setActiveId, createNew, updateMessages, deleteConversation };
 }

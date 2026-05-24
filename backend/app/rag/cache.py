@@ -65,35 +65,19 @@ def init_cache():
     return _cache
 
 def search_cache(query: str) -> Optional[str]:
-    """Search the semantic cache for a >96% similar query."""
+    """Search the semantic cache for a >92% similar query."""
     cache = init_cache()
     if not cache:
         return None
         
     try:
-        # GPTCache's internal similarity threshold is usually configured in the evaluator.
-        # By default SearchDistanceEvaluation checks distance.
-        # We can perform a manual query if needed, or use cache API.
-        
-        # Actually, GPTCache's interceptor handles the threshold, but we are streaming.
-        # So we query the data_manager manually to find top-1 match.
-        llm_embeddings = get_embeddings()
-        query_embedding = llm_embeddings.embed_query(query)
-        
-        # Search vector base
-        results = cache.data_manager.search(query_embedding, top_k=1)
-        if not results:
-            return None
-            
-        distance, cache_data = results[0]
-        # Cosine similarity roughly corresponds to distance. 
-        # For a 92% similarity (cosine similarity >= 0.92), distance should be <= 0.08 (if normalized 1-cosine)
-        # or L2 distance threshold depending on the vector base implementation.
-        # Assuming normalized vectors, threshold is 0.08 for 92% similarity.
-        if distance <= 0.08:
-            print(f"[Cache] Hit! Semantic similarity > 92% (Distance: {distance})")
-            return cache.data_manager.get_scalar_data(cache_data, "response_text") # pseudo-code
-            
+        # GPTCache standard API for getting a cached value.
+        # Under the hood, it uses the embeddings encoder, vector base search,
+        # and similarity evaluator configured in cache.init()
+        response = cache.get(query)
+        if response:
+            print("[Cache] Hit! Semantic similarity match found.")
+            return response
         return None
     except Exception as e:
         print(f"[Cache] Error searching cache: {e}")
@@ -106,15 +90,12 @@ async def save_to_cache(query: str, response: str):
         return
         
     try:
-        def _save():
-            llm_embeddings = get_embeddings()
-            query_embedding = llm_embeddings.embed_query(query)
-            cache.data_manager.save(query, response, query_embedding)
-            print("[Cache] Saved response to semantic cache.")
-            
-        await asyncio.to_thread(_save)
+        # GPTCache standard API for saving. It encodes the query and saves both scalar and vector.
+        await asyncio.to_thread(cache.put, query, response)
+        print("[Cache] Saved response to semantic cache.")
     except Exception as e:
         print(f"[Cache] Error saving to cache: {e}")
+
 
 # Note: The above is a generic implementation. GPTCache has specific API for data_manager.
 # To be robust, if data_manager API differs, we can fallback to standard caching behavior.

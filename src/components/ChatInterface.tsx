@@ -16,6 +16,7 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [attachments, setAttachments] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -24,9 +25,25 @@ export default function ChatInterface() {
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
     messagesEndRef.current?.scrollIntoView({ behavior });
   };
+  
   useEffect(() => {
     scrollToBottom(isLoading ? "auto" : "smooth");
   }, [messages, isLoading]);
+
+  // Online / Offline Status Detection
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsOnline(navigator.onLine);
+      const goOnline = () => setIsOnline(true);
+      const goOffline = () => setIsOnline(false);
+      window.addEventListener("online", goOnline);
+      window.addEventListener("offline", goOffline);
+      return () => {
+        window.removeEventListener("online", goOnline);
+        window.removeEventListener("offline", goOffline);
+      };
+    }
+  }, []);
 
   // Keyboard shortcuts (Cmd+K / Ctrl+K for a new chat)
   useEffect(() => {
@@ -39,6 +56,97 @@ export default function ChatInterface() {
     window.addEventListener("keydown", handleGlobalKeyDown);
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
   }, [conversations]);
+
+  // Local Offline Scoring and Search Handler
+  const performOfflineSearch = async (queryText: string): Promise<string> => {
+    try {
+      const { getAllMaterials, getAllConversations } = await import("@/lib/db");
+      const queryTokens = queryText.toLowerCase().split(/\W+/).filter(Boolean);
+      if (queryTokens.length === 0) return "Please enter a valid search query.";
+
+      const [materials, localConvs] = await Promise.all([
+        getAllMaterials(),
+        getAllConversations()
+      ]);
+
+      interface ScoredItem {
+        title: string;
+        content: string;
+        source: string;
+        score: number;
+      }
+
+      const scoredItems: ScoredItem[] = [];
+
+      // Score cached study materials / sources
+      for (const m of materials) {
+        let score = 0;
+        const contentLower = m.content.toLowerCase();
+        const titleLower = m.title.toLowerCase();
+
+        for (const token of queryTokens) {
+          if (titleLower.includes(token)) score += 12; // massive boost for title match
+          const count = contentLower.split(token).length - 1;
+          score += count * 2; // term frequency boost
+        }
+
+        if (score > 0) {
+          scoredItems.push({
+            title: m.title,
+            content: m.content,
+            source: m.source,
+            score: score
+          });
+        }
+      }
+
+      // Score cached historical chats
+      for (const c of localConvs) {
+        if (c.id === activeId) continue; // Skip active conversation content
+        for (const msg of c.messages) {
+          if (msg.role !== "assistant") continue;
+          let score = 0;
+          const contentLower = msg.content.toLowerCase();
+
+          for (const token of queryTokens) {
+            const count = contentLower.split(token).length - 1;
+            score += count * 1.5; // score boost for chat matching
+          }
+
+          if (score > 0) {
+            scoredItems.push({
+              title: `Historical Chat: ${c.title}`,
+              content: msg.content,
+              source: "chat_history",
+              score: score
+            });
+          }
+        }
+      }
+
+      // Sort by score descending
+      scoredItems.sort((a, b) => b.score - a.score);
+
+      if (scoredItems.length === 0) {
+        return "No matching offline documents or historical chats were found in your local database cache.\n\nPlease connect to the campus Wi-Fi network to query the complete knowledge base!";
+      }
+
+      let responseText = "📶 **[Offline Retrieval]** You are currently disconnected from the campus network. SNUGPT searched your browser's offline IndexedDB cache and retrieved the most relevant matching sections:\n\n";
+
+      // Select top 3 items
+      const topItems = scoredItems.slice(0, 3);
+      for (const item of topItems) {
+        responseText += `### 📚 ${item.title}\n`;
+        responseText += `*Cached from: ${item.source}*\n\n`;
+        responseText += `${item.content}\n\n---\n\n`;
+      }
+
+      return responseText;
+    } catch (e) {
+      console.error("Local search failed:", e);
+      return "I encountered an error searching the local database cache. Please check your connection and try again.";
+    }
+  };
 
   const handleSubmit = async (
     e?: React.FormEvent,
@@ -64,6 +172,37 @@ export default function ChatInterface() {
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
+
+    // ── Local Interceptor for Offline Mode ──
+    if (!isOnline) {
+      try {
+        const offlineMsg = await performOfflineSearch(queryText);
+        const words = offlineMsg.split(" ");
+        let currentContent = "";
+        
+        for (let i = 0; i < words.length; i++) {
+          if (abortController.signal.aborted) {
+            currentContent += " *[stopped]*";
+            break;
+          }
+          currentContent += words[i] + " ";
+          const updated = [...nextMessages];
+          updated[updated.length - 1] = {
+            role: "assistant",
+            content: currentContent.trim(),
+            sources: []
+          };
+          updateMessages(convId, updated);
+          await new Promise((r) => setTimeout(r, 12)); // smooth local typing simulation (12ms)
+        }
+      } catch (offlineErr) {
+        console.error("Offline execution failure:", offlineErr);
+      } finally {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
+      return;
+    }
 
     let current = [...nextMessages];
     try {
@@ -162,6 +301,28 @@ export default function ChatInterface() {
         last.content = "I'm having trouble generating a response right now. Please try again.";
         updateMessages(convId!, finalMsgs);
       }
+
+      // ── Auto-Caching Retrieved Sources into Offline Library ──
+      if (last && last.role === "assistant" && last.sources && last.sources.length > 0) {
+        try {
+          const { saveMaterial } = await import("@/lib/db");
+          for (const src of last.sources) {
+            const title = src.metadata?.source?.split("/")?.pop()?.split("\\")?.pop() || "Handbook Document";
+            const id = src.metadata?.id || `${Date.now()}-${Math.random()}`;
+            await saveMaterial({
+              id: String(id),
+              title: title,
+              content: src.content || "",
+              source: src.metadata?.source || "snu_knowledge",
+              timestamp: Date.now()
+            });
+          }
+          console.info(`Auto-cached ${last.sources.length} sources to IndexedDB offline storage.`);
+        } catch (cacheErr) {
+          console.error("Auto-caching failed:", cacheErr);
+        }
+      }
+
     } catch (err: any) {
       if (err.name === "AbortError") {
         console.log("Generation stopped by user.");
@@ -272,6 +433,27 @@ export default function ChatInterface() {
             </div>
             <span className="text-sm font-semibold text-color-text">SNUGPT</span>
           </Link>
+
+          {/* Offline Pill Indicator */}
+          {!isOnline && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border shadow-sm select-none"
+              style={{
+                background: "rgba(242, 169, 0, 0.08)",
+                borderColor: "rgba(242, 169, 0, 0.3)",
+                color: "var(--color-text-warning, #f2a900)"
+              }}
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#f2a900" }}></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: "#f2a900" }}></span>
+              </span>
+              Offline Mode • Local DB
+            </motion.div>
+          )}
 
           <div className="flex-1" />
 
