@@ -122,28 +122,10 @@ def get_bm25_index():
 
     with _bm25_lock:
         if _bm25_index is None:
-            logger.info("Initializing BM25 sparse search index from ChromaDB...")
-            try:
-                collection = _get_collection()
-                # Retrieve all documents currently indexed in ChromaDB (up to 20000)
-                result = collection.get(limit=20000, include=["documents", "metadatas"])
-                documents = result.get("documents") or []
-                metadatas = result.get("metadatas") or []
-
-                corpus_docs = []
-                for i, doc_text in enumerate(documents):
-                    if doc_text:
-                        meta = metadatas[i] if i < len(metadatas) else {}
-                        corpus_docs.append(Document(page_content=doc_text, metadata=meta or {}))
-
-                # Tokenize documents into lowercased alphanumeric words
-                tokenized_corpus = [re.findall(r'\b\w+\b', doc.page_content.lower()) for doc in corpus_docs]
-                bm25_inst = BM25(tokenized_corpus)
-                _bm25_index = (bm25_inst, corpus_docs)
-                logger.info("BM25 index initialized successfully with %d documents.", len(corpus_docs))
-            except Exception as e:
-                logger.error("Failed to lazily build BM25 index from Chroma: %s", e)
-                _bm25_index = (None, [])
+            # BM25 is disabled for serverless scalability.
+            # Building BM25 index in memory pulls 20,000 docs on every cold start which destroys performance under high concurrency.
+            _bm25_index = (None, [])
+            logger.info("BM25 index generation disabled for scalability. Using pure Dense Vector + Exact Match Boosting.")
     return _bm25_index
 
 
@@ -249,10 +231,8 @@ def add_documents(documents: List[Document]) -> None:
     )
 
 
-def rerank_documents(query: str, docs: List[Document], top_n: int = 5) -> List[Document]:
-    """Re-ranks retrieved documents using NVIDIA's hosted state-of-the-art re-ranking API (nvidia/rerank-qa-mistral-4b),
-    falling back gracefully to returning the top top_n original documents if unconfigured or failed.
-    """
+async def rerank_documents(query: str, docs: List[Document], top_n: int = 5) -> List[Document]:
+    """Re-ranks retrieved documents using NVIDIA's hosted state-of-the-art re-ranking API."""
     if not docs:
         return []
         
@@ -268,7 +248,6 @@ def rerank_documents(query: str, docs: List[Document], top_n: int = 5) -> List[D
         "Accept": "application/json"
     }
     
-    # Map documents to the API passages structure
     passages = [{"text": doc.page_content} for doc in docs]
     payload = {
         "model": "nvidia/rerank-qa-mistral-4b",
@@ -277,30 +256,28 @@ def rerank_documents(query: str, docs: List[Document], top_n: int = 5) -> List[D
     }
     
     try:
-        import os
-        import requests
-        response = requests.post(url, json=payload, headers=headers, timeout=12)
-        if response.status_code == 200:
-            result = response.json()
-            rankings = result.get("rankings") or []
-            
-            # Sort documents based on re-ranker logit score order
-            ranked_docs = []
-            for rank in rankings:
-                idx = rank.get("index")
-                if idx is not None and 0 <= idx < len(docs):
-                    ranked_docs.append(docs[idx])
-            
-            # Append any missing documents that didn't get scored for some reason
-            seen = set(id(d) for d in ranked_docs)
-            for d in docs:
-                if id(d) not in seen:
-                    ranked_docs.append(d)
-                    
-            logger.info("Successfully re-ranked %d documents down to top %d.", len(docs), top_n)
-            return ranked_docs[:top_n]
-        else:
-            logger.error("NVIDIA Reranking API error (status %d): %s", response.status_code, response.text)
+        import httpx
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload, headers=headers, timeout=12.0)
+            if response.status_code == 200:
+                result = response.json()
+                rankings = result.get("rankings") or []
+                
+                ranked_docs = []
+                for rank in rankings:
+                    idx = rank.get("index")
+                    if idx is not None and 0 <= idx < len(docs):
+                        ranked_docs.append(docs[idx])
+                
+                seen = set(id(d) for d in ranked_docs)
+                for d in docs:
+                    if id(d) not in seen:
+                        ranked_docs.append(d)
+                        
+                logger.info("Successfully re-ranked %d documents down to top %d.", len(docs), top_n)
+                return ranked_docs[:top_n]
+            else:
+                logger.error("NVIDIA Reranking API error (status %d): %s", response.status_code, response.text)
     except Exception as e:
         logger.error("Failed to call NVIDIA Reranking API: %s", e)
         

@@ -206,8 +206,12 @@ export default function ChatInterface() {
 
     let current = [...nextMessages];
     try {
-      // Prefer /api/chat (Next proxy). Fall back to /_/backend if /api/chat 404s (legacy deploys).
-      let endpoint = "/api/chat";
+      // Bypass Next.js Edge proxy to prevent "Network connection lost" timeouts on slow LLM TTFB.
+      // Connect directly to the FastAPI backend (local or production).
+      let endpoint = process.env.NEXT_PUBLIC_BACKEND_URL 
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`
+        : "/_/backend/api/chat";
+        
       let res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -220,22 +224,6 @@ export default function ChatInterface() {
           previous_response: previousResponse || undefined,
         }),
       });
-
-      if (res.status === 404) {
-        endpoint = "/_/backend/api/chat";
-        res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: abortController.signal,
-          body: JSON.stringify({
-            query: queryText,
-            session_id: convId,
-            history: baseMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
-            regenerate: !!isRegenerate,
-            previous_response: previousResponse || undefined,
-          }),
-        });
-      }
 
       if (!res.ok) {
         const rawText = await res.text();

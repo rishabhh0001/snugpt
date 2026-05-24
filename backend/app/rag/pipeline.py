@@ -168,7 +168,7 @@ async def generate_streaming_response(
 
         # Re-rank positive documents using Cross-Encoder to select top 5 most relevant
         try:
-            positive_docs = await asyncio.to_thread(rerank_documents, query, positive_docs, top_n=5)
+            positive_docs = await rerank_documents(query, positive_docs, top_n=5)
         except Exception as re_err:
             print(f"Reranking error: {re_err}")
             positive_docs = positive_docs[:5]

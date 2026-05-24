@@ -5,6 +5,10 @@ import { fileURLToPath } from "url";
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  experimental: {
+    reactCompiler: true,
+    optimizePackageImports: ["lucide-react", "framer-motion", "motion"],
+  },
   turbopack: {
     root: projectRoot,
   },

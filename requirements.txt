@@ -14,3 +14,4 @@ psycopg2-binary
 qrcode
 redis
 gptcache
+httpx

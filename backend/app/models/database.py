@@ -56,11 +56,11 @@ async def connect_database() -> None:
         logger.warning("DATABASE_URL is not set; waitlist and chat logs disabled.")
         return
 
-    # Configure connection pool limits optimized for Neon serverless postgres
+    # Configure connection pool limits optimized for Neon serverless postgres (and Vercel scaling)
     _database = Database(
         async_url,
-        min_size=2,
-        max_size=20
+        min_size=1,
+        max_size=5
     )
     await _database.connect()
     init_db()
@@ -84,13 +84,13 @@ def get_sync_engine():
         sync_url = _sync_database_url()
         if not sync_url:
             return None
-        # Maximize connection reuse and handle up to 70 concurrent transactions gracefully
+        # Optimized for serverless scale (100s of concurrent instances)
         _sync_engine = create_engine(
             sync_url,
-            pool_size=20,
-            max_overflow=50,
+            pool_size=1,
+            max_overflow=2,
             pool_timeout=30,
-            pool_recycle=1800,
+            pool_recycle=300,
             pool_pre_ping=True
         )
     return _sync_engine
