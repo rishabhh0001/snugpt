@@ -24,6 +24,95 @@ function getFilename(src: string): string {
   return src.split(/[/\\]/).pop()?.replace(/_/g, " ").replace(/\.md$/i, "") ?? src;
 }
 
+function preprocessMarkdown(text: string): string {
+  if (!text) return "";
+  
+  const lines = text.split("\n");
+  const processedLines: string[] = [];
+  let inTable = false;
+  let expectedPipes = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Detect if we are in a table
+    const isDelimiter = /^\s*\|?\s*(:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/.test(trimmed);
+    
+    if (isDelimiter && processedLines.length > 0) {
+      inTable = true;
+      // Count pipes in the delimiter row to know expected pipes per row
+      expectedPipes = (trimmed.match(/\|/g) || []).length;
+      processedLines.push(line);
+      continue;
+    }
+
+    if (inTable) {
+      // Check if table has ended: an empty line or a line without any pipes (unless it's a continuation)
+      const hasPipes = trimmed.includes("|");
+      
+      if (trimmed === "" || (!hasPipes && !/^[a-zA-Z0-9]/.test(trimmed))) {
+        inTable = false;
+        expectedPipes = 0;
+        processedLines.push(line);
+        continue;
+      }
+
+      const startsWithPipe = trimmed.startsWith("|");
+      const pipeCount = (trimmed.match(/\|/g) || []).length;
+
+      // Continuation condition:
+      // 1. Doesn't start with a pipe, but has a letter/number (likely cell content text)
+      // 2. Starts with a pipe, but has far fewer pipes than expected (broken cell content)
+      const isContinuation = !startsWithPipe || (pipeCount < expectedPipes - 1);
+
+      if (isContinuation && processedLines.length > 0) {
+        let prev = processedLines.pop()!;
+        prev = prev.trimEnd();
+        
+        let cleanCurr = trimmed;
+        if (prev.endsWith("|") && cleanCurr.startsWith("|")) {
+          const lastPipeIndex = prev.lastIndexOf("|");
+          const beforeLastPipe = prev.substring(0, lastPipeIndex);
+          const afterLastPipe = prev.substring(lastPipeIndex); // "|"
+          
+          cleanCurr = cleanCurr.substring(1).trim();
+          
+          if (cleanCurr.endsWith("|")) {
+            prev = `${beforeLastPipe.trimEnd()} <br /> ${cleanCurr}`;
+          } else {
+            prev = `${beforeLastPipe.trimEnd()} <br /> ${cleanCurr} ${afterLastPipe}`;
+          }
+        } else if (prev.endsWith("|")) {
+          const lastPipeIndex = prev.lastIndexOf("|");
+          if (lastPipeIndex !== -1) {
+            const beforeLastPipe = prev.substring(0, lastPipeIndex);
+            const afterLastPipe = prev.substring(lastPipeIndex); // "|"
+            
+            if (cleanCurr.endsWith("|")) {
+              cleanCurr = cleanCurr.substring(0, cleanCurr.length - 1).trimEnd();
+            }
+            
+            prev = `${beforeLastPipe.trimEnd()} <br /> ${cleanCurr} ${afterLastPipe}`;
+          } else {
+            prev = `${prev} <br /> ${cleanCurr}`;
+          }
+        } else {
+          prev = `${prev} <br /> ${cleanCurr}`;
+        }
+        
+        processedLines.push(prev);
+      } else {
+        processedLines.push(line);
+      }
+    } else {
+      processedLines.push(line);
+    }
+  }
+
+  return processedLines.join("\n");
+}
+
 export default function MessageBubble({
   message,
   chatId,
@@ -166,9 +255,36 @@ export default function MessageBubble({
                   a: ({ href, children }) => (
                     <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
                   ),
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto my-3 w-full rounded-xl border border-white/5 bg-zinc-900/10 dark:bg-zinc-950/20">
+                      <table className="min-w-full divide-y divide-white/5 text-left border-collapse">
+                        {children}
+                      </table>
+                    </div>
+                  ),
+                  thead: ({ children }) => (
+                    <thead className="bg-white/[0.02]">
+                      {children}
+                    </thead>
+                  ),
+                  th: ({ children }) => (
+                    <th className="px-3.5 py-2.5 text-xs font-semibold text-color-text border-b border-white/5 uppercase tracking-wider">
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children }) => (
+                    <td className="px-3.5 py-2.5 text-xs text-color-muted border-b border-white/[0.02] align-top whitespace-normal">
+                      {children}
+                    </td>
+                  ),
+                  tr: ({ children }) => (
+                    <tr className="hover:bg-white/[0.01] transition-colors">
+                      {children}
+                    </tr>
+                  )
                 }}
               >
-                {cleanContent}
+                {preprocessMarkdown(cleanContent)}
               </ReactMarkdown>
             </div>
           ) : (

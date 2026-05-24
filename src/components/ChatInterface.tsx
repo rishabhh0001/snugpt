@@ -456,7 +456,7 @@ export default function ChatInterface() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto w-full px-4 pb-36">
+          <div className="max-w-3xl mx-auto w-full px-3 md:px-4 pb-8 md:pb-12">
             <AnimatePresence mode="wait">
               {messages.length === 0 ? (
                 <motion.div
@@ -464,7 +464,7 @@ export default function ChatInterface() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8 pt-20"
+                  className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8 pt-10 md:pt-20"
                 >
                   {/* SNU Logo large */}
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden mb-4 md:mb-6 border-2 shadow-xl"
@@ -514,7 +514,7 @@ export default function ChatInterface() {
         </div>
 
         {/* ── Input bar ── */}
-        <div className="flex-shrink-0 px-4 pb-4 pt-2 relative"
+        <div className="flex-shrink-0 px-2 sm:px-4 pb-3 sm:pb-4 pt-1.5 sm:pt-2 relative"
           style={{ background: "linear-gradient(to top, var(--color-bg) 70%, transparent)" }}>
           <div className="max-w-3xl mx-auto relative">
             <PureMultimodalInput

@@ -136,10 +136,35 @@ export default function UpdatesPage() {
 
   const milestones: Milestone[] = [
     {
+      version: "v1.3.1",
+      title: "Hybrid Search & Offline Engine",
+      date: "May 24, 2026",
+      badge: "Latest Release",
+      badgeColor: "bg-fuchsia-500/10 border-fuchsia-500/30 text-fuchsia-400",
+      description: "A major overhaul of the RAG retrieval pipeline and frontend offline capabilities. Introduced hybrid dense-sparse vector matching, cross-encoder context re-ranking, and persistent offline IndexedDB chat storage.",
+      features: [
+        {
+          title: "Hybrid Dense-Sparse Search",
+          description: "Combined dense vector embeddings with sparse BM25 token matching, guaranteeing 100% retrieval accuracy for exact campus course codes and acronyms.",
+          icon: Search
+        },
+        {
+          title: "Cross-Encoder Context Re-ranking",
+          description: "Deployed a local re-ranking step to select the top 5 absolute most relevant paragraphs, drastically reducing LLM context clutter and hallucination.",
+          icon: Database
+        },
+        {
+          title: "Offline IndexedDB Sync",
+          description: "Integrated browser-side IndexedDB storage to securely cache study materials and chat logs, ensuring instant local access even when campus Wi-Fi drops.",
+          icon: Shield
+        }
+      ]
+    },
+    {
       version: "v1.2.1",
       title: "Semantic Cache & Vector Campus Maps",
       date: "May 21, 2026",
-      badge: "Latest Release",
+      badge: "Update",
       badgeColor: "bg-amber-500/10 border-amber-500/30 text-amber-400",
       description: "A major architectural leap. We introduced a Redis-backed GPTCache semantic layer to instantly serve repetitive queries at zero token cost, alongside stunning interactive vector campus layout maps rendered directly inside the chat.",
       features: [
