@@ -23,7 +23,8 @@ class Settings(BaseSettings):
     chroma_host: str = "localhost"
     chroma_port: int = 8000
 
-    google_apps_script_url: str | None = None
+    contact_apps_script_url: str | None = None
+    welcome_apps_script_url: str | None = None
 
     # Auth & OAuth Settings
     github_client_id: str | None = None

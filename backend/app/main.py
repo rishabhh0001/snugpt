@@ -159,7 +159,7 @@ async def contact(request: ContactRequest):
         )
 
         # 2. Initiate Google Apps Script to send emails if URL is configured
-        if settings.google_apps_script_url:
+        if settings.contact_apps_script_url:
             import requests
             def send_email_webhook():
                 payload = {
@@ -170,7 +170,7 @@ async def contact(request: ContactRequest):
                 }
                 try:
                     # POST to Google Apps Script Web App URL
-                    response = requests.post(settings.google_apps_script_url, json=payload, timeout=12)
+                    response = requests.post(settings.contact_apps_script_url, json=payload, timeout=12)
                     logger.info("Google Apps Script webhook trigger response: %s", response.status_code)
                 except Exception as ex:
                     logger.error("Failed to call Google Apps Script webhook: %s", ex)
@@ -178,7 +178,7 @@ async def contact(request: ContactRequest):
             # Fire-and-forget in background thread to keep API response sub-second
             await asyncio.to_thread(send_email_webhook)
         else:
-            logger.warning("GOOGLE_APPS_SCRIPT_URL not configured. Direct logging completed without email dispatch.")
+            logger.warning("CONTACT_APPS_SCRIPT_URL not configured. Direct logging completed without email dispatch.")
 
         return {"message": "Message successfully received and logged.", "id": message_id}
     except Exception as e:

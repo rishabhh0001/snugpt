@@ -74,6 +74,32 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async signIn({ user }) {
+      if (user?.email && process.env.WELCOME_APPS_SCRIPT_URL) {
+        try {
+          const payload = {
+            action: "welcome",
+            email: user.email,
+            name: user.name || user.email.split("@")[0],
+          };
+
+          // Trigger the Apps Script Web App in a fire-and-forget server-side fetch
+          fetch(process.env.WELCOME_APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }).catch((err) => {
+            console.error("Failed to dispatch welcome email webhook:", err);
+          });
+        } catch (error) {
+          console.error("Welcome email trigger error:", error);
+        }
+      }
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
 };
 

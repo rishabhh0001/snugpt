@@ -26,7 +26,7 @@ function getFilename(src: string): string {
 
 function preprocessMarkdown(text: string): string {
   if (!text) return "";
-  
+
   const lines = text.split("\n");
   const processedLines: string[] = [];
   let inTable = false;
@@ -38,7 +38,7 @@ function preprocessMarkdown(text: string): string {
 
     // Detect if we are in a table
     const isDelimiter = /^\s*\|?\s*(:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/.test(trimmed);
-    
+
     if (isDelimiter && processedLines.length > 0) {
       inTable = true;
       // Count pipes in the delimiter row to know expected pipes per row
@@ -50,7 +50,7 @@ function preprocessMarkdown(text: string): string {
     if (inTable) {
       // Check if table has ended: an empty line or a line without any pipes (unless it's a continuation)
       const hasPipes = trimmed.includes("|");
-      
+
       if (trimmed === "" || (!hasPipes && !/^[a-zA-Z0-9]/.test(trimmed))) {
         inTable = false;
         expectedPipes = 0;
@@ -69,15 +69,15 @@ function preprocessMarkdown(text: string): string {
       if (isContinuation && processedLines.length > 0) {
         let prev = processedLines.pop()!;
         prev = prev.trimEnd();
-        
+
         let cleanCurr = trimmed;
         if (prev.endsWith("|") && cleanCurr.startsWith("|")) {
           const lastPipeIndex = prev.lastIndexOf("|");
           const beforeLastPipe = prev.substring(0, lastPipeIndex);
           const afterLastPipe = prev.substring(lastPipeIndex); // "|"
-          
+
           cleanCurr = cleanCurr.substring(1).trim();
-          
+
           if (cleanCurr.endsWith("|")) {
             prev = `${beforeLastPipe.trimEnd()} <br /> ${cleanCurr}`;
           } else {
@@ -88,11 +88,11 @@ function preprocessMarkdown(text: string): string {
           if (lastPipeIndex !== -1) {
             const beforeLastPipe = prev.substring(0, lastPipeIndex);
             const afterLastPipe = prev.substring(lastPipeIndex); // "|"
-            
+
             if (cleanCurr.endsWith("|")) {
               cleanCurr = cleanCurr.substring(0, cleanCurr.length - 1).trimEnd();
             }
-            
+
             prev = `${beforeLastPipe.trimEnd()} <br /> ${cleanCurr} ${afterLastPipe}`;
           } else {
             prev = `${prev} <br /> ${cleanCurr}`;
@@ -100,7 +100,7 @@ function preprocessMarkdown(text: string): string {
         } else {
           prev = `${prev} <br /> ${cleanCurr}`;
         }
-        
+
         processedLines.push(prev);
       } else {
         processedLines.push(line);
@@ -346,18 +346,16 @@ export default function MessageBubble({
                 <button
                   onClick={handleThumbsUp}
                   title="Helpful"
-                  className={`p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center ${
-                    activeFeedback === "up" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-color-text"
-                  }`}
+                  className={`p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center ${activeFeedback === "up" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-color-text"
+                    }`}
                 >
                   <ThumbsUp className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={handleThumbsDown}
                   title="Not helpful"
-                  className={`p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center ${
-                    activeFeedback === "down" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-color-text"
-                  }`}
+                  className={`p-1.5 rounded-md hover:bg-color-surface-hover transition-all duration-150 active:scale-90 flex items-center justify-center ${activeFeedback === "down" ? "text-yellow-500 bg-yellow-500/10 border border-yellow-500/20" : "hover:text-color-text"
+                    }`}
                 >
                   <ThumbsDown className="w-3.5 h-3.5" />
                 </button>
