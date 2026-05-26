@@ -16,6 +16,8 @@ build/
 node_modules/
 .turbo/
 .vercel/
+*.tsbuildinfo
+
 
 # Local pip probes
 .pip-test/
