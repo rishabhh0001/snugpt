@@ -161,7 +161,7 @@ export default function UpdatesPage() {
       ]
     },
     {
-      version: "v1.2.1",
+      version: "v1.2.4",
       title: "Semantic Cache & Vector Campus Maps",
       date: "May 21, 2026",
       badge: "Update",
@@ -188,7 +188,7 @@ export default function UpdatesPage() {
     {
       version: "v1.2.0",
       title: "Neural Chat & Branding Alignment",
-      date: "May 18, 2026",
+      date: "May 17, 2026",
       badge: "Major Update",
       badgeColor: "bg-blue-500/10 border-blue-500/30 text-blue-400",
       description: "A major step forward in conversation logic, query streaming, and project branding consistency. Introducing lightning-fast semantic queries and persistent multi-turn chat memory structures.",
