@@ -14,7 +14,7 @@ export default function ChatInterface() {
     useConversations();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [attachments, setAttachments] = useState<any[]>([]);
+  const [webSearchActive, setWebSearchActive] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -153,7 +153,8 @@ export default function ChatInterface() {
     customQuery?: string,
     historyOverride?: MessageProps[],
     isRegenerate?: boolean,
-    previousResponse?: string
+    previousResponse?: string,
+    isWebSearch: boolean = false
   ) => {
     e?.preventDefault();
     const queryText = (customQuery || "").trim();
@@ -222,6 +223,7 @@ export default function ChatInterface() {
           history: baseMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
           regenerate: !!isRegenerate,
           previous_response: previousResponse || undefined,
+          web_search: isWebSearch,
         }),
       });
 
@@ -345,8 +347,8 @@ export default function ChatInterface() {
     setSidebarOpen(false);
   };
 
-  const handleSendMessage = ({ input: queryText }: { input: string }) => {
-    handleSubmit(undefined, queryText);
+  const handleSendMessage = ({ input: queryText, webSearch: isWebSearch }: { input: string; webSearch: boolean }) => {
+    handleSubmit(undefined, queryText, undefined, false, undefined, isWebSearch);
   };
 
   const handleSelect = (id: string) => {
@@ -499,7 +501,7 @@ export default function ChatInterface() {
                               const userPrompt = messages[i - 1];
                               if (userPrompt && userPrompt.role === "user") {
                                 const baseHistory = messages.slice(0, i - 1);
-                                handleSubmit(undefined, userPrompt.content, baseHistory, true, msg.content);
+                                handleSubmit(undefined, userPrompt.content, baseHistory, true, msg.content, webSearchActive);
                               }
                             }
                           : undefined
@@ -520,8 +522,8 @@ export default function ChatInterface() {
             <PureMultimodalInput
               chatId={activeId || "new-chat"}
               messages={messages.map((m, i) => ({ id: `${i}`, content: m.content, role: m.role }))}
-              attachments={attachments}
-              setAttachments={setAttachments}
+              webSearchActive={webSearchActive}
+              setWebSearchActive={setWebSearchActive}
               onSendMessage={handleSendMessage}
               onStopGenerating={handleStop}
               isGenerating={isLoading}

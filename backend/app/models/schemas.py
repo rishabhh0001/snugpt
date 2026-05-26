@@ -11,6 +11,7 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = None
     regenerate: Optional[bool] = False
     previous_response: Optional[str] = None
+    web_search: Optional[bool] = False
 
 class SourceDocument(BaseModel):
     content: str

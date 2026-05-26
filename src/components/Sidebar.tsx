@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, MessageSquare, Trash2, X, ChevronRight, Mail } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, MessageSquare, Trash2, X, ChevronRight, Mail, MoreHorizontal } from "lucide-react";
 import { Conversation } from "./useConversations";
 import Link from "next/link";
 
@@ -25,8 +25,21 @@ function timeAgo(ts: number): string {
 }
 
 export default function Sidebar({ conversations, activeId, onSelect, onNew, onDelete, mobile, onClose }: SidebarProps) {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
+  const containerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownOpenId) {
+        const activeContainer = containerRefs.current[dropdownOpenId];
+        if (activeContainer && !activeContainer.contains(event.target as Node)) {
+          setDropdownOpenId(null);
+        }
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpenId]);
 
   return (
     <aside className={`flex flex-col h-full ${mobile ? "w-full" : "w-64"}`}
@@ -71,18 +84,14 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
           conversations.map((conv) => (
             <div
               key={conv.id}
+              ref={(el) => { containerRefs.current[conv.id] = el; }}
               className="group relative flex items-center rounded-xl cursor-pointer transition-all"
               style={{
                 background: conv.id === activeId ? "var(--color-surface-hover)" : "transparent",
               }}
-              onMouseEnter={() => setHoveredId(conv.id)}
-              onMouseLeave={() => {
-                setHoveredId(null);
-                setDeletingId(null);
-              }}
               onClick={() => onSelect(conv.id)}
             >
-              <div className="flex items-start gap-2.5 px-3 py-2.5 flex-1 min-w-0">
+              <div className="flex items-start gap-2.5 px-3 py-2.5 flex-1 min-w-0 pr-8">
                 <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
                   style={{ color: conv.id === activeId ? "var(--color-snu-yellow)" : "var(--color-muted)" }} />
                 <div className="min-w-0 flex-1">
@@ -95,32 +104,40 @@ export default function Sidebar({ conversations, activeId, onSelect, onNew, onDe
                 </div>
               </div>
 
-              {/* Delete button */}
-              {(hoveredId === conv.id || conv.id === activeId || deletingId === conv.id) && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (deletingId === conv.id) {
-                      onDelete(conv.id);
-                      setDeletingId(null);
-                    } else {
-                      setDeletingId(conv.id);
-                    }
+              {/* 3 dots action button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDropdownOpenId(dropdownOpenId === conv.id ? null : conv.id);
+                }}
+                className="absolute right-2 p-1 rounded-lg text-color-muted hover:text-color-text hover:bg-[var(--color-surface-hover)] transition-all"
+                title="Conversation actions"
+              >
+                <MoreHorizontal className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Dropdown Menu */}
+              {dropdownOpenId === conv.id && (
+                <div 
+                  className="absolute right-2 top-9 z-50 w-36 rounded-xl border shadow-xl py-1 text-left animate-in fade-in slide-in-from-top-1 duration-100"
+                  style={{ 
+                    background: "var(--color-bg)", 
+                    borderColor: "var(--color-border)" 
                   }}
-                  className={`absolute right-2 py-1 px-1.5 rounded-lg transition-all ${
-                    deletingId === conv.id
-                      ? "bg-red-500/10 text-red-400 scale-100 opacity-100 z-10"
-                      : "opacity-0 group-hover:opacity-100 text-color-muted hover:text-red-400"
-                  }`}
-                  style={deletingId !== conv.id ? { color: "var(--color-muted)" } : undefined}
-                  title={deletingId === conv.id ? "Click again to confirm" : "Delete conversation"}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  {deletingId === conv.id ? (
-                    <span className="text-[9px] font-black tracking-wider uppercase">Confirm?</span>
-                  ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(conv.id);
+                      setDropdownOpenId(null);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-500/10 transition-colors text-left font-medium"
+                  >
                     <Trash2 className="w-3.5 h-3.5" />
-                  )}
-                </button>
+                    Delete Chat
+                  </button>
+                </div>
               )}
             </div>
           ))

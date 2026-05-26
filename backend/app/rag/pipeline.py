@@ -109,6 +109,29 @@ def save_qa_to_vectorstore(query: str, answer: str):
         print(f"[Learning] Failed to save Q&A: {e}")
 
 
+async def _fetch_web_results(query: str, max_results: int = 5) -> list[dict]:
+    """Fetch top web results using DuckDuckGo (no API key required).
+    Returns a list of {title, url, snippet} dicts.
+    """
+    try:
+        from duckduckgo_search import DDGS
+        results = []
+        with DDGS() as ddgs:
+            for r in ddgs.text(query, max_results=max_results):
+                results.append({
+                    "title": r.get("title", ""),
+                    "url": r.get("href", ""),
+                    "snippet": r.get("body", ""),
+                })
+        return results
+    except ImportError:
+        print("[WebSearch] duckduckgo_search not installed. Run: pip install duckduckgo-search")
+        return []
+    except Exception as e:
+        print(f"[WebSearch] DuckDuckGo search failed: {e}")
+        return []
+
+
 async def generate_streaming_response(
     query: str,
     history: Optional[list] = None,
@@ -116,6 +139,7 @@ async def generate_streaming_response(
     user_ip: Optional[str] = None,
     regenerate: Optional[bool] = False,
     previous_response: Optional[str] = None,
+    web_search: bool = False,
 ):
     if history is None:
         history = []
@@ -175,7 +199,7 @@ async def generate_streaming_response(
 
 
         # Format DB docs for the prompt
-        context_str = "--- DATABASE DOCUMENTS ---\n"
+        context_str = "--- DATABASE DOCUMENTS (SNU Knowledge Base) ---\n"
         context_str += format_docs(positive_docs) if positive_docs else "(No documents retrieved)"
 
         # Add negative feedback reinforcement if present to guide the model
@@ -184,6 +208,21 @@ async def generate_streaming_response(
             context_str += "The following answers previously received negative student feedback for this or similar queries. Do NOT repeat these responses or replicate their structure/errors:\n"
             for ndoc in negative_docs:
                 context_str += f"- {ndoc.page_content}\n"
+
+        # ── Optional Web Search Layer ─────────────────────────────────────────
+        web_results_data = []
+        if web_search:
+            print(f"[WebSearch] Fetching live web results for: {query}")
+            web_results_data = await _fetch_web_results(query, max_results=5)
+            if web_results_data:
+                context_str += "\n\n--- LIVE WEB SEARCH RESULTS ---\n"
+                context_str += "The following results were fetched live from the web to supplement the knowledge base:\n\n"
+                for i, r in enumerate(web_results_data, 1):
+                    context_str += f"{i}. **{r['title']}**\n"
+                    context_str += f"   URL: {r['url']}\n"
+                    context_str += f"   {r['snippet']}\n\n"
+            else:
+                context_str += "\n\n--- LIVE WEB SEARCH RESULTS ---\n(No web results could be retrieved at this time)"
 
         web_results = ""
 
@@ -212,18 +251,30 @@ async def generate_streaming_response(
             else:
                 full_context += "\n\nPlease re-read the database documents carefully, revalidate the information, and re-frame the answer with improved structure, clarity, and precision."
 
-        # Build sources — deduped by filename, max 8
+        # Build sources — DB docs (deduped by filename, max 5) + web results
         seen_sources: set = set()
         sources_data = []
         for doc in positive_docs:
             src = doc.metadata.get("source", "")
             key = src.split("/")[-1].split("\\")[-1]
-            if key and key not in seen_sources and len(sources_data) < 8:
+            if key and key not in seen_sources and len(sources_data) < 5:
                 seen_sources.add(key)
                 sources_data.append({
                     "content": doc.page_content[:120],
-                    "metadata": doc.metadata
+                    "metadata": doc.metadata,
+                    "source_type": "db",
                 })
+
+        # Append web results as sources (max 5)
+        for r in web_results_data[:5]:
+            sources_data.append({
+                "content": r["snippet"][:120],
+                "metadata": {
+                    "source": r["url"],
+                    "title": r["title"],
+                },
+                "source_type": "web",
+            })
 
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 

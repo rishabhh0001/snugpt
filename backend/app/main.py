@@ -136,6 +136,7 @@ async def chat(request: ChatRequest, fastapi_request: Request):
             user_ip=user_ip,
             regenerate=request.regenerate,
             previous_response=request.previous_response,
+            web_search=request.web_search or False,
         ),
         media_type="text/event-stream",
         headers={
