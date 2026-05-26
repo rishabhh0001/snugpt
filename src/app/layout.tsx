@@ -20,6 +20,20 @@ export const metadata: Metadata = {
     title: "SNUGPT",
     description: "AI assistant for Shiv Nadar University students and parents.",
     type: "website",
+    images: [
+      {
+        url: "/avatar.svg",
+        width: 512,
+        height: 512,
+        alt: "SNUGPT Logo",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SNUGPT",
+    description: "AI assistant for Shiv Nadar University students and parents.",
+    images: ["/avatar.svg"],
   },
   verification: {
     google: "google-site-verification-placeholder", // Replace with your actual Google Search Console code
