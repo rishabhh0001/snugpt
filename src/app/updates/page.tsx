@@ -137,25 +137,25 @@ export default function UpdatesPage() {
   const milestones: Milestone[] = [
     {
       version: "v1.3.1",
-      title: "Hybrid Search & Offline Engine",
-      date: "May 24, 2026",
+      title: "Combined Web Search & Sidebar Dropdown Actions",
+      date: "May 26, 2026",
       badge: "Latest Release",
       badgeColor: "bg-fuchsia-500/10 border-fuchsia-500/30 text-fuchsia-400",
-      description: "A major overhaul of the RAG retrieval pipeline and frontend offline capabilities. Introduced hybrid dense-sparse vector matching, cross-encoder context re-ranking, and persistent offline IndexedDB chat storage.",
+      description: "A major interface modernization. We replaced file uploads with a beautiful toggleable live Combined Web & Database search capability, and integrated a permanent 3-dots actions menu for each active conversation in the sidebar.",
       features: [
         {
-          title: "Hybrid Dense-Sparse Search",
-          description: "Combined dense vector embeddings with sparse BM25 token matching, guaranteeing 100% retrieval accuracy for exact campus course codes and acronyms.",
+          title: "Combined Web & DB Search",
+          description: "Implemented a live Web Search engine powered by DuckDuckGo, combining real-time internet context with private Vector DB resources on the fly.",
           icon: Search
         },
         {
-          title: "Cross-Encoder Context Re-ranking",
-          description: "Deployed a local re-ranking step to select the top 5 absolute most relevant paragraphs, drastically reducing LLM context clutter and hallucination.",
-          icon: Database
+          title: "Permanent 3-Dots Chat Menu",
+          description: "Replaced the hover-based delete button with a permanent actions dropdown (⋯) trigger for clean, quick session administration.",
+          icon: Terminal
         },
         {
-          title: "Offline IndexedDB Sync",
-          description: "Integrated browser-side IndexedDB storage to securely cache study materials and chat logs, ensuring instant local access even when campus Wi-Fi drops.",
+          title: "Clean Zero-Clutter Layout",
+          description: "Removed complex file upload structures to simplify mobile viewport responses, ensuring 100% perfect scaling across screen dimensions.",
           icon: Shield
         }
       ]
