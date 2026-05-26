@@ -110,26 +110,75 @@ def save_qa_to_vectorstore(query: str, answer: str):
 
 
 async def _fetch_web_results(query: str, max_results: int = 5) -> list[dict]:
-    """Fetch top web results using DuckDuckGo (no API key required).
+    """Fetch top web results using a highly robust DDG HTML scraper to guarantee delivery.
     Returns a list of {title, url, snippet} dicts.
     """
-    try:
-        from duckduckgo_search import DDGS
-        results = []
-        with DDGS() as ddgs:
-            for r in ddgs.text(query, max_results=max_results):
-                results.append({
-                    "title": r.get("title", ""),
-                    "url": r.get("href", ""),
-                    "snippet": r.get("body", ""),
-                })
-        return results
-    except ImportError:
-        print("[WebSearch] duckduckgo_search not installed. Run: pip install duckduckgo-search")
-        return []
-    except Exception as e:
-        print(f"[WebSearch] DuckDuckGo search failed: {e}")
-        return []
+    import urllib.request
+    import urllib.parse
+    import re
+    
+    # Run in a thread pool as it performs synchronous I/O
+    def _sync_scrape():
+        try:
+            from bs4 import BeautifulSoup
+            url = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote(query)
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=8) as response:
+                html = response.read().decode('utf-8')
+                
+            soup = BeautifulSoup(html, 'html.parser')
+            results = []
+            for a in soup.find_all('a', class_='result__snippet'):
+                parent = a.parent
+                if not parent or not parent.parent:
+                    continue
+                parent = parent.parent
+                title_elem = parent.find('a', class_='result__url')
+                if title_elem:
+                    title = title_elem.text.strip()
+                    href = str(title_elem.get('href', ''))
+                    
+                    # Decode DDG redirect URL if present
+                    if href.startswith('//duckduckgo.com/l/?kh=-1&uddg='):
+                        href = urllib.parse.unquote(href.split('uddg=')[1].split('&')[0])
+                    elif 'uddg=' in href:
+                        href = urllib.parse.unquote(href.split('uddg=')[1].split('&')[0])
+                    
+                    if not href.startswith('http'):
+                        href = 'https://' + href.lstrip('/')
+                        
+                    results.append({
+                        "title": title,
+                        "url": href,
+                        "snippet": a.text.strip()
+                    })
+                    if len(results) >= max_results:
+                        break
+            return results
+        except Exception as html_err:
+            print(f"[WebSearch] Custom DDG HTML scrape failed: {html_err}")
+            # Fallback to standard package if scraping fails
+            try:
+                from duckduckgo_search import DDGS
+                fallback_results = []
+                with DDGS() as ddgs:
+                    for r in ddgs.text(query, max_results=max_results):
+                        fallback_results.append({
+                            "title": r.get("title", ""),
+                            "url": r.get("href", ""),
+                            "snippet": r.get("body", ""),
+                        })
+                return fallback_results
+            except Exception as e:
+                print(f"[WebSearch] Fallback duckduckgo_search also failed: {e}")
+                return []
+
+    return await asyncio.to_thread(_sync_scrape)
 
 
 async def generate_streaming_response(
