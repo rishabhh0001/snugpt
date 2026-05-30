@@ -2,6 +2,7 @@ import os
 import re
 import asyncio
 import json
+import logging
 from typing import Optional
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from app.rag.prompts import qa_prompt
@@ -10,6 +11,8 @@ from app.config import settings
 from app.rag.cache import search_cache, save_to_cache
 
 import threading
+
+logger = logging.getLogger(__name__)
 
 # Lazy initialization of LLM to prevent startup crashes
 _llm = None
@@ -104,9 +107,9 @@ def save_qa_to_vectorstore(query: str, answer: str):
     """Persist a Q&A pair back into ChromaDB so the bot learns from real conversations."""
     try:
         add_qa_pair(query, answer)
-        print("[Learning] Saved Q&A to vectorstore.")
+        logger.info("[Learning] Saved Q&A to vectorstore.")
     except Exception as e:
-        print(f"[Learning] Failed to save Q&A: {e}")
+        logger.error("[Learning] Failed to save Q&A: %s", e)
 
 
 async def _fetch_web_results(query: str, max_results: int = 5) -> list[dict]:
@@ -126,34 +129,37 @@ async def _fetch_web_results(query: str, max_results: int = 5) -> list[dict]:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 results = []
                 for a in soup.find_all('a', class_='result__snippet'):
-                    parent = a.parent
-                    if not parent or not parent.parent:
-                        continue
-                    parent = parent.parent
-                    title_elem = parent.find('a', class_='result__url')
-                    if title_elem:
-                        title = title_elem.text.strip()
-                        href = str(title_elem.get('href', ''))
-                        
-                        if href.startswith('//duckduckgo.com/l/?kh=-1&uddg='):
-                            href = urllib.parse.unquote(href.split('uddg=')[1].split('&')[0])
-                        elif 'uddg=' in href:
-                            href = urllib.parse.unquote(href.split('uddg=')[1].split('&')[0])
-                        
-                        if not href.startswith('http'):
-                            href = 'https://' + href.lstrip('/')
+                    try:
+                        parent = a.parent
+                        if not parent or not parent.parent:
+                            continue
+                        parent = parent.parent
+                        title_elem = parent.find('a', class_='result__url')
+                        if title_elem:
+                            title = title_elem.text.strip()
+                            href = str(title_elem.get('href', ''))
                             
-                        results.append({
-                            "title": title,
-                            "url": href,
-                            "snippet": a.text.strip()
-                        })
-                        if len(results) >= max_results:
-                            break
+                            if href.startswith('//duckduckgo.com/l/?kh=-1&uddg='):
+                                href = urllib.parse.unquote(href.split('uddg=')[1].split('&')[0])
+                            elif 'uddg=' in href:
+                                href = urllib.parse.unquote(href.split('uddg=')[1].split('&')[0])
+                            
+                            if not href.startswith('http'):
+                                href = 'https://' + href.lstrip('/')
+                                
+                            results.append({
+                                "title": title,
+                                "url": href,
+                                "snippet": a.text.strip()
+                            })
+                            if len(results) >= max_results:
+                                break
+                    except Exception as parse_err:
+                        logger.warning("[WebSearch] Failed parsing individual result snippet: %s", parse_err)
                 if results:
                     return results
     except Exception as e:
-        print(f"[WebSearch] Async DDG scrape failed: {e}")
+        logger.error("[WebSearch] Async DDG scrape failed: %s", e)
 
     try:
         from duckduckgo_search import DDGS
@@ -166,7 +172,7 @@ async def _fetch_web_results(query: str, max_results: int = 5) -> list[dict]:
                 } for r in ddgs.text(query, max_results=max_results)]
         return await asyncio.to_thread(_fallback)
     except Exception as err:
-        print(f"[WebSearch] Fallback duckduckgo_search failed: {err}")
+        logger.error("[WebSearch] Fallback duckduckgo_search failed: %s", err)
         return []
 
 
@@ -209,48 +215,41 @@ async def generate_streaming_response(
             return
 
     try:
-        # Get relevant documents from DB (fetch candidate pool for re-ranking)
         try:
             enhanced_query = preprocess_temporal_query(query)
-            print(f"[Temporal Query Expansion] Query: '{query}' -> Enhanced: '{enhanced_query}'")
+            logger.info("[Temporal Query Expansion] Query: '%s' -> Enhanced: '%s'", query, enhanced_query)
             docs = await asyncio.to_thread(retrieve_documents, enhanced_query, k=15)
         except Exception as e:
-            print(f"Retriever error: {e}")
+            logger.error("Retriever error: %s", e)
             docs = []
 
-        # Filter out positive vs negative feedback documents
         positive_docs = []
         negative_docs = []
         for doc in docs:
-            # Check metadata for chat_learning source and thumbs down
             if doc.metadata.get("source") == "chat_learning" and doc.metadata.get("feedback") == "down":
                 negative_docs.append(doc)
             else:
                 positive_docs.append(doc)
 
-        # Re-rank positive documents using Cross-Encoder to select top 5 most relevant
         try:
             positive_docs = await rerank_documents(query, positive_docs, top_n=5)
         except Exception as re_err:
-            print(f"Reranking error: {re_err}")
+            logger.error("Reranking error: %s", re_err)
             positive_docs = positive_docs[:5]
 
 
-        # Format DB docs for the prompt
         context_str = "--- DATABASE DOCUMENTS (SNU Knowledge Base) ---\n"
         context_str += format_docs(positive_docs) if positive_docs else "(No documents retrieved)"
 
-        # Add negative feedback reinforcement if present to guide the model
         if negative_docs:
             context_str += "\n\n--- CRITICAL: AVOID THESE ANSWERS (STUDENT NEGATIVE FEEDBACK) ---\n"
             context_str += "The following answers previously received negative student feedback for this or similar queries. Do NOT repeat these responses or replicate their structure/errors:\n"
             for ndoc in negative_docs:
                 context_str += f"- {ndoc.page_content}\n"
 
-        # ── Optional Web Search Layer ─────────────────────────────────────────
         web_results_data = []
         if web_search:
-            print(f"[WebSearch] Fetching live web results for: {query}")
+            logger.info("[WebSearch] Fetching live web results for: %s", query)
             web_results_data = await _fetch_web_results(query, max_results=5)
             if web_results_data:
                 context_str += "\n\n--- LIVE WEB SEARCH RESULTS ---\n"
@@ -264,7 +263,6 @@ async def generate_streaming_response(
 
         web_results = ""
 
-        # Build conversation history (last 6 turns max)
         history_str = ""
         if history:
             recent = history[-6:]
@@ -289,7 +287,6 @@ async def generate_streaming_response(
             else:
                 full_context += "\n\nPlease re-read the database documents carefully, revalidate the information, and re-frame the answer with improved structure, clarity, and precision."
 
-        # Build sources — DB docs (deduped by filename, max 5) + web results
         seen_sources: set = set()
         sources_data = []
         for doc in positive_docs:
@@ -303,7 +300,6 @@ async def generate_streaming_response(
                     "source_type": "db",
                 })
 
-        # Append web results as sources (max 5)
         for r in web_results_data[:5]:
             sources_data.append({
                 "content": r["snippet"][:120],
@@ -316,14 +312,12 @@ async def generate_streaming_response(
 
         yield f'data: {{"type": "sources", "data": {json.dumps(sources_data)}}}\n\n'
 
-        # Prepare and stream LLM response
         api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
         if not api_key:
             yield f'data: {{"type": "chunk", "text": "NVIDIA API Key is not configured. Please contact the administrator."}}\n\n'
             yield f'data: {{"type": "done"}}\n\n'
             return
 
-        # Elevate temperature slightly for regeneration to encourage creative re-framing and detailed revalidation
         if regenerate:
             llm = ChatNVIDIA(
                 model="meta/llama-3.1-8b-instruct",
@@ -354,7 +348,6 @@ async def generate_streaming_response(
         elif full_response and len(full_response) > 30:
             from app.models.chat_log import save_chat_log
 
-            # Persist concurrently before stream ends
             async def _log_chat():
                 try:
                     await save_chat_log(
@@ -366,19 +359,17 @@ async def generate_streaming_response(
                         log_id=log_id,
                     )
                 except Exception as log_err:
-                    print(f"Chat log save failed: {log_err}")
+                    logger.error("Chat log save failed: %s", log_err)
 
-            # Vector learning is now triggered on explicit user feedback (thumbs up / thumbs down)
             await asyncio.gather(_log_chat())
             
-            # Save the fully generated response to Semantic Cache
             if full_response.strip() and not regenerate:
                 await save_to_cache(query, full_response.strip())
 
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
-        print(f"Pipeline error: {error_details}")
+        logger.error("Pipeline error: %s", error_details)
         error_msg = "Neural Engine Error: An internal system error occurred. Please try again later."
         yield f'data: {{"type": "chunk", "text": {json.dumps(error_msg)}}}\n\n'
 
