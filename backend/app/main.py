@@ -151,7 +151,6 @@ async def chat(request: ChatRequest, fastapi_request: Request):
 @app.post("/api/contact")
 async def contact(request: ContactRequest):
     try:
-        # 1. Save contact message to Neon SQL Database
         message_id = await save_contact_message(
             name=request.name,
             email=request.email,
@@ -159,7 +158,6 @@ async def contact(request: ContactRequest):
             message=request.message
         )
 
-        # 2. Initiate Google Apps Script to send emails if URL is configured
         if settings.contact_apps_script_url:
             import requests
             def send_email_webhook():
@@ -170,13 +168,11 @@ async def contact(request: ContactRequest):
                     "message": request.message
                 }
                 try:
-                    # POST to Google Apps Script Web App URL
                     response = requests.post(settings.contact_apps_script_url, json=payload, timeout=12)
                     logger.info("Google Apps Script webhook trigger response: %s", response.status_code)
                 except Exception as ex:
                     logger.error("Failed to call Google Apps Script webhook: %s", ex)
 
-            # Fire-and-forget in background thread to keep API response sub-second
             await asyncio.to_thread(send_email_webhook)
         else:
             logger.warning("CONTACT_APPS_SCRIPT_URL not configured. Direct logging completed without email dispatch.")
@@ -201,7 +197,6 @@ async def authenticate(request: AuthRequest):
     try:
         user = await get_user_by_email(email)
         if user:
-            # Secure dynamic password check
             is_valid = await verify_and_upgrade_user_password(user, password)
             if is_valid:
                 return {
@@ -212,7 +207,6 @@ async def authenticate(request: AuthRequest):
             else:
                 raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
         else:
-            # Registration check (Auto Sign up)
             new_user = await create_user(email, password)
             return {
                 "id": new_user["id"],
@@ -230,14 +224,12 @@ async def authenticate(request: AuthRequest):
 @app.post("/api/chat/feedback")
 async def chat_feedback(request: FeedbackRequest):
     try:
-        # 1. Save feedback event to SQL database
         await save_chat_feedback(
             chat_id=request.chat_id,
             action=request.action,
             message_id=request.message_id
         )
 
-        # 2. Reinforce Vector store (ChromaDB) if the feedback is positive or negative
         if request.action in ("up", "down") and request.message_id:
             db = get_database()
             query_select = "SELECT user_query, ai_response FROM chat_logs WHERE id = :id"
@@ -245,7 +237,6 @@ async def chat_feedback(request: FeedbackRequest):
             if row:
                 user_query = row["user_query"]
                 ai_response = row["ai_response"]
-                # Save to vector store in a background thread to prevent request blocking
                 await asyncio.to_thread(add_qa_pair, user_query, ai_response, request.action)
                 print(f"[Feedback Vectorstore] Reinforced vector DB for log {request.message_id} with action {request.action}")
             else:
@@ -262,17 +253,14 @@ async def share_chat(request: ShareChatRequest, fastapi_request: Request):
     try:
         share_id = str(uuid.uuid4())
         
-        # Determine origin for construction of frontend URL
         origin = fastapi_request.headers.get("origin")
         if not origin:
-            # Fallback to host header if origin isn't present
             host = fastapi_request.headers.get("host") or "snugpt.rishabhj.in"
             scheme = fastapi_request.url.scheme
             origin = f"{scheme}://{host}"
             
         share_url = f"{origin}/share/{share_id}"
         
-        # Generate clean base64 SVG QR code using vector rendering
         qr = qrcode.QRCode(
             version=1,
             box_size=10,
@@ -287,10 +275,8 @@ async def share_chat(request: ShareChatRequest, fastapi_request: Request):
         svg_bytes = stream.getvalue()
         base64_qr = f"data:image/svg+xml;base64,{base64.b64encode(svg_bytes).decode('utf-8')}"
         
-        # Serialize messages to dictionary format for database JSON field
         serialized_messages = [m.model_dump() for m in request.messages]
         
-        # Save chat snapshot to SQL database
         success = await save_shared_chat(
             share_id=share_id,
             messages=serialized_messages,
