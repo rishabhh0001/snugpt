@@ -154,9 +154,9 @@ export default function UpdatesPage() {
           icon: Cpu
         },
         {
-          title: "Elite Code Humanization & Casing Updates",
-          description: "Scrubbed noisy inline commentary (AI-isms) for code cleanliness, and updated quick university reference links to casing-aligned SNUxplore.",
-          icon: Database
+          title: "Secure Session Telemetry & Casing",
+          description: "Encrypts traceback metadata before DB persistence, protecting sensitive user tokens, while aligning quick university reference links to SNUxplore.",
+          icon: Lock
         }
       ]
     },
