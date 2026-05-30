@@ -171,3 +171,51 @@ async def get_shared_chat(share_id: str) -> Optional[dict]:
     return None
 
 
+class ErrorTelemetry(Base):
+    __tablename__ = "error_telemetry"
+
+    id = Column(String(36), primary_key=True)
+    error_id = Column(String(12), unique=True, index=True, nullable=False)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    reason = Column(Text, nullable=True)
+    what_caused = Column(Text, nullable=True)
+    user_query = Column(Text, nullable=True)
+    user_ip = Column(String(45), nullable=True)
+    user_details = Column(JSON, nullable=True)
+
+
+async def save_error_telemetry(
+    error_id: str,
+    reason: str,
+    what_caused: str,
+    query: str,
+    user_ip: Optional[str] = None,
+    user_details: Optional[dict] = None,
+):
+    """Save an error telemetry report to the Neon SQL database."""
+    if not is_database_connected():
+        logger.warning("Database not connected; skipping error telemetry save.")
+        return
+
+    db = get_database()
+    query_insert = """
+    INSERT INTO error_telemetry (id, error_id, timestamp, reason, what_caused, user_query, user_ip, user_details)
+    VALUES (:id, :error_id, CURRENT_TIMESTAMP, :reason, :what_caused, :user_query, :user_ip, :user_details)
+    """
+
+    values = {
+        "id": str(uuid.uuid4()),
+        "error_id": error_id,
+        "reason": reason,
+        "what_caused": what_caused,
+        "user_query": query,
+        "user_ip": user_ip,
+        "user_details": user_details,
+    }
+
+    try:
+        await db.execute(query=query_insert, values=values)
+    except Exception as e:
+        logger.error("Failed to save error telemetry: %s", e)
+
+

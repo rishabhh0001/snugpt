@@ -9,6 +9,8 @@ from app.rag.prompts import qa_prompt
 from app.rag.vectorstore import add_qa_pair, retrieve_documents, rerank_documents
 from app.config import settings
 from app.rag.cache import search_cache, save_to_cache
+from app.models.chat_log import save_error_telemetry
+from app.utils.email import send_error_email
 
 import threading
 
@@ -184,6 +186,7 @@ async def generate_streaming_response(
     regenerate: Optional[bool] = False,
     previous_response: Optional[str] = None,
     web_search: bool = False,
+    user_email: Optional[str] = None,
 ):
     if history is None:
         history = []
@@ -368,9 +371,46 @@ async def generate_streaming_response(
 
     except Exception as e:
         import traceback
+        import secrets
         error_details = traceback.format_exc()
         logger.error("Pipeline error: %s", error_details)
-        error_msg = "Neural Engine Error: An internal system error occurred. Please try again later."
+        
+        # Generate clean 6-digit alphanumeric error ID
+        error_id = "".join(secrets.choice("0123456789ABCDEF") for _ in range(6))
+        
+        async def _log_error():
+            try:
+                await save_error_telemetry(
+                    error_id=error_id,
+                    reason=str(e),
+                    what_caused=error_details,
+                    query=query,
+                    user_ip=user_ip or "unknown",
+                    user_details={"email": user_email} if user_email else None
+                )
+            except Exception as db_err:
+                logger.error("Failed to save error telemetry: %s", db_err)
+            try:
+                await send_error_email(
+                    error_id=error_id,
+                    reason=str(e),
+                    what_caused=error_details,
+                    query=query,
+                    user_ip=user_ip or "unknown",
+                    user_email=user_email
+                )
+            except Exception as email_err:
+                logger.error("Failed to send error notification: %s", email_err)
+
+        # Run telemetry operations in the background concurrently
+        await asyncio.gather(_log_error())
+
+        error_msg = (
+            f"❌ **Neural Engine Error**: An internal system error occurred. Please try again later.\n\n"
+            f"**Error ID:** `{error_id}`\n\n"
+            f"If this issue persists, please [report it to us via the Contact Page](/contact) "
+            f"along with the Error ID so we can resolve it."
+        )
         yield f'data: {{"type": "chunk", "text": {json.dumps(error_msg)}}}\n\n'
 
     finally:

@@ -293,6 +293,7 @@ export default function ChatInterface() {
           regenerate: !!isRegenerate,
           previous_response: previousResponse || undefined,
           web_search: isWebSearch,
+          user_email: session?.user?.email || undefined,
         }),
       });
 
