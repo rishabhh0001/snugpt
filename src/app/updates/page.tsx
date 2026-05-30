@@ -924,7 +924,7 @@ export default function UpdatesPage() {
               © {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.
             </span>
             <span className="text-[8px] font-mono tracking-widest text-white/10 uppercase">
-              BUILD_ID: V1.3.2 &bull; Delhi-NCR
+              BUILD_ID: V1.3.2 &bull; Build 194 &bull; Delhi-NCR
             </span>
           </div>
         </div>
