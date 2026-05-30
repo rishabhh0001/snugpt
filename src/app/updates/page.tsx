@@ -136,10 +136,35 @@ export default function UpdatesPage() {
 
   const milestones: Milestone[] = [
     {
+      version: "v1.4.0",
+      title: "Alphanumeric Error Telemetry & Automated Diagnostic Reporting",
+      date: "May 30, 2026",
+      badge: "Latest Release",
+      badgeColor: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+      description: "A premium stability and telemetry upgrade. Uncaught exceptions are now caught, logged as a 6-character Error ID, persisted to the database, and dispatched asynchronously via direct SMTP and webhook fallbacks to engineering. Reference links have also been corrected to use SNUxplore casing.",
+      features: [
+        {
+          title: "Alphanumeric Error IDs & Contact Links",
+          description: "Streams dynamic clickable Markdown warnings with a unique Error ID and direct reports link to /contact when exceptions occur.",
+          icon: Shield
+        },
+        {
+          title: "Asynchronous SMTP & Webhook Dispatch",
+          description: "Fires non-blocking background emails to rj910@snu.edu.in via SMTP and Google Apps Script triggers containing traceback diagnostic metadata.",
+          icon: Cpu
+        },
+        {
+          title: "Elite Code Humanization & Casing Updates",
+          description: "Scrubbed noisy inline commentary (AI-isms) for code cleanliness, and updated quick university reference links to casing-aligned SNUxplore.",
+          icon: Database
+        }
+      ]
+    },
+    {
       version: "v1.3.1",
       title: "Combined Web Search & Sidebar Dropdown Actions",
       date: "May 26, 2026",
-      badge: "Latest Release",
+      badge: "Update",
       badgeColor: "bg-fuchsia-500/10 border-fuchsia-500/30 text-fuchsia-400",
       description: "A major interface modernization. We replaced file uploads with a beautiful toggleable live Combined Web & Database search capability, and integrated a permanent 3-dots actions menu for each active conversation in the sidebar.",
       features: [
@@ -899,7 +924,7 @@ export default function UpdatesPage() {
               © {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.
             </span>
             <span className="text-[8px] font-mono tracking-widest text-white/10 uppercase">
-              BUILD_ID: V1.2.1 &bull; Delhi-NCR
+              BUILD_ID: V1.4.0 &bull; Delhi-NCR
             </span>
           </div>
         </div>
