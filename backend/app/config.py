@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     smtp_from_email: str | None = None
     smtp_from_name: str | None = None
 
+    # Admin Settings
+    admin_emails: str = "rj910@snu.edu.in,rishabh.joshi260905@gmail.com"
+
+
 
 
 settings = Settings()

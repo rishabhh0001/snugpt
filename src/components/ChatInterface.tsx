@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { SquarePen } from "lucide-react";
+import { SquarePen, ShieldCheck, UploadCloud, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MessageBubble, { MessageProps } from "./MessageBubble";
 import { useConversations } from "./useConversations";
 import Sidebar from "./Sidebar";
 import { PureMultimodalInput } from "@/components/ui/multimodal-ai-chat-input";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+
 
 export default function ChatInterface() {
   const { conversations, activeId, activeConversation, setActiveId, createNew, updateMessages, deleteConversation } =
@@ -19,6 +21,73 @@ export default function ChatInterface() {
   const [isOnline, setIsOnline] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const { data: session } = useSession();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [adminTitle, setAdminTitle] = useState("");
+  const [adminContent, setAdminContent] = useState("");
+  const [isAdminUploading, setIsAdminUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<{ type: "success" | "error" | null; msg: string }>({ type: null, msg: "" });
+
+  useEffect(() => {
+    async function checkAdminStatus() {
+      if (!session?.user?.email) {
+        setIsAdmin(false);
+        return;
+      }
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
+          ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/admin-check`
+          : "/_/backend/api/auth/admin-check";
+        const res = await fetch(`${backendUrl}?email=${encodeURIComponent(session.user.email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data.is_admin);
+        }
+      } catch (err) {
+        console.error("Admin status check failed:", err);
+      }
+    }
+    checkAdminStatus();
+  }, [session]);
+
+  const handleAdminUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminTitle.trim() || !adminContent.trim() || !session?.user?.email) return;
+
+    setIsAdminUploading(true);
+    setUploadStatus({ type: null, msg: "" });
+
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/upload-knowledge`
+        : "/_/backend/api/admin/upload-knowledge";
+
+      const res = await fetch(backendUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: session.user.email,
+          title: adminTitle,
+          content: adminContent
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setUploadStatus({ type: "success", msg: data.message || "Knowledge uploaded successfully!" });
+        setAdminTitle("");
+        setAdminContent("");
+      } else {
+        setUploadStatus({ type: "error", msg: data.detail || "Failed to upload knowledge." });
+      }
+    } catch (err: any) {
+      setUploadStatus({ type: "error", msg: err.message || "A network error occurred." });
+    } finally {
+      setIsAdminUploading(false);
+    }
+  };
 
   const messages: MessageProps[] = activeConversation?.messages ?? [];
 
@@ -514,6 +583,105 @@ export default function ChatInterface() {
             </AnimatePresence>
           </div>
         </div>
+
+        {/* Admin Knowledge Portal Panel */}
+        {isAdmin && (
+          <div className="max-w-3xl mx-auto w-full px-2 sm:px-4 z-20 pb-2">
+            <div className="rounded-2xl border transition-all duration-300 backdrop-blur-xl overflow-hidden shadow-2xl"
+              style={{
+                borderColor: showAdminPanel ? "rgba(242, 169, 0, 0.4)" : "var(--color-border)",
+                background: showAdminPanel ? "rgba(10, 10, 10, 0.95)" : "rgba(255, 255, 255, 0.02)"
+              }}>
+              
+              {/* Header Toggle */}
+              <button
+                onClick={() => setShowAdminPanel(!showAdminPanel)}
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-white/[0.02]"
+                style={{ color: showAdminPanel ? "var(--color-snu-yellow)" : "var(--color-muted)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className={`w-4 h-4 ${showAdminPanel ? "text-amber-500 animate-pulse" : "text-color-muted"}`} />
+                  <span>🛡️ Admin Knowledge Portal (ChromaDB Cloud)</span>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                  {showAdminPanel ? "Collapse" : "Expand"}
+                </span>
+              </button>
+
+              {/* Collapsible Form */}
+              <AnimatePresence>
+                {showAdminPanel && (
+                  <motion.form
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    onSubmit={handleAdminUpload}
+                    className="p-4 border-t space-y-3.5"
+                    style={{ borderColor: "var(--color-border)" }}
+                  >
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold tracking-wider mb-1.5 text-color-muted">Document Title or Section</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. SNU Sports Complex Timings Expansion"
+                        value={adminTitle}
+                        onChange={(e) => setAdminTitle(e.target.value)}
+                        required
+                        disabled={isAdminUploading}
+                        className="w-full text-sm rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-2 focus:outline-none focus:border-amber-500/50 text-color-text placeholder:text-white/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold tracking-wider mb-1.5 text-color-muted">Knowledge Content / Policy Details</label>
+                      <textarea
+                        placeholder="Paste or write university rules, campus guidelines, or handbook sections here..."
+                        value={adminContent}
+                        onChange={(e) => setAdminContent(e.target.value)}
+                        required
+                        rows={4}
+                        disabled={isAdminUploading}
+                        className="w-full text-sm rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-2.5 focus:outline-none focus:border-amber-500/50 text-color-text placeholder:text-white/20 resize-none"
+                      />
+                    </div>
+
+                    {/* Status Alert */}
+                    {uploadStatus.type && (
+                      <div className={`p-3 rounded-xl border flex items-start gap-2.5 text-xs font-semibold ${
+                        uploadStatus.type === "success" 
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" 
+                          : "bg-red-500/10 border-red-500/30 text-red-400"
+                      }`}>
+                        {uploadStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />}
+                        <span>{uploadStatus.msg}</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-end gap-2.5 pt-1.5">
+                      <button
+                        type="submit"
+                        disabled={isAdminUploading || !adminTitle.trim() || !adminContent.trim()}
+                        className="px-4 py-2 rounded-xl text-xs font-bold tracking-wider uppercase transition-all flex items-center gap-1.5 bg-[#f2a900] text-[#002e5b] hover:bg-[#cc8e00] disabled:bg-white/5 disabled:text-white/20 disabled:border-transparent active:scale-95 cursor-pointer shadow-lg border-none"
+                      >
+                        {isAdminUploading ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Indexing...
+                          </>
+                        ) : (
+                          <>
+                            <UploadCloud className="w-3.5 h-3.5" />
+                            Ingest to ChromaDB
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
 
         {/* ── Input bar ── */}
         <div className="flex-shrink-0 px-2 sm:px-4 pb-3 sm:pb-4 pt-1.5 sm:pt-2 relative"

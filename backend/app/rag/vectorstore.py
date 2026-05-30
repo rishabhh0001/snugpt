@@ -206,14 +206,39 @@ def retrieve_documents(query: str, k: int = 4) -> List[Document]:
 def add_qa_pair(query: str, answer: str, feedback: str = "up") -> None:
     """Persist a learned Q&A pair to Chroma with feedback type (up or down)."""
     clear_bm25_cache()  # Clear cache to trigger re-indexing of learned QA
+    try:
+        # Delete existing entries with the same query to prevent vector store pollution
+        _get_collection().delete(where={"query": query})
+    except Exception as e:
+        logger.debug("Did not delete old duplicates: %s", e)
+
     text = f"Q: {query}\nA: {answer}"
     embedding = get_embeddings().embed_documents([text])[0]
     _get_collection().add(
         ids=[str(uuid.uuid4())],
         documents=[text],
-        metadatas=cast(Any, [{"source": "chat_learning", "type": "learned_qa", "feedback": feedback}]),
+        metadatas=cast(Any, [{"source": "chat_learning", "type": "learned_qa", "feedback": feedback, "query": query}]),
         embeddings=cast(Any, [embedding]),
     )
+
+
+def add_admin_document(content: str, title: str, source: str = "admin_upload") -> None:
+    """Index an administrative knowledge document directly into ChromaDB."""
+    clear_bm25_cache()
+    try:
+        # Prevent duplicate document titles
+        _get_collection().delete(where={"title": title})
+    except Exception as e:
+        logger.debug("Did not delete old document duplicate: %s", e)
+
+    embedding = get_embeddings().embed_documents([content])[0]
+    _get_collection().add(
+        ids=[str(uuid.uuid4())],
+        documents=[content],
+        metadatas=cast(Any, [{"source": source, "type": "admin_document", "title": title}]),
+        embeddings=cast(Any, [embedding]),
+    )
+
 
 
 def add_documents(documents: List[Document]) -> None:
