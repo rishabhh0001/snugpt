@@ -32,5 +32,5 @@ Welcome to the SNUGPT development roadmap. SNUGPT is an advanced, RAG-driven stu
 * `[ ]` **Campus Map Navigation**: Real-time directions and block placements mapped directly in the chat bubble.
 
 ### 🔒 Phase 5: Privacy & Scale Hardening
-* `[ ]` **Document Sanitization Pipeline**: Auto-anonymization of student details in chat logs to comply with strict student privacy guidelines.
-* `[ ]` **Distributed Vector Ingestions**: Multi-tenant database pooling for concurrent queries during admissions seasons.
+* `[x]` **Document Sanitization Pipeline**: Auto-anonymization of student details in chat logs to comply with strict student privacy guidelines.
+* `[x]` **Distributed Vector Ingestions**: Multi-tenant database pooling for concurrent queries during admissions seasons.
