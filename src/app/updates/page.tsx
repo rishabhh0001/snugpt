@@ -136,7 +136,7 @@ export default function UpdatesPage() {
 
   const milestones: Milestone[] = [
     {
-      version: "v1.4.0",
+      version: "v1.3.2",
       title: "Alphanumeric Error Telemetry & Automated Diagnostic Reporting",
       date: "May 30, 2026",
       badge: "Latest Release",
@@ -924,7 +924,7 @@ export default function UpdatesPage() {
               © {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.
             </span>
             <span className="text-[8px] font-mono tracking-widest text-white/10 uppercase">
-              BUILD_ID: V1.4.0 &bull; Delhi-NCR
+              BUILD_ID: V1.3.2 &bull; Delhi-NCR
             </span>
           </div>
         </div>
