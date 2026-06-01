@@ -1,7 +1,7 @@
 # <img src="./public/avatar.svg" width="48" align="center" style="vertical-align: middle;" /> SNUGPT — Delhi-NCR
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Release-v1.2%20(%2B74)-indigo?style=for-the-badge&logo=rocket" />
+  <img src="https://img.shields.io/badge/Release-v1.3.1%20(%2B192)-indigo?style=for-the-badge&logo=rocket" />
   <img src="https://img.shields.io/badge/Architecture-RAG-indigo?style=for-the-badge&logo=ai" />
   <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge&logo=fastapi" />
   <img src="https://img.shields.io/badge/Frontend-Next.js_16.2-black?style=for-the-badge&logo=nextdotjs" />
