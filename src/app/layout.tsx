@@ -70,8 +70,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="text-lg max-w-lg mx-auto" style={{ color: "var(--color-muted)" }}>
                 We are currently undergoing scheduled maintenance and rebuilding our knowledge base. 
                 <br/><br/>
-                SNUGPT will be back online by <strong>16/06/2026 02:00 PM</strong>. Thank you for your patience!
+                SNUGPT will be back online by <strong>18/06/2026 01:00 PM</strong>. Thank you for your patience!
               </p>
+              
+              <a 
+                href="https://rishabhj.in" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="mt-10 group relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold tracking-widest text-white uppercase transition-all duration-300 ease-out bg-[#0a0a0a] border border-[#f2a900]/30 rounded-full shadow-[0_0_15px_rgba(242,169,0,0.2)] hover:shadow-[0_0_30px_rgba(242,169,0,0.4)] hover:bg-[#111] hover:border-[#f2a900]/60 hover:-translate-y-1 active:translate-y-0 active:scale-95 overflow-hidden"
+              >
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
+                <span className="relative flex items-center gap-2 z-10" style={{ color: "var(--color-snu-yellow, #f2a900)" }}>
+                  Checkout My Portfolio 
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </span>
+              </a>
             </div>
           ) : (
             children
