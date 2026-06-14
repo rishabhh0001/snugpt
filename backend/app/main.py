@@ -238,8 +238,9 @@ async def chat_feedback(request: FeedbackRequest):
             if row:
                 user_query = row["user_query"]
                 ai_response = row["ai_response"]
-                await asyncio.to_thread(add_qa_pair, user_query, ai_response, request.action)
-                print(f"[Feedback Vectorstore] Reinforced vector DB for log {request.message_id} with action {request.action}")
+                # await asyncio.to_thread(add_qa_pair, user_query, ai_response, request.action)
+                # print(f"[Feedback Vectorstore] Reinforced vector DB for log {request.message_id} with action {request.action}")
+                print(f"[Maintenance] Auto-learning from chat is temporarily disabled for {request.message_id}")
             else:
                 logger.warning("Could not find chat log %s for reinforcing vector store.", request.message_id)
 
@@ -312,32 +313,5 @@ async def admin_check(email: str):
     allowed_admins = [e.strip().lower() for e in settings.admin_emails.split(",") if e.strip()]
     is_admin = email_clean in allowed_admins
     return {"is_admin": is_admin}
-
-
-from pydantic import BaseModel
-
-class AdminUploadRequest(BaseModel):
-    email: str
-    title: str
-    content: str
-
-
-@app.post("/api/admin/upload-knowledge")
-async def admin_upload_knowledge(request: AdminUploadRequest):
-    email_clean = request.email.strip().lower()
-    allowed_admins = [e.strip().lower() for e in settings.admin_emails.split(",") if e.strip()]
-    if email_clean not in allowed_admins:
-        raise HTTPException(status_code=403, detail="Unauthorized: Only admins can upload knowledge to ChromaDB.")
-    
-    if not request.title.strip() or not request.content.strip():
-        raise HTTPException(status_code=400, detail="Title and Content cannot be empty.")
-        
-    try:
-        from app.rag.vectorstore import add_admin_document
-        await asyncio.to_thread(add_admin_document, request.content, request.title)
-        return {"status": "success", "message": f"Successfully uploaded and indexed '{request.title}' into ChromaDB!"}
-    except Exception as e:
-        logger.error("Failed to upload admin knowledge to Chroma: %s", e)
-        raise HTTPException(status_code=500, detail=f"Database ingestion failure: {str(e)}")
 
 

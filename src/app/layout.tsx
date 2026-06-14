@@ -41,6 +41,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const isMaintenance = true;
   return (
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
       <head>
@@ -59,7 +60,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased">
         <Providers>
-          {children}
+          {isMaintenance ? (
+            <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center" style={{ backgroundColor: "var(--color-bg)", color: "var(--color-text)" }}>
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-6 border-2 shadow-xl"
+                    style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff", margin: "0 auto 1.5rem" }}>
+                <img src="/avatar.svg" alt="SNUGPT logo" className="w-full h-full object-cover" />
+              </div>
+              <h1 className="text-3xl font-bold mb-4" style={{ color: "var(--color-snu-yellow, #f2a900)" }}>System Under Maintenance</h1>
+              <p className="text-lg max-w-lg mx-auto" style={{ color: "var(--color-muted)" }}>
+                We are currently undergoing scheduled maintenance and rebuilding our knowledge base. 
+                <br/><br/>
+                SNUGPT will be back online by <strong>16/06/2026 02:00 PM</strong>. Thank you for your patience!
+              </p>
+            </div>
+          ) : (
+            children
+          )}
         </Providers>
         <Analytics />
       </body>
