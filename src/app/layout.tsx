@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const isMaintenance = true;
+  const isMaintenance = false;
   return (
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
       <head>

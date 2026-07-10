@@ -55,8 +55,8 @@ def index_documents(docs_dir: str):
     # 2. Chunking
     print("Splitting documents into chunks...")
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
+        chunk_size=800,
+        chunk_overlap=150,
         length_function=len,
         add_start_index=True,
     )

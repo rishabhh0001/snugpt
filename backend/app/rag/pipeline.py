@@ -240,6 +240,9 @@ async def generate_streaming_response(
             logger.error("Reranking error: %s", re_err)
             positive_docs = positive_docs[:5]
 
+        if not positive_docs or (positive_docs and positive_docs[0].metadata.get("rerank_score", 1.0) < -1.0):
+            logger.info("[Agentic RAG] Insufficient DB confidence or empty results. Automatically falling back to Web Search.")
+            web_search = True
 
         context_str = "--- DATABASE DOCUMENTS (SNU Knowledge Base) ---\n"
         context_str += format_docs(positive_docs) if positive_docs else "(No documents retrieved)"
