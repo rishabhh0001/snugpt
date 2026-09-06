@@ -3,9 +3,60 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { BookOpen, ThumbsUp, ThumbsDown, Copy, Check, RotateCw } from "lucide-react";
+import { BookOpen, ThumbsUp, ThumbsDown, Copy, Check, RotateCw, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShiningText } from "@/components/ui/shining-text";
+
+function getSmartQuestionsForMessage(content: string): string[] {
+  const text = content.toLowerCase();
+  if (text.includes("attendance") || text.includes("present") || text.includes("absent") || text.includes("partha")) {
+    return [
+      "What is the official minimum attendance requirement?",
+      "How do duty leave and medical certificates get approved?",
+      "Can course coordinators grant attendance relaxations?"
+    ];
+  }
+  if (text.includes("hostel") || text.includes("room") || text.includes("mess") || text.includes("dining")) {
+    return [
+      "What are the hostel gate timings and in-time rules?",
+      "How do I apply for a night-out pass on the hostel portal?",
+      "Where can I report room maintenance or mess complaints?"
+    ];
+  }
+  if (text.includes("exam") || text.includes("grade") || text.includes("gpa") || text.includes("ccc") || text.includes("clearance")) {
+    return [
+      "What is the procedure for clearing an I-grade?",
+      "When is the deadline to drop 1st half CCC courses?",
+      "How is the CGPA and relative grading curve calculated?"
+    ];
+  }
+  if (text.includes("club") || text.includes("breeze") || text.includes("surge") || text.includes("fest")) {
+    return [
+      "When are Breeze and Surge festivals scheduled?",
+      "How can I join or apply for student club positions?",
+      "Where can I find the directory of all campus clubs?"
+    ];
+  }
+  if (text.includes("library") || text.includes("lasc") || text.includes("tutor") || text.includes("book")) {
+    return [
+      "What are the Central Library opening and closing hours?",
+      "How can I join the LASC peer tutorial groups?",
+      "How do I reserve discussion rooms in the library?"
+    ];
+  }
+  if (text.includes("admission") || text.includes("apply") || text.includes("eligibility") || text.includes("fee")) {
+    return [
+      "What are the eligibility criteria and fees for SNU programs?",
+      "Where can I fill out the official SNU online application form?",
+      "What scholarships are available for new admissions?"
+    ];
+  }
+  return [
+    "Can you provide more specific details on this?",
+    "Where can I find the official student handbook policy?",
+    "Who is the point of contact on campus for this?"
+  ];
+}
 
 export interface SourceDocument {
   content: string;
@@ -384,29 +435,48 @@ export default function MessageBubble({
           </div>
         )}
         
-        {/* Follow-up Suggestions */}
-        {!isUser && message.follow_ups && message.follow_ups.length > 0 && isLast && !isTyping && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col gap-2 mt-4"
-          >
-            {message.follow_ups.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => onFollowUpClick && onFollowUpClick(q)}
-                className="text-left px-4 py-2 text-[12.5px] rounded-xl border transition-all hover:bg-yellow-500/10 active:scale-[0.98]"
-                style={{
-                  background: "var(--color-surface)",
-                  borderColor: "rgba(242,169,0,0.2)",
-                  color: "var(--color-text-warning, #f2a900)"
-                }}
-              >
-                {q}
-              </button>
-            ))}
-          </motion.div>
-        )}
+        {/* Smart Follow-up Questions (Shown after each AI answer) */}
+        {!isUser && isLast && !isTyping && (() => {
+          const followUps =
+            message.follow_ups && message.follow_ups.length > 0
+              ? message.follow_ups
+              : message.content.length > 15
+              ? getSmartQuestionsForMessage(message.content)
+              : [];
+
+          if (followUps.length === 0) return null;
+
+          return (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col gap-2 mt-4 pt-3 border-t"
+              style={{ borderColor: "rgba(255,255,255,0.07)" }}
+            >
+              <div className="flex items-center gap-1.5 text-[11px] font-medium tracking-wide uppercase select-none opacity-80" style={{ color: "var(--color-text-warning, #f2a900)" }}>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Smart Questions</span>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {followUps.map((q, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => onFollowUpClick && onFollowUpClick(q)}
+                    className="text-left px-3.5 py-2 text-[12.5px] rounded-xl border transition-all hover:bg-yellow-500/10 active:scale-[0.98] cursor-pointer flex items-center justify-between group"
+                    style={{
+                      background: "var(--color-surface)",
+                      borderColor: "rgba(242,169,0,0.2)",
+                      color: "var(--color-text-warning, #f2a900)"
+                    }}
+                  >
+                    <span>{q}</span>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-mono">↵</span>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          );
+        })()}
       </div>
     </motion.div>
   );

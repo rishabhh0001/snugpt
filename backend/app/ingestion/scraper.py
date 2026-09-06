@@ -8,13 +8,12 @@ import time
 # ── Config ────────────────────────────────────────────────────────────────────
 BASE_URLS = [
     "https://snu.edu.in",
-    "https://snu.edu.in/admissions",
+    "https://snuadmissions.com/?utm_source=SEO&utm_medium=Organic&utm_campaign=WebApplyNow",
     "https://snu.edu.in/academics",
     "https://snu.edu.in/campus-life",
     "https://snu.edu.in/home/mandatory-disclosure",
     "https://snu.edu.in/schools",
     "https://snu.edu.in/research",
-    "https://snuadmissions.com",
     "https://rslookup.abs.moe/",
     "https://snulinks.snu.edu.in/application/student-policy",
     "https://wiki.snu.edu.in/index.php?title=Main_Page",

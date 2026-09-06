@@ -1,131 +1,167 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import createGlobe, { type COBEOptions } from "cobe";
-import { useMotionValue, useSpring } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const MOVEMENT_DAMPING = 1400;
-
-const GLOBE_CONFIG: COBEOptions = {
-  width: 800,
-  height: 800,
+const DEFAULT_CONFIG: Omit<COBEOptions, "width" | "height"> = {
   devicePixelRatio: 2,
   phi: 0,
   theta: 0.3,
-  dark: 0,
-  diffuse: 0.4,
+  dark: 1,
+  diffuse: 1.2,
   mapSamples: 16000,
-  mapBrightness: 1.2,
-  baseColor: [1, 1, 1],
-  markerColor: [251 / 255, 100 / 255, 21 / 255],
-  glowColor: [1, 1, 1],
+  mapBrightness: 6,
+  baseColor: [0.2, 0.2, 0.25],
+  markerColor: [1, 0.45, 0.1], // SNU vibrant orange
+  glowColor: [0.2, 0.2, 0.3],
   markers: [
-    { location: [14.5995, 120.9842], size: 0.03 },
-    { location: [19.076, 72.8777], size: 0.1 },
-    { location: [23.8103, 90.4125], size: 0.05 },
-    { location: [30.0444, 31.2357], size: 0.07 },
-    { location: [39.9042, 116.4074], size: 0.08 },
-    { location: [-23.5505, -46.6333], size: 0.1 },
-    { location: [19.4326, -99.1332], size: 0.1 },
-    { location: [40.7128, -74.006], size: 0.1 },
-    { location: [34.6937, 135.5022], size: 0.05 },
-    { location: [41.0082, 28.9784], size: 0.06 },
+    { location: [28.5244, 77.5755], size: 0.12 }, // Shiv Nadar University (Delhi-NCR)
+    { location: [40.7128, -74.006], size: 0.08 },
+    { location: [51.5074, -0.1278], size: 0.08 },
+    { location: [35.6762, 139.6503], size: 0.08 },
+    { location: [1.3521, 103.8198], size: 0.07 },
+    { location: [-33.8688, 151.2093], size: 0.07 },
+    { location: [25.2048, 55.2708], size: 0.08 },
+    { location: [37.7749, -122.4194], size: 0.08 },
   ],
 };
 
-export function Globe({
-  className,
-  config = GLOBE_CONFIG,
-}: {
+export interface GlobeProps {
   className?: string;
-  config?: COBEOptions;
-}) {
+  config?: Partial<COBEOptions>;
+}
+
+export function Globe({ className, config }: GlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const phiRef = useRef(0);
-  const widthRef = useRef(0);
-  const pointerInteracting = useRef<number | null>(null);
-  const pointerInteractionMovement = useRef(0);
-
-  const r = useMotionValue(0);
-  const rs = useSpring(r, {
-    mass: 1,
-    damping: 30,
-    stiffness: 100,
-  });
-
-  const updatePointerInteraction = (value: number | null) => {
-    pointerInteracting.current = value;
-    if (canvasRef.current) {
-      canvasRef.current.style.cursor = value !== null ? "grabbing" : "grab";
-    }
-  };
-
-  const updateMovement = (clientX: number) => {
-    if (pointerInteracting.current !== null) {
-      const delta = clientX - pointerInteracting.current;
-      pointerInteractionMovement.current = delta;
-      r.set(r.get() + delta / MOVEMENT_DAMPING);
-    }
-  };
+  const pointerInteracting = useRef<boolean>(false);
+  const lastClientX = useRef<number>(0);
+  const phiOffset = useRef<number>(0);
+  const phiBase = useRef<number>(0);
+  const velocity = useRef<number>(0);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let width = canvas.offsetWidth || canvas.parentElement?.offsetWidth || 300;
+    if (width < 50) width = 300;
+
+    let globe: ReturnType<typeof createGlobe> | null = null;
+    let animFrameId: number;
+
     const onResize = () => {
-      if (canvasRef.current) {
-        widthRef.current = canvasRef.current.offsetWidth;
+      if (!canvas) return;
+      const newWidth = canvas.offsetWidth || canvas.parentElement?.offsetWidth || width;
+      if (newWidth > 0 && globe) {
+        width = newWidth;
+        globe.update({
+          width: width * 2,
+          height: width * 2,
+        });
       }
     };
 
     window.addEventListener("resize", onResize);
-    onResize();
 
-    const globe = createGlobe(canvasRef.current!, {
-      ...config,
-      width: widthRef.current * 2,
-      height: widthRef.current * 2,
-      onRender: (state: any) => {
-        if (!pointerInteracting.current) phiRef.current += 0.005;
-        state.phi = phiRef.current + rs.get();
-        state.width = widthRef.current * 2;
-        state.height = widthRef.current * 2;
-      },
-    } as any);
+    try {
+      globe = createGlobe(canvas, {
+        ...DEFAULT_CONFIG,
+        ...config,
+        width: width * 2,
+        height: width * 2,
+        phi: 0,
+      });
 
-    setTimeout(() => {
-      if (canvasRef.current) {
-        canvasRef.current.style.opacity = "1";
-      }
-    }, 0);
+      setIsLoaded(true);
+
+      const renderLoop = () => {
+        if (!pointerInteracting.current) {
+          phiBase.current += 0.005; // auto-spin
+          if (Math.abs(velocity.current) > 0.0001) {
+            phiOffset.current += velocity.current;
+            velocity.current *= 0.95; // momentum dampening
+          }
+        }
+
+        if (globe) {
+          globe.update({
+            phi: phiBase.current + phiOffset.current,
+          });
+        }
+
+        animFrameId = requestAnimationFrame(renderLoop);
+      };
+
+      animFrameId = requestAnimationFrame(renderLoop);
+    } catch (err) {
+      console.warn("Failed to initialize cobe WebGL globe:", err);
+    }
 
     return () => {
-      globe.destroy();
+      cancelAnimationFrame(animFrameId);
       window.removeEventListener("resize", onResize);
+      if (globe) {
+        globe.destroy();
+      }
     };
-  }, [rs, config]);
+  }, [config]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    pointerInteracting.current = true;
+    lastClientX.current = e.clientX;
+    velocity.current = 0;
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.setPointerCapture(e.pointerId);
+      canvas.style.cursor = "grabbing";
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!pointerInteracting.current) return;
+    const delta = e.clientX - lastClientX.current;
+    lastClientX.current = e.clientX;
+    const phiDelta = delta * 0.007;
+    phiOffset.current += phiDelta;
+    velocity.current = phiDelta; // record momentum
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    pointerInteracting.current = false;
+    const canvas = canvasRef.current;
+    if (canvas) {
+      try {
+        canvas.releasePointerCapture(e.pointerId);
+      } catch {
+        // Safe catch if pointer was lost
+      }
+      canvas.style.cursor = "grab";
+    }
+  };
 
   return (
-    <div
-      className={cn(
-        "absolute inset-0 mx-auto aspect-square w-full max-w-150",
-        className
-      )}
-    >
+    <div className={cn("relative aspect-square w-full flex items-center justify-center select-none", className)}>
       <canvas
-        className={cn(
-          "size-full opacity-0 transition-opacity duration-500 contain-[layout_paint_size]"
-        )}
         ref={canvasRef}
-        onPointerDown={(e) => {
-          pointerInteracting.current = e.clientX;
-          updatePointerInteraction(e.clientX);
+        style={{
+          width: "100%",
+          height: "100%",
+          cursor: "grab",
+          touchAction: "none",
         }}
-        onPointerUp={() => updatePointerInteraction(null)}
-        onPointerOut={() => updatePointerInteraction(null)}
-        onMouseMove={(e) => updateMovement(e.clientX)}
-        onTouchMove={(e) =>
-          e.touches[0] && updateMovement(e.touches[0].clientX)
-        }
+        className={cn(
+          "size-full rounded-full transition-opacity duration-700",
+          isLoaded ? "opacity-100" : "opacity-0"
+        )}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
       />
     </div>
   );
 }
+
+export default Globe;

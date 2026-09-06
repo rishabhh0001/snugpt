@@ -182,9 +182,115 @@ async def _fetch_web_results(query: str, max_results: int = 5) -> list[dict]:
         return []
 
 
+def get_fallback_smart_questions(query: str, response_text: str) -> list[str]:
+    combined = (query + " " + response_text).lower()
+
+    if any(k in combined for k in ["attendance", "present", "absent", "partha", "circular", "september 7"]):
+        return [
+            "What is the official minimum attendance requirement?",
+            "How do I submit medical or duty leave on ERP?",
+            "Can faculty members grant attendance exemptions?"
+        ]
+    if any(k in combined for k in ["grade", "grading", "cgpa", "gpa", "exam", "clearance", "i grade", "ccc"]):
+        return [
+            "What is the procedure for clearing an I-grade?",
+            "When is the deadline to drop 1st half CCC courses?",
+            "How is the CGPA and relative grading curve determined?"
+        ]
+    if any(k in combined for k in ["hostel", "room", "mess", "dining", "warden", "night out"]):
+        return [
+            "What are the hostel gate timings and in-time rules?",
+            "How do I apply for a night-out pass on the hostel portal?",
+            "Where can I report room maintenance or mess complaints?"
+        ]
+    if any(k in combined for k in ["library", "lasc", "tutor", "book", "borrow", "study"]):
+        return [
+            "What are the Central Library floor timings?",
+            "How do I join LASC peer tutorial groups?",
+            "How can I book group discussion rooms in the library?"
+        ]
+    if any(k in combined for k in ["calendar", "holiday", "vacation", "monsoon", "winter", "semester"]):
+        return [
+            "What are the official campus holidays this semester?",
+            "When do winter vacations officially begin?",
+            "When does course registration start for next semester?"
+        ]
+    if any(k in combined for k in ["club", "society", "breeze", "surge", "fest", "event", "cultural", "sports"]):
+        return [
+            "When are Breeze and Surge festivals scheduled?",
+            "How can I join or apply for student club positions?",
+            "Where can I find the directory of all campus clubs?"
+        ]
+    if any(k in combined for k in ["fee", "scholarship", "financial", "payment", "accounts"]):
+        return [
+            "Where do I view fee payment receipts and deadlines on ERP?",
+            "What are the eligibility criteria for merit scholarships?",
+            "How can I contact the university finance department?"
+        ]
+    if any(k in combined for k in ["wifi", "internet", "it helpdesk", "portal", "login", "erp"]):
+        return [
+            "How do I connect to SNU campus Wi-Fi?",
+            "How do I reset my ERP or student email password?",
+            "How do I log a support ticket with the IT helpdesk?"
+        ]
+    return [
+        "Can you provide more specific details on this?",
+        "Where can I find the official student handbook policy?",
+        "Who is the point of contact on campus for this?"
+    ]
+
+
+async def generate_smart_followups(query: str, response_text: str, api_key: Optional[str]) -> list[str]:
+    """Generates 3 sharp, contextual follow-up questions with guaranteed non-blocking fallback."""
+    if not api_key:
+        return get_fallback_smart_questions(query, response_text)
+
+    try:
+        followup_prompt = (
+            f"Based on the following user query and assistant response, generate exactly 3 short, relevant follow-up questions the user might want to ask next about Shiv Nadar University.\n\n"
+            f"User Query: {query}\n"
+            f"Assistant Response: {response_text[:800]}\n\n"
+            f"Output strictly a JSON array of 3 strings and nothing else. Example: [\"Question 1?\", \"Question 2?\", \"Question 3?\"]"
+        )
+        fast_llm = ChatNVIDIA(
+            model="nvidia/nemotron-3-super-120b-a12b",
+            nvidia_api_key=api_key,
+            temperature=0.3,
+            max_tokens=300,
+        )
+
+        followup_res = await asyncio.wait_for(
+            fast_llm.ainvoke([HumanMessage(content=followup_prompt)]),
+            timeout=3.2
+        )
+
+        raw_content = followup_res.content
+        if isinstance(raw_content, str):
+            followup_text = raw_content.strip()
+        elif isinstance(raw_content, list):
+            followup_text = "".join(str(item) for item in raw_content).strip()
+        else:
+            followup_text = str(raw_content).strip()
+
+        if followup_text.startswith("```json"):
+            followup_text = followup_text[7:-3].strip()
+        elif followup_text.startswith("```"):
+            followup_text = followup_text[3:-3].strip()
+
+        followups = json.loads(followup_text)
+        if isinstance(followups, list) and len(followups) > 0:
+            cleaned = [str(q).strip() for q in followups[:3] if str(q).strip()]
+            if cleaned:
+                return cleaned
+    except Exception as err:
+        logger.debug("Fast follow-up generation failed or timed out: %s. Using contextual fallback.", err)
+
+    return get_fallback_smart_questions(query, response_text)
+
+
 async def generate_streaming_response(
     query: str,
-    history: Optional[list] = None,
+    history: Optional[list[dict]] = None,
     session_id: Optional[str] = None,
     user_ip: Optional[str] = None,
     regenerate: Optional[bool] = False,
@@ -195,6 +301,7 @@ async def generate_streaming_response(
     if history is None:
         history = []
     log_id = str(uuid.uuid4())
+    api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
 
     # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
     blocked = check_safety(query)
@@ -217,6 +324,15 @@ async def generate_streaming_response(
                 chunk = cached_response[i:i+chunk_size]
                 yield f'data: {{"type": "chunk", "text": {json.dumps(chunk)}}}\n\n'
                 await asyncio.sleep(0.002)
+
+            # Smart follow-ups for cached responses
+            try:
+                cached_followups = await generate_smart_followups(query, cached_response, api_key)
+                if cached_followups:
+                    yield f'data: {{"type": "follow_ups", "data": {json.dumps(cached_followups[:3])}}}\n\n'
+            except Exception as fe:
+                logger.debug("Cache follow-up error: %s", fe)
+
             yield f'data: {{"type": "done"}}\n\n'
             return
 
@@ -376,38 +492,11 @@ async def generate_streaming_response(
 
             # ── Generate Smart Follow-up Questions ──
             try:
-                followup_prompt = (
-                    f"Based on the following user query and assistant response, generate exactly 3 short, relevant follow-up questions the user might want to ask next.\n\n"
-                    f"User Query: {query}\n"
-                    f"Assistant Response: {full_response}\n\n"
-                    f"Output strictly a JSON array of 3 strings and nothing else. Example: [\"Question 1?\", \"Question 2?\", \"Question 3?\"]"
-                )
-                if not regenerate:
-                    followup_llm = get_llm()
-                else:
-                    followup_llm = llm
-
-                if followup_llm:
-                    # Request short non-reasoning response for speed
-                    fast_llm = ChatNVIDIA(
-                        model="nvidia/nemotron-3-super-120b-a12b",
-                        nvidia_api_key=api_key,
-                        temperature=0.3,
-                        max_tokens=256,
-                    )
-                    followup_res = await fast_llm.ainvoke([HumanMessage(content=followup_prompt)])
-                    followup_text = followup_res.content.strip()
-                    if followup_text.startswith("```json"):
-                        followup_text = followup_text[7:-3].strip()
-                    
-                    try:
-                        followups = json.loads(followup_text)
-                        if isinstance(followups, list) and len(followups) > 0:
-                            yield f'data: {{"type": "follow_ups", "data": {json.dumps(followups[:3])}}}\n\n'
-                    except json.JSONDecodeError:
-                        logger.warning("Failed to decode follow-ups JSON: %s", followup_text)
+                followups = await generate_smart_followups(query, full_response, api_key)
+                if followups:
+                    yield f'data: {{"type": "follow_ups", "data": {json.dumps(followups[:3])}}}\n\n'
             except Exception as followup_err:
-                logger.error("Failed to generate follow-ups: %s", followup_err)
+                logger.debug("Failed to stream follow-ups: %s", followup_err)
 
 
     except Exception as e:

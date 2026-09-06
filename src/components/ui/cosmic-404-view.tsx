@@ -104,7 +104,7 @@ export default function NotFound({
             {description}
           </motion.p>
 
-          <motion.div variants={fadeUp}>
+          <motion.div variants={fadeUp} className="flex flex-col items-center gap-4">
             <Button
               onClick={handleBack}
               className="gap-2 cursor-pointer transition-all duration-300 font-medium px-6 py-5 active:scale-95 text-base shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20"
@@ -112,6 +112,18 @@ export default function NotFound({
               <ArrowLeftIcon className="w-5 h-5" />
               {backText}
             </Button>
+
+            {/* Discreet Easter Egg Portal */}
+            <div className="mt-8 opacity-40 hover:opacity-100 transition-opacity duration-300">
+              <a
+                href="/easter"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono text-muted-foreground/80 hover:text-orange-400 bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 hover:border-orange-500/30 transition-all duration-200 cursor-pointer select-none"
+                title="Secret: Launch Campus Simulation"
+              >
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>anomaly: 0xSNU // launch simulation</span>
+              </a>
+            </div>
           </motion.div>
         </motion.div>
       </AnimatePresence>

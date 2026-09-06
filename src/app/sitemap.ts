@@ -16,7 +16,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/license",
     "/updates",
     "/changelog",
-    "/demo"
+    "/demo",
+    "/easter"
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date().toISOString().split("T")[0],
