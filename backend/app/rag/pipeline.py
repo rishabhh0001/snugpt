@@ -36,7 +36,7 @@ def get_llm():
                 nvidia_api_key=api_key,
                 temperature=0.1,
                 max_tokens=16384,
-                model_kwargs={"extra_body": {"chat_template_kwargs": {"enable_thinking": True}}}
+                model_kwargs={"chat_template_kwargs": {"enable_thinking": True}}
             )
     return _llm
 
@@ -331,7 +331,7 @@ async def generate_streaming_response(
                 nvidia_api_key=api_key,
                 temperature=0.4,
                 max_tokens=16384,
-                model_kwargs={"extra_body": {"chat_template_kwargs": {"enable_thinking": True}}}
+                model_kwargs={"chat_template_kwargs": {"enable_thinking": True}}
             )
         else:
             llm = get_llm()
