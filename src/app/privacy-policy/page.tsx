@@ -128,6 +128,18 @@ export default function PrivacyPolicyPage() {
               </ul>
             </motion.div>
 
+            {/* Card 3: Web Crawlers */}
+            <motion.div variants={fadeInUp} className="p-6 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-md md:col-span-2 lg:col-span-1">
+              <h3 className="text-base font-bold text-white uppercase tracking-wider mb-2">Public Web Crawlers</h3>
+              <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter mb-4">
+                To keep knowledge context fresh, SNUGPT utilizes autonomous systems to aggregate public data:
+              </p>
+              <ul className="text-xs text-white/40 space-y-1.5 font-medium font-inter">
+                <li>• <strong className="text-white/70">Public Scraping:</strong> Active scraping of public campus events, announcements, and calendars from snu.edu.in.</li>
+                <li>• <strong className="text-white/70">Database Uploads:</strong> Non-sensitive public data is ingested into our ChromaDB vectors.</li>
+              </ul>
+            </motion.div>
+
           </div>
         </motion.section>
 

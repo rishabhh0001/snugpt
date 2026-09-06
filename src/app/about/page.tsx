@@ -118,7 +118,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-base font-bold text-white uppercase tracking-wider">Inference Layer</h3>
                 <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter">
-                  Powered by <strong>Meta Llama 3.1 8B Instruct</strong> running over high-speed NVIDIA AI Foundation endpoints, streaming answers token-by-token for commercial-grade speed.
+                  Powered by <strong>Meta Llama 3.3 70B Instruct</strong> running over high-speed NVIDIA AI Foundation endpoints, streaming answers token-by-token for commercial-grade speed.
                 </p>
               </div>
             </motion.div>
@@ -131,7 +131,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-base font-bold text-white uppercase tracking-wider">Vector Database</h3>
                 <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter">
-                  Semantic lookup uses highly advanced <strong>nv-embedqa-e5-v5</strong> embeddings indexed inside a secure Chroma vector store to fetch exact policies from scanned documentation.
+                  Semantic lookup uses highly advanced <strong>nvidia/nemotron-3-embed-1b</strong> embeddings indexed inside a secure Chroma vector store to fetch exact policies from scanned documentation.
                 </p>
               </div>
             </motion.div>
@@ -208,6 +208,7 @@ export default function AboutPage() {
                 <li><strong className="text-white/70">ERP Academic Catalogs:</strong> Detailed course credits, departmental codes, prerequisites, and registration procedures.</li>
                 <li><strong className="text-white/70">SNU Student Handbooks:</strong> Essential legal regulations, grading curves, CGPA thresholds, and disciplinary policies.</li>
                 <li><strong className="text-white/70">Student Welfare Guidelines:</strong> On-campus hostel rules, curfews, medical support directories, and event protocol guides.</li>
+                <li><strong className="text-white/70">Active Web Scrapers:</strong> Live crawling of the official snu.edu.in homepage to index fresh campus announcements and events.</li>
               </ul>
               <p>
                 Every source is cleaned, chunked into overlap-aware passages, converted into vector representations, and safely cached to ensure retrieval queries respond with exact-match citations.

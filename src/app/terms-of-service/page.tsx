@@ -141,6 +141,12 @@ export default function TermsOfServicePage() {
                   To protect server performance and ensure absolute responsiveness for the whole student body, rate limits are applied to active chat sequences. Exploiting system resources, attempting to scraping context pipelines, or attacking API endpoints is strictly prohibited.
                 </p>
               </div>
+              <div>
+                <h4 className="text-white font-bold mb-1">4. Data Source Validity</h4>
+                <p>
+                  SNUGPT actively crawls public pages (e.g. snu.edu.in) to provide real-time updates on academic calendars and announcements. However, scraped data is strictly informational. Official university circulars and direct administration notices always take ultimate precedence over AI-generated outputs.
+                </p>
+              </div>
             </div>
           </motion.div>
         </motion.section>
