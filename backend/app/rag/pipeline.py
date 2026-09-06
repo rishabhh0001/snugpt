@@ -32,10 +32,11 @@ def get_llm():
                 # We don't raise here to avoid crashing the worker, but we'll fail gracefully during generation
                 return None
             _llm = ChatNVIDIA(
-                model="nvidia/llama-3.3-nemotron-super-49b-v1.5",
+                model="nvidia/nemotron-3-super-120b-a12b",
                 nvidia_api_key=api_key,
                 temperature=0.1,
-                max_tokens=2048
+                max_tokens=16384,
+                model_kwargs={"extra_body": {"chat_template_kwargs": {"enable_thinking": True}}}
             )
     return _llm
 
@@ -326,10 +327,11 @@ async def generate_streaming_response(
 
         if regenerate:
             llm = ChatNVIDIA(
-                model="nvidia/llama-3.3-nemotron-super-49b-v1.5",
+                model="nvidia/nemotron-3-super-120b-a12b",
                 nvidia_api_key=api_key,
                 temperature=0.4,
-                max_tokens=2048
+                max_tokens=16384,
+                model_kwargs={"extra_body": {"chat_template_kwargs": {"enable_thinking": True}}}
             )
         else:
             llm = get_llm()
