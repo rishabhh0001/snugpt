@@ -262,6 +262,9 @@ async def rerank_documents(query: str, docs: List[Document], top_n: int = 5) -> 
     if not docs:
         return []
         
+    if not getattr(settings, "enable_reranking", False):
+        return docs[:top_n]
+
     api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
     if not api_key:
         logger.warning("NVIDIA API key not configured for reranking. Returning top %d original documents.", top_n)

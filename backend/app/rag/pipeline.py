@@ -3,16 +3,19 @@ import re
 import asyncio
 import json
 import logging
+import uuid
+import secrets
+import traceback
+import threading
 from typing import Optional
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
+from langchain_core.messages import HumanMessage
 from app.rag.prompts import qa_prompt
 from app.rag.vectorstore import add_qa_pair, retrieve_documents, rerank_documents
 from app.config import settings
 from app.rag.cache import search_cache, save_to_cache
-from app.models.chat_log import save_error_telemetry
+from app.models.chat_log import save_error_telemetry, save_chat_log
 from app.utils.email import send_error_email
-
-import threading
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +194,6 @@ async def generate_streaming_response(
 ):
     if history is None:
         history = []
-    import uuid
     log_id = str(uuid.uuid4())
 
     # ── Layer 1: Pre-LLM guardrail ────────────────────────────────────────────
@@ -354,8 +356,6 @@ async def generate_streaming_response(
         if not got_content:
             yield f'data: {{"type": "chunk", "text": "I could not generate a response. Please try again."}}\n\n'
         elif full_response and len(full_response) > 30:
-            from app.models.chat_log import save_chat_log
-
             async def _log_chat():
                 try:
                     await save_chat_log(
@@ -388,8 +388,6 @@ async def generate_streaming_response(
                     followup_llm = llm
 
                 if followup_llm:
-                    import json
-                    from langchain_core.messages import HumanMessage
                     # Request short non-reasoning response for speed
                     fast_llm = ChatNVIDIA(
                         model="nvidia/nemotron-3-super-120b-a12b",
@@ -413,8 +411,6 @@ async def generate_streaming_response(
 
 
     except Exception as e:
-        import traceback
-        import secrets
         error_details = traceback.format_exc()
         logger.error("Pipeline error: %s", error_details)
         

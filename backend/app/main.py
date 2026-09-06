@@ -99,6 +99,8 @@ _redis_client = None
 
 def get_redis_client():
     global _redis_client
+    if not getattr(settings, "enable_redis", False):
+        return None
     if _redis_client is None and settings.redis_url:
         import redis.asyncio as aioredis
         _redis_client = aioredis.from_url(settings.redis_url, decode_responses=True)
@@ -112,22 +114,23 @@ async def chat(request: ChatRequest, fastapi_request: Request):
     else:
         user_ip = fastapi_request.client.host if fastapi_request.client else "unknown"
 
-    # Serverless-friendly Redis Rate Limiter: 15 requests per minute per IP
-    try:
-        redis_client = get_redis_client()
-        if redis_client:
-            current_minute = int(time.time() // 60)
-            rate_key = f"rate_limit:chat:{user_ip}:{current_minute}"
-            count = await redis_client.incr(rate_key)
-            if count == 1:
-                await redis_client.expire(rate_key, 60)
-            if count > 15:
-                logger.warning(f"Rate limit exceeded for IP: {user_ip}")
-                raise HTTPException(status_code=429, detail="Too many requests. Please slow down and try again in a minute.")
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Redis rate limiter bypassed due to error: {e}")
+    # Serverless-friendly Redis Rate Limiter (only if enabled)
+    if getattr(settings, "enable_redis", False):
+        try:
+            redis_client = get_redis_client()
+            if redis_client:
+                current_minute = int(time.time() // 60)
+                rate_key = f"rate_limit:chat:{user_ip}:{current_minute}"
+                count = await redis_client.incr(rate_key)
+                if count == 1:
+                    await redis_client.expire(rate_key, 60)
+                if count > 15:
+                    logger.warning(f"Rate limit exceeded for IP: {user_ip}")
+                    raise HTTPException(status_code=429, detail="Too many requests. Please slow down and try again in a minute.")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Redis rate limiter bypassed due to error: {e}")
 
     history = [{"role": m.role, "content": m.content} for m in (request.history or [])]
     return StreamingResponse(

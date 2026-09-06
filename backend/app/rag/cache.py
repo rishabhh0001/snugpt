@@ -31,8 +31,7 @@ def init_cache():
         print("[Cache] GPTCache not installed. Semantic caching disabled.")
         return None
 
-    if not settings.redis_url:
-        print("[Cache] No REDIS_URL configured. Semantic caching disabled.")
+    if not getattr(settings, "enable_redis", False) or not settings.redis_url:
         return None
 
     try:
@@ -74,10 +73,12 @@ def search_cache(query: str) -> Optional[str]:
         # GPTCache standard API for getting a cached value.
         # Under the hood, it uses the embeddings encoder, vector base search,
         # and similarity evaluator configured in cache.init()
-        response = cache.get(query)
-        if response:
-            print("[Cache] Hit! Semantic similarity match found.")
-            return response
+        get_fn = getattr(cache, "get", None)
+        if callable(get_fn):
+            response = get_fn(query)
+            if response:
+                print("[Cache] Hit! Semantic similarity match found.")
+                return str(response)
         return None
     except Exception as e:
         print(f"[Cache] Error searching cache: {e}")
@@ -91,8 +92,10 @@ async def save_to_cache(query: str, response: str):
         
     try:
         # GPTCache standard API for saving. It encodes the query and saves both scalar and vector.
-        await asyncio.to_thread(cache.put, query, response)
-        print("[Cache] Saved response to semantic cache.")
+        put_fn = getattr(cache, "put", None)
+        if callable(put_fn):
+            await asyncio.to_thread(put_fn, query, response)
+            print("[Cache] Saved response to semantic cache.")
     except Exception as e:
         print(f"[Cache] Error saving to cache: {e}")
 
