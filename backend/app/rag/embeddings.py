@@ -14,10 +14,10 @@ def get_embeddings():
     
     with _embeddings_lock:
         if _embeddings is None:
-            # We use the NV-Embed-QA model which is optimized for RAG
+            # We use the nemotron-3-embed-1b model which is optimized for fast RAG
             api_key = settings.nvidia_api_key or os.getenv("NVIDIA_API_KEY")
             _embeddings = NVIDIAEmbeddings(
-                model="nvidia/nv-embedqa-e5-v5", 
+                model="nvidia/nemotron-3-embed-1b", 
                 nvidia_api_key=api_key
             )
     return _embeddings

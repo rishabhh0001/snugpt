@@ -32,7 +32,7 @@ def get_llm():
                 # We don't raise here to avoid crashing the worker, but we'll fail gracefully during generation
                 return None
             _llm = ChatNVIDIA(
-                model="meta/llama-3.1-8b-instruct",
+                model="meta/llama-3.1-70b-instruct",
                 nvidia_api_key=api_key,
                 temperature=0.1,
                 max_tokens=2048
@@ -326,7 +326,7 @@ async def generate_streaming_response(
 
         if regenerate:
             llm = ChatNVIDIA(
-                model="meta/llama-3.1-8b-instruct",
+                model="meta/llama-3.1-70b-instruct",
                 nvidia_api_key=api_key,
                 temperature=0.4,
                 max_tokens=2048
