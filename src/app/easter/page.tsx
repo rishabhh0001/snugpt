@@ -153,10 +153,15 @@ const SNU_QUOTES = [
   "Don't worry, attendance is guaranteed till September 7!",
   "Take a breather and grab a 2 AM Maggi at D-Block.",
   "The 3rd floor Central Library silence will heal this run.",
-  "LASC doubt-clearing tutorial is now available for Glider physics.",
+  "LASC doubt-clearing tutorial is now available for Paper Plane physics.",
   "Stay focused — Dean's List ceremony is on February 13!",
   "Drop that 1st-half CCC course and try again!",
   "Even with a crash, Breeze 2027 stage lights still shine on you.",
+  "Lost your ID card again? Go check at the library desk.",
+  "You missed the shuttle to City Centre! Run!",
+  "Surviving on Nescafe and pending assignments.",
+  "Did you check Blackboard? Deadline is in 5 minutes!",
+  "Winging the mid-sems like this paper plane."
 ];
 
 export default function EasterEggPage() {
@@ -213,7 +218,7 @@ export default function EasterEggPage() {
   const jump = useCallback(() => {
     if (gameState === "ready") {
       setGameState("playing");
-      birdVelocity.current = -7.5;
+      birdVelocity.current = -5.5;
       soundRef.current.jump();
       return;
     }
@@ -222,17 +227,17 @@ export default function EasterEggPage() {
       return;
     }
     // Playing
-    birdVelocity.current = -7.2;
+    birdVelocity.current = -5.0;
     soundRef.current.jump();
 
-    // Spawn tiny jet propulsion sparks
+    // Spawn tiny paper trails
     for (let i = 0; i < 4; i++) {
       particles.current.push({
         x: 80 - 16,
         y: birdY.current + (Math.random() * 8 - 4),
         vx: -(Math.random() * 3 + 2),
         vy: Math.random() * 2 - 1,
-        color: Math.random() > 0.5 ? "#f97316" : "#fbbf24",
+        color: Math.random() > 0.5 ? "#ffffff" : "#e2e8f0",
         size: Math.random() * 3 + 2,
         alpha: 1,
         life: 1,
@@ -243,7 +248,7 @@ export default function EasterEggPage() {
   // Restart Game
   const restartGame = () => {
     birdY.current = 240;
-    birdVelocity.current = -6;
+    birdVelocity.current = -5.5;
     obstacles.current = [];
     particles.current = [];
     scoreRef.current = 0;
@@ -334,7 +339,7 @@ export default function EasterEggPage() {
       // 2. GAME STATE: PLAYING
       if (gameState === "playing") {
         // Apply Gravity
-        birdVelocity.current += 0.35;
+        birdVelocity.current += 0.25;
         birdY.current += birdVelocity.current;
 
         // Ground / Ceiling bounds
@@ -508,7 +513,7 @@ export default function EasterEggPage() {
             soundRef.current.score();
 
             // Milestones
-            if (scoreRef.current === 10) triggerBanner("🔥 10 Streak: Campus Glider Activated!");
+            if (scoreRef.current === 10) triggerBanner("🔥 10 Streak: Paper Plane Activated!");
             if (scoreRef.current === 25) triggerBanner("⚡ 25 Streak: Breeze '27 All-Access!");
             if (scoreRef.current === 50) triggerBanner("👑 50 Score: SNUGPT Supreme Master!");
           }
@@ -541,7 +546,7 @@ export default function EasterEggPage() {
         }
       }
 
-      // 4. DRAW GLIDER (Bird)
+      // 4. DRAW PAPER PLANE (Bird)
       const bX = 80;
       const bY = gameState === "ready" ? 240 + Math.sin(Date.now() / 250) * 8 : birdY.current;
       const tilt = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (birdVelocity.current * 3.5 * Math.PI) / 180));
@@ -550,41 +555,27 @@ export default function EasterEggPage() {
       ctx.translate(bX, bY);
       ctx.rotate(tilt);
 
-      // Neon Jet Glow
-      ctx.shadowColor = "#f97316";
-      ctx.shadowBlur = 12;
+      // Paper Plane Shadow
+      ctx.shadowColor = "rgba(255, 255, 255, 0.3)";
+      ctx.shadowBlur = 10;
 
-      // Body (Futuristic Campus Glider / Drone)
+      // Paper Plane Body (Triangle)
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
-      ctx.ellipse(0, 0, 16, 12, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Wing
-      ctx.fillStyle = "#f97316";
-      ctx.beginPath();
-      ctx.moveTo(-6, 0);
-      ctx.lineTo(8, -14);
-      ctx.lineTo(4, 0);
+      ctx.moveTo(16, 0); // Nose
+      ctx.lineTo(-12, -10); // Top tail
+      ctx.lineTo(-8, 0); // Inner center
+      ctx.lineTo(-12, 10); // Bottom tail
       ctx.closePath();
       ctx.fill();
 
-      // Cockpit visor
-      ctx.fillStyle = "#0284c7";
+      // Wing Fold
+      ctx.fillStyle = "#e2e8f0";
       ctx.beginPath();
-      ctx.arc(6, -2, 5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Visor highlight
-      ctx.fillStyle = "#7dd3fc";
-      ctx.beginPath();
-      ctx.arc(8, -3, 1.8, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Jet Thruster at back
-      ctx.fillStyle = "#ea580c";
-      ctx.beginPath();
-      ctx.arc(-14, 2, 4, 0, Math.PI * 2);
+      ctx.moveTo(16, 0);
+      ctx.lineTo(-12, 0);
+      ctx.lineTo(-8, 8);
+      ctx.closePath();
       ctx.fill();
 
       ctx.restore();
@@ -648,7 +639,7 @@ export default function EasterEggPage() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             <h1 className="text-sm font-semibold tracking-wide flex items-center gap-1.5 text-neutral-200">
               <Gamepad2 className="w-4 h-4 text-orange-400" />
-              SNU Campus Glider
+              SNU Paper Plane
             </h1>
           </div>
         </div>
@@ -710,7 +701,7 @@ export default function EasterEggPage() {
               </div>
 
               <h2 className="text-2xl font-bold tracking-tight text-white mb-1">
-                SNU Campus Glider
+                SNU Paper Plane
               </h2>
               <p className="text-xs text-neutral-400 max-w-xs mb-6 font-mono">
                 Pilot through D-Block & Library pillars. Collect Attendance passes & 2 AM Maggi!
