@@ -65,6 +65,25 @@ def scrape_and_index_snu():
     )
     chunks = text_splitter.split_documents(docs)
     
+    # 1. Sanitize metadata to avoid ChromaDB serialization errors
+    # 2. Filter out base64 images to prevent NVIDIA VLM embedding crashes
+    valid_chunks = []
+    for chunk in chunks:
+        cleaned_meta = {}
+        for k, v in chunk.metadata.items():
+            if v is None:
+                continue
+            if isinstance(v, (str, int, float, bool)):
+                cleaned_meta[k] = v
+            else:
+                cleaned_meta[k] = str(v)
+        chunk.metadata = cleaned_meta
+        
+        if "data:image/" not in chunk.page_content:
+            valid_chunks.append(chunk)
+            
+    chunks = valid_chunks
+    
     logger.info(f"Created {len(chunks)} contextual chunks. Uploading to Chroma DB in batches...")
     
     batch_size = 50
