@@ -48,6 +48,11 @@ class Settings(BaseSettings):
     # Admin Settings
     admin_emails: str = "rj910@snu.edu.in,rishabh.joshi260905@gmail.com"
 
+    # Twilio / WhatsApp Settings
+    twilio_account_sid: str | None = None
+    twilio_auth_token: str | None = None
+    twilio_whatsapp_number: str | None = None
+
 
 
 

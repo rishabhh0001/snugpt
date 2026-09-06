@@ -15,6 +15,7 @@ from app.models.chat_log import save_chat_feedback, save_shared_chat, get_shared
 from app.models.contact import save_contact_message
 from app.rag.pipeline import generate_streaming_response
 from app.rag.vectorstore import add_qa_pair
+from app.api import whatsapp
 import uuid
 import io
 import base64
@@ -65,6 +66,7 @@ app.add_middleware(
 )
 app.add_middleware(StripBackendPrefixMiddleware)
 
+app.include_router(whatsapp.router, prefix="/api/whatsapp", tags=["whatsapp"])
 
 @app.get("/")
 @app.get("/api")

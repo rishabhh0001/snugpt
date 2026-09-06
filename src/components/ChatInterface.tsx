@@ -281,6 +281,7 @@ export default function ChatInterface() {
               if (data.type === "message_id") last.id = data.id;
               else if (data.type === "sources") last.sources = data.data;
               else if (data.type === "chunk" && data.text) last.content += data.text;
+              else if (data.type === "follow_ups") last.follow_ups = data.data;
 
               current = updated;
               updateMessages(convId!, current);
@@ -500,6 +501,7 @@ export default function ChatInterface() {
                       chatId={activeId || undefined}
                       isLast={i === messages.length - 1}
                       isTyping={isLoading && i === messages.length - 1}
+                      onFollowUpClick={(text) => handleSendMessage({ input: text, webSearch: webSearchActive })}
                       onRegenerate={
                         msg.role === "assistant" && i > 0
                           ? () => {

@@ -18,6 +18,7 @@ export interface MessageProps {
   content: string;
   sources?: SourceDocument[];
   feedback?: "up" | "down" | null;
+  follow_ups?: string[];
 }
 
 function getFilename(src: string): string {
@@ -117,12 +118,14 @@ export default function MessageBubble({
   message,
   chatId,
   onRegenerate,
+  onFollowUpClick,
   isLast = false,
   isTyping = false,
 }: {
   message: MessageProps;
   chatId?: string;
   onRegenerate?: () => void;
+  onFollowUpClick?: (text: string) => void;
   isLast?: boolean;
   isTyping?: boolean;
 }) {
@@ -379,6 +382,30 @@ export default function MessageBubble({
               </button>
             )}
           </div>
+        )}
+        
+        {/* Follow-up Suggestions */}
+        {!isUser && message.follow_ups && message.follow_ups.length > 0 && isLast && !isTyping && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col gap-2 mt-4"
+          >
+            {message.follow_ups.map((q, idx) => (
+              <button
+                key={idx}
+                onClick={() => onFollowUpClick && onFollowUpClick(q)}
+                className="text-left px-4 py-2 text-[12.5px] rounded-xl border transition-all hover:bg-yellow-500/10 active:scale-[0.98]"
+                style={{
+                  background: "var(--color-surface)",
+                  borderColor: "rgba(242,169,0,0.2)",
+                  color: "var(--color-text-warning, #f2a900)"
+                }}
+              >
+                {q}
+              </button>
+            ))}
+          </motion.div>
         )}
       </div>
     </motion.div>

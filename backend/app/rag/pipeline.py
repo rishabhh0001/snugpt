@@ -374,6 +374,44 @@ async def generate_streaming_response(
             if full_response.strip() and not regenerate:
                 await save_to_cache(query, full_response.strip())
 
+            # ── Generate Smart Follow-up Questions ──
+            try:
+                followup_prompt = (
+                    f"Based on the following user query and assistant response, generate exactly 3 short, relevant follow-up questions the user might want to ask next.\n\n"
+                    f"User Query: {query}\n"
+                    f"Assistant Response: {full_response}\n\n"
+                    f"Output strictly a JSON array of 3 strings and nothing else. Example: [\"Question 1?\", \"Question 2?\", \"Question 3?\"]"
+                )
+                if not regenerate:
+                    followup_llm = get_llm()
+                else:
+                    followup_llm = llm
+
+                if followup_llm:
+                    import json
+                    from langchain_core.messages import HumanMessage
+                    # Request short non-reasoning response for speed
+                    fast_llm = ChatNVIDIA(
+                        model="nvidia/nemotron-3-super-120b-a12b",
+                        nvidia_api_key=api_key,
+                        temperature=0.3,
+                        max_tokens=256,
+                    )
+                    followup_res = await fast_llm.ainvoke([HumanMessage(content=followup_prompt)])
+                    followup_text = followup_res.content.strip()
+                    if followup_text.startswith("```json"):
+                        followup_text = followup_text[7:-3].strip()
+                    
+                    try:
+                        followups = json.loads(followup_text)
+                        if isinstance(followups, list) and len(followups) > 0:
+                            yield f'data: {{"type": "follow_ups", "data": {json.dumps(followups[:3])}}}\n\n'
+                    except json.JSONDecodeError:
+                        logger.warning("Failed to decode follow-ups JSON: %s", followup_text)
+            except Exception as followup_err:
+                logger.error("Failed to generate follow-ups: %s", followup_err)
+
+
     except Exception as e:
         import traceback
         import secrets
