@@ -326,7 +326,7 @@ async def generate_streaming_response(
 
         if regenerate:
             llm = ChatNVIDIA(
-                model="meta/llama-3.1-70b-instruct",
+                model="meta/llama-3.3-70b-instruct",
                 nvidia_api_key=api_key,
                 temperature=0.4,
                 max_tokens=2048

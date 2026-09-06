@@ -293,9 +293,7 @@ async def rerank_documents(query: str, docs: List[Document], top_n: int = 5) -> 
                 for rank in rankings:
                     idx = rank.get("index")
                     if idx is not None and 0 <= idx < len(docs):
-                        doc = docs[idx]
-                        doc.metadata["rerank_score"] = rank.get("logit", rank.get("score", 0.0))
-                        ranked_docs.append(doc)
+                        ranked_docs.append(docs[idx])
                 
                 seen = set(id(d) for d in ranked_docs)
                 for d in docs:
