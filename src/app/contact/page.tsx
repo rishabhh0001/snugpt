@@ -228,7 +228,7 @@ export default function ContactPage() {
     {
       icon: Mail,
       label: 'Developer Support',
-      value: 'rj910@snu.edu.in',
+      value: 'help@rishabhj.in',
     },
     {
       icon: MessageSquare,
