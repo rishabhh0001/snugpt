@@ -179,23 +179,33 @@ export default function EasterEggPage() {
   // Physics & Logic Refs
   const birdY = useRef<number>(250);
   const birdVelocity = useRef<number>(0);
+  const gameOverRef = useRef<boolean>(false);
   const obstacles = useRef<Obstacle[]>([]);
   const particles = useRef<Particle[]>([]);
   const stars = useRef<{ x: number; y: number; speed: number; size: number }[]>([]);
   const frameId = useRef<number>(0);
   const lastSpawn = useRef<number>(0);
+  const lastGapCenter = useRef<number>(260);
   const scoreRef = useRef<number>(0);
   const bannerTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Load high score from storage
   useEffect(() => {
+    let restoreTimer: ReturnType<typeof setTimeout> | undefined;
     try {
       const saved = localStorage.getItem("snugpt_easter_highscore");
       if (saved) {
         const val = parseInt(saved, 10);
-        if (!isNaN(val)) setHighScore(val);
+        if (!isNaN(val)) restoreTimer = setTimeout(() => setHighScore(val), 0);
       }
     } catch {}
+    return () => {
+      if (restoreTimer) clearTimeout(restoreTimer);
+    };
+  }, []);
+
+  useEffect(() => () => {
+    if (bannerTimer.current) clearTimeout(bannerTimer.current);
   }, []);
 
   // Sync audio toggle
@@ -214,11 +224,28 @@ export default function EasterEggPage() {
     }, 2800);
   };
 
+  // Restart Game
+  const restartGame = useCallback(() => {
+    birdY.current = 260;
+    birdVelocity.current = 0;
+    obstacles.current = [];
+    particles.current = [];
+    scoreRef.current = 0;
+    gameOverRef.current = false;
+    lastSpawn.current = Date.now();
+    lastGapCenter.current = 260;
+    setScore(0);
+    setBannerMessage(null);
+    setGameState("playing");
+  }, []);
+
   // Jump Action
   const jump = useCallback(() => {
     if (gameState === "ready") {
+      gameOverRef.current = false;
+      lastSpawn.current = Date.now();
       setGameState("playing");
-      birdVelocity.current = -5.5;
+      birdVelocity.current = -390;
       soundRef.current.jump();
       return;
     }
@@ -227,7 +254,7 @@ export default function EasterEggPage() {
       return;
     }
     // Playing
-    birdVelocity.current = -5.0;
+    birdVelocity.current = -390;
     soundRef.current.jump();
 
     // Spawn tiny paper trails
@@ -243,25 +270,14 @@ export default function EasterEggPage() {
         life: 1,
       });
     }
-  }, [gameState]);
-
-  // Restart Game
-  const restartGame = () => {
-    birdY.current = 240;
-    birdVelocity.current = -5.5;
-    obstacles.current = [];
-    particles.current = [];
-    scoreRef.current = 0;
-    setScore(0);
-    setGameState("playing");
-    setBannerMessage(null);
-  };
+  }, [gameState, restartGame]);
 
   // Key listeners
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
         e.preventDefault();
+        if (e.repeat) return;
         jump();
       }
     };
@@ -298,9 +314,14 @@ export default function EasterEggPage() {
     }
 
     let isRunning = true;
+    let previousFrameTime = 0;
 
-    const gameLoop = () => {
+    const gameLoop = (frameTime: number) => {
       if (!isRunning) return;
+      const deltaSeconds = previousFrameTime === 0
+        ? 0
+        : Math.min((frameTime - previousFrameTime) / 1000, 0.05);
+      previousFrameTime = frameTime;
 
       // 1. CLEAR & BACKGROUND
       const gradient = ctx.createLinearGradient(0, 0, 0, logicalHeight);
@@ -314,7 +335,7 @@ export default function EasterEggPage() {
       ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
       stars.current.forEach((star) => {
         if (gameState === "playing") {
-          star.x -= star.speed * 1.2;
+          star.x -= star.speed * 72 * deltaSeconds;
           if (star.x < 0) star.x = logicalWidth;
         }
         ctx.beginPath();
@@ -339,12 +360,12 @@ export default function EasterEggPage() {
       // 2. GAME STATE: PLAYING
       if (gameState === "playing") {
         // Apply Gravity
-        birdVelocity.current += 0.25;
-        birdY.current += birdVelocity.current;
+        birdVelocity.current = Math.min(birdVelocity.current + 700 * deltaSeconds, 460);
+        birdY.current += birdVelocity.current * deltaSeconds;
 
         // Ground / Ceiling bounds
-        if (birdY.current < 15) {
-          birdY.current = 15;
+        if (birdY.current < 24) {
+          birdY.current = 24;
           birdVelocity.current = 0;
         }
         if (birdY.current > logicalHeight - 50) {
@@ -352,15 +373,26 @@ export default function EasterEggPage() {
           soundRef.current.crash();
           handleGameOver();
         }
+        if (gameOverRef.current) {
+          frameId.current = requestAnimationFrame(gameLoop);
+          return;
+        }
 
         // Spawn obstacles
         const now = Date.now();
-        if (now - lastSpawn.current > 1500) {
+        if (now - lastSpawn.current > 1900) {
           lastSpawn.current = now;
-          const gap = 145; // generous opening for fun play
+          const gap = 175;
           const minH = 60;
           const maxH = logicalHeight - 35 - gap - minH;
-          const topH = Math.floor(Math.random() * (maxH - minH + 1)) + minH;
+          const minCenter = minH + gap / 2;
+          const maxCenter = maxH + gap / 2;
+          const nextCenter = Math.max(
+            minCenter,
+            Math.min(maxCenter, lastGapCenter.current + (Math.random() * 140 - 70))
+          );
+          lastGapCenter.current = nextCenter;
+          const topH = Math.round(nextCenter - gap / 2);
           const bottomH = logicalHeight - 35 - gap - topH;
 
           // Optional bonus token in the center of gap
@@ -384,13 +416,13 @@ export default function EasterEggPage() {
         }
 
         // Update & Render Obstacles
-        const speed = 2.4;
+        const speed = 120;
         const birdX = 80;
         const birdRadius = 14;
 
         for (let i = obstacles.current.length - 1; i >= 0; i--) {
           const obs = obstacles.current[i];
-          obs.x -= speed;
+          obs.x -= speed * deltaSeconds;
 
           // Draw Top Pillar (Cyber Campus Architecture)
           const topGrad = ctx.createLinearGradient(obs.x, 0, obs.x + obs.width, 0);
@@ -503,6 +535,7 @@ export default function EasterEggPage() {
           if (inHorizontalBounds && (hitTop || hitBottom)) {
             soundRef.current.crash();
             handleGameOver();
+            break;
           }
 
           // Score when passed
@@ -584,6 +617,8 @@ export default function EasterEggPage() {
     };
 
     const handleGameOver = () => {
+      if (gameOverRef.current) return;
+      gameOverRef.current = true;
       setGameState("gameover");
       // Choose random SNU campus quote
       const q = SNU_QUOTES[Math.floor(Math.random() * SNU_QUOTES.length)];
@@ -704,7 +739,7 @@ export default function EasterEggPage() {
                 SNU Paper Plane
               </h2>
               <p className="text-xs text-neutral-400 max-w-xs mb-6 font-mono">
-                Pilot through D-Block & Library pillars. Collect Attendance passes & 2 AM Maggi!
+                Tap or press Space to lift. Release between taps and steer through the gaps. Collect Maggi and attendance passes for bonus points.
               </p>
 
               <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-neutral-950 font-bold text-sm shadow-md active:scale-95 transition">
@@ -749,7 +784,7 @@ export default function EasterEggPage() {
 
               {/* Campus Quote */}
               <p className="text-xs text-neutral-300 italic max-w-xs mb-6 px-2 font-mono leading-relaxed bg-neutral-800/40 py-2 rounded border border-white/5">
-                "{campusQuote}"
+                &ldquo;{campusQuote}&rdquo;
               </p>
 
               {/* Restart Button */}
