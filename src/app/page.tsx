@@ -982,16 +982,16 @@ export default function Lander() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
               </div>
-              <span className="uppercase tracking-[0.4em] text-amber-400/90">Student Built Handbook Engine</span>
+              <span className="uppercase tracking-[0.4em] text-amber-400/90">A student-built guide to SNU</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl lg:text-8xl font-black font-jakarta tracking-tighter mb-6 md:mb-8 leading-[0.9] md:leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 pb-2 md:pb-4">
               <CharReveal text="The Student" /><br />
-              <CharReveal text="Brain Engine." />
+              <CharReveal text="SNU, Made Clear." />
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="text-base md:text-lg text-white/40 mb-10 md:mb-12 max-w-xl mx-auto leading-relaxed font-medium tracking-tight px-4">
-              Your personal SNU intelligence layer. Instantly retrieve policies, course data, and university knowledge with neural precision.
+              Find answers about SNU policies, courses, and campus life without digging through pages of documents.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-col items-center gap-6 md:gap-10 w-full max-w-2xl mx-auto">
@@ -1071,7 +1071,7 @@ export default function Lander() {
             <BentoCard
               className="md:col-span-4"
               title="Instant Answers"
-              description="Powered by Llama 3.1 for blazingly fast, accurate responses."
+              description="Get a clear answer with links to the campus sources behind it."
               icon={Zap}
             >
               <div className="mt-8 space-y-4">

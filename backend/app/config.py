@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     )
 
     nvidia_api_key: str | None = None
+    nvidia_chat_model: str = "nvidia/nemotron-3.5-bolt-e4b"
     database_url: str | None = None
     redis_url: str | None = None
     enable_redis: bool = False

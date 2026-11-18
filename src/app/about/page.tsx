@@ -93,7 +93,7 @@ export default function AboutPage() {
                 University campuses are complex, highly regulated micro-ecosystems. Between fragmented ERP portal pages, institutional handbooks, hostel rules, exam procedures, and academic pre-requisites, students are often forced to manually hunt through dozens of PDFs and web pages to find simple answers.
               </p>
               <p>
-                <strong>SNUGPT</strong> was engineered by students, for students, to serve as a unified, conversational knowledge layer. By merging highly structured institutional context with cutting-edge Large Language Models, SNUGPT acts as an instantaneous, neural query center that answers questions with extreme precision in seconds.
+                <strong>SNUGPT</strong> was built by students to make university information easier to find. Ask a question in plain language and it searches the available campus documents and links for a useful answer. It can still miss details, so check the original policy when a decision depends on it.
               </p>
             </div>
           </motion.div>
@@ -118,7 +118,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-base font-bold text-white uppercase tracking-wider">Inference Layer</h3>
                 <p className="text-xs md:text-sm text-white/40 leading-relaxed font-medium font-inter">
-                  Powered by <strong>NVIDIA Nemotron-3 Super 120B</strong> running over high-speed NVIDIA AI Foundation endpoints, streaming answers token-by-token for commercial-grade speed.
+                  Answers are generated with NVIDIA Nemotron and streamed as they arrive. The model can be changed through the <code>NVIDIA_CHAT_MODEL</code> setting.
                 </p>
               </div>
             </motion.div>

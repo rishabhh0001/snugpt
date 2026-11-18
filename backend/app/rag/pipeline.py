@@ -19,6 +19,9 @@ from app.utils.email import send_error_email
 
 logger = logging.getLogger(__name__)
 
+def _chat_model_name() -> str:
+    return os.getenv("NVIDIA_CHAT_MODEL") or settings.nvidia_chat_model
+
 # Lazy initialization of LLM to prevent startup crashes
 _llm = None
 _llm_lock = threading.Lock()
@@ -35,11 +38,11 @@ def get_llm():
                 # We don't raise here to avoid crashing the worker, but we'll fail gracefully during generation
                 return None
             _llm = ChatNVIDIA(
-                model="nvidia/nemotron-3-super-120b-a12b",
+                model=_chat_model_name(),
                 nvidia_api_key=api_key,
                 temperature=0.1,
-                max_tokens=16384,
-                model_kwargs={"chat_template_kwargs": {"enable_thinking": True}}
+                max_tokens=4096,
+                model_kwargs={"chat_template_kwargs": {"enable_thinking": False}}
             )
     return _llm
 
@@ -253,7 +256,7 @@ async def generate_smart_followups(query: str, response_text: str, api_key: Opti
             f"Output strictly a JSON array of 3 strings and nothing else. Example: [\"Question 1?\", \"Question 2?\", \"Question 3?\"]"
         )
         fast_llm = ChatNVIDIA(
-            model="nvidia/nemotron-3-super-120b-a12b",
+            model=_chat_model_name(),
             nvidia_api_key=api_key,
             temperature=0.3,
             max_tokens=300,
@@ -325,13 +328,8 @@ async def generate_streaming_response(
                 yield f'data: {{"type": "chunk", "text": {json.dumps(chunk)}}}\n\n'
                 await asyncio.sleep(0.002)
 
-            # Smart follow-ups for cached responses
-            try:
-                cached_followups = await generate_smart_followups(query, cached_response, api_key)
-                if cached_followups:
-                    yield f'data: {{"type": "follow_ups", "data": {json.dumps(cached_followups[:3])}}}\n\n'
-            except Exception as fe:
-                logger.debug("Cache follow-up error: %s", fe)
+            cached_followups = get_fallback_smart_questions(query, cached_response)
+            yield f'data: {{"type": "follow_ups", "data": {json.dumps(cached_followups[:3])}}}\n\n'
 
             yield f'data: {{"type": "done"}}\n\n'
             return
@@ -340,7 +338,7 @@ async def generate_streaming_response(
         try:
             enhanced_query = preprocess_temporal_query(query)
             logger.info("[Temporal Query Expansion] Query: '%s' -> Enhanced: '%s'", query, enhanced_query)
-            docs = await asyncio.to_thread(retrieve_documents, enhanced_query, k=15)
+            docs = await asyncio.to_thread(retrieve_documents, enhanced_query, k=8)
         except Exception as e:
             logger.error("Retriever error: %s", e)
             docs = []
@@ -353,10 +351,13 @@ async def generate_streaming_response(
             else:
                 positive_docs.append(doc)
 
-        try:
-            positive_docs = await rerank_documents(query, positive_docs, top_n=5)
-        except Exception as re_err:
-            logger.error("Reranking error: %s", re_err)
+        if getattr(settings, "enable_reranking", False):
+            try:
+                positive_docs = await rerank_documents(query, positive_docs, top_n=5)
+            except Exception as re_err:
+                logger.error("Reranking error: %s", re_err)
+                positive_docs = positive_docs[:5]
+        else:
             positive_docs = positive_docs[:5]
 
         if not positive_docs or (positive_docs and positive_docs[0].metadata.get("rerank_score", 1.0) < -1.0):
@@ -445,11 +446,11 @@ async def generate_streaming_response(
 
         if regenerate:
             llm = ChatNVIDIA(
-                model="nvidia/nemotron-3-super-120b-a12b",
+                model=_chat_model_name(),
                 nvidia_api_key=api_key,
                 temperature=0.4,
-                max_tokens=16384,
-                model_kwargs={"chat_template_kwargs": {"enable_thinking": True}}
+                max_tokens=4096,
+                model_kwargs={"chat_template_kwargs": {"enable_thinking": False}}
             )
         else:
             llm = get_llm()
@@ -485,22 +486,18 @@ async def generate_streaming_response(
                 except Exception as log_err:
                     logger.error("Chat log save failed: %s", log_err)
 
-            await asyncio.gather(_log_chat())
+            asyncio.create_task(_log_chat())
             
             if full_response.strip() and not regenerate:
-                await save_to_cache(query, full_response.strip())
+                asyncio.create_task(save_to_cache(query, full_response.strip()))
 
-            # ── Generate Smart Follow-up Questions ──
-            try:
-                followups = await generate_smart_followups(query, full_response, api_key)
-                if followups:
-                    yield f'data: {{"type": "follow_ups", "data": {json.dumps(followups[:3])}}}\n\n'
-            except Exception as followup_err:
-                logger.debug("Failed to stream follow-ups: %s", followup_err)
+            followups = get_fallback_smart_questions(query, full_response)
+            yield f'data: {{"type": "follow_ups", "data": {json.dumps(followups[:3])}}}\n\n'
 
 
     except Exception as e:
         error_details = traceback.format_exc()
+        error_reason = str(e)
         logger.error("Pipeline error: %s", error_details)
         
         # Generate clean 6-digit alphanumeric error ID
@@ -510,7 +507,7 @@ async def generate_streaming_response(
             try:
                 await save_error_telemetry(
                     error_id=error_id,
-                    reason=str(e),
+                    reason=error_reason,
                     what_caused=error_details,
                     query=query,
                     user_ip=user_ip or "unknown",
@@ -521,7 +518,7 @@ async def generate_streaming_response(
             try:
                 await send_error_email(
                     error_id=error_id,
-                    reason=str(e),
+                    reason=error_reason,
                     what_caused=error_details,
                     query=query,
                     user_ip=user_ip or "unknown",
@@ -531,7 +528,7 @@ async def generate_streaming_response(
                 logger.error("Failed to send error notification: %s", email_err)
 
         # Run telemetry operations in the background concurrently
-        await asyncio.gather(_log_error())
+        asyncio.create_task(_log_error())
 
         error_msg = (
             f"❌ **Neural Engine Error**: An internal system error occurred. Please try again later.\n\n"

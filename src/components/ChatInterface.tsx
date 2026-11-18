@@ -182,24 +182,13 @@ export default function ChatInterface() {
     if (!isOnline) {
       try {
         const offlineMsg = await performOfflineSearch(queryText);
-        const words = offlineMsg.split(" ");
-        let currentContent = "";
-        
-        for (let i = 0; i < words.length; i++) {
-          if (abortController.signal.aborted) {
-            currentContent += " *[stopped]*";
-            break;
-          }
-          currentContent += words[i] + " ";
-          const updated = [...nextMessages];
-          updated[updated.length - 1] = {
-            role: "assistant",
-            content: currentContent.trim(),
-            sources: []
-          };
-          updateMessages(convId, updated);
-          await new Promise((r) => setTimeout(r, 12)); // smooth local typing simulation (12ms)
-        }
+        const updated = [...nextMessages];
+        updated[updated.length - 1] = {
+          role: "assistant",
+          content: abortController.signal.aborted ? "This response was stopped." : offlineMsg,
+          sources: []
+        };
+        updateMessages(convId, updated);
       } catch (offlineErr) {
         console.error("Offline execution failure:", offlineErr);
       } finally {
@@ -265,6 +254,7 @@ export default function ChatInterface() {
           const lines = buffer.split("\n");
           buffer = lines.pop() ?? "";
 
+          let shouldUpdate = false;
           for (const line of lines) {
             if (!line.startsWith("data: ")) continue;
             const dataStr = line.slice(6).trim();
@@ -284,9 +274,11 @@ export default function ChatInterface() {
               else if (data.type === "follow_ups") last.follow_ups = data.data;
 
               current = updated;
-              updateMessages(convId!, current);
+              shouldUpdate = true;
             } catch { /* skip malformed */ }
           }
+          // Coalesce all SSE events from this network read into one state/IndexedDB write.
+          if (shouldUpdate) updateMessages(convId!, current);
         }
       }
 
@@ -330,7 +322,7 @@ export default function ChatInterface() {
         updateMessages(convId!, updated);
       } else {
         console.error("Chat error:", err);
-        const errMsgs = [...messages, userMsg, {
+        const errMsgs = [...baseMessages, userMsg, {
           role: "assistant" as const,
           content: "I encountered a connection error. Please try again.",
         }];
