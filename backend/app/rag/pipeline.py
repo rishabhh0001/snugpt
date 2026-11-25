@@ -109,7 +109,7 @@ def preprocess_temporal_query(query: str) -> str:
 
 
 def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
+    return "\n\n".join(f"Source: {json.dumps(doc.metadata, default=str)}\n{doc.page_content}" for doc in docs)
 
 
 def save_qa_to_vectorstore(query: str, answer: str):

@@ -74,7 +74,7 @@ async def save_chat_feedback(
 ):
     """Capture message feedback (up, down, copy, regenerate) with timestamp."""
     if not is_database_connected():
-        logger.warning("Database not connected; skipping chat feedback save.")
+        raise RuntimeError("Feedback storage unavailable")
         return
 
     db = get_database()
@@ -95,7 +95,7 @@ async def save_chat_feedback(
         await db.execute(query=query_insert, values=values)
         print(f"[Feedback] Saved {action} feedback for chat {chat_id}")
     except Exception as e:
-        logger.error("Failed to save chat feedback: %s", e)
+        raise RuntimeError("Could not save feedback") from e
 
 
 class SharedChat(Base):
@@ -217,5 +217,3 @@ async def save_error_telemetry(
         await db.execute(query=query_insert, values=values)
     except Exception as e:
         logger.error("Failed to save error telemetry: %s", e)
-
-

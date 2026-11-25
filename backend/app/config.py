@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     chroma_persist_dir: str = "./chroma_db"
 
     use_chroma_cloud: bool = True
+    vector_backend: str = "chroma"
+    chroma_use_http: bool = False
     chroma_api_key: str | None = None
     chroma_tenant: str = "bf7a99b2-7384-49c8-8710-25dc1baccd97"
     chroma_database: str = "SNUGPT"
@@ -60,4 +62,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-

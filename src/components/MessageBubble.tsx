@@ -191,11 +191,12 @@ export default function MessageBubble({
   const [activeFeedback, setActiveFeedback] = useState<"up" | "down" | null>(
     message.feedback || null
   );
+  const [report, setReport] = useState("");
   const [copied, setCopied] = useState(false);
 
   if (message.role === "system" || message.role === "data") return null;
 
-  const submitFeedback = async (action: "up" | "down" | "copy" | "regenerate") => {
+  const submitFeedback = async (action: "up" | "down" | "copy" | "regenerate" | "report") => {
     if (!chatId) return;
     try {
       let endpoint = "/api/chat/feedback";
@@ -222,10 +223,12 @@ export default function MessageBubble({
         });
       }
 
+      if (action === "report") setReport(res.ok ? "Reported" : "Retry report");
       if (!res.ok) {
         console.error("Failed to submit feedback:", await res.text());
       }
     } catch (err) {
+      if (action === "report") setReport("Retry report");
       console.error("Feedback connection error:", err);
     }
   };
@@ -383,6 +386,7 @@ export default function MessageBubble({
                       >
                         <span>{isWeb ? "🌐" : "📄"}</span>
                         <span className="truncate font-medium" style={{ maxWidth: "140px" }}>{name}</span>
+                        {typeof src.metadata.last_checked === "string" && <span>Checked {src.metadata.last_checked}</span>}
                       </span>
                     );
                   })}
@@ -395,6 +399,7 @@ export default function MessageBubble({
         {/* Feedback Buttons */}
         {!isUser && message.content && (
           <div className="flex items-center gap-2 mt-2 px-0.5 text-[11px]" style={{ color: "var(--color-muted)" }}>
+            {chatId && message.id && !isTyping && <button disabled={report === "Reported"} onClick={() => submitFeedback("report")}>{report || "Report incorrect answer"}</button>}
             {message.content !== "This response was stopped." && (
               <>
                 <button

@@ -5,6 +5,7 @@ import { SquarePen, ShieldCheck, UploadCloud, CheckCircle, AlertTriangle, Loader
 import { motion, AnimatePresence } from "framer-motion";
 import MessageBubble, { MessageProps } from "./MessageBubble";
 import { useConversations } from "./useConversations";
+import { ChatTools } from "./ChatTools";
 import Sidebar from "./Sidebar";
 import { PureMultimodalInput } from "@/components/ui/multimodal-ai-chat-input";
 import Link from "next/link";
@@ -443,7 +444,7 @@ export default function ChatInterface() {
             </motion.div>
           )}
 
-          <div className="flex-1" />
+          <div className="flex-1" /><ChatTools messages={messages} />
 
           <button
             onClick={handleNew}

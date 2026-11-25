@@ -1,6 +1,7 @@
 import logging
 import uuid
 import os
+import hashlib
 from typing import List, Any, cast
 
 import chromadb
@@ -31,7 +32,9 @@ def _get_client():
         if _client is not None:
             return _client
 
-        if settings.chroma_api_key and settings.use_chroma_cloud:
+        if settings.use_chroma_cloud:
+            if not settings.chroma_api_key:
+                raise RuntimeError("USE_CHROMA_CLOUD is enabled but CHROMA_API_KEY is not configured.")
             logger.info(
                 "Chroma Cloud tenant=%s database=%s",
                 settings.chroma_tenant,
@@ -42,12 +45,15 @@ def _get_client():
                 tenant=settings.chroma_tenant,
                 database=settings.chroma_database,
             )
-        else:
+        elif settings.chroma_use_http:
             logger.info("Chroma HTTP %s:%s", settings.chroma_host, settings.chroma_port)
             _client = chromadb.HttpClient(
                 host=settings.chroma_host,
                 port=settings.chroma_port,
             )
+        else:
+            logger.info("Chroma embedded persistent store at %s", settings.chroma_persist_dir)
+            _client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
     return _client
 
 
@@ -132,20 +138,37 @@ def get_bm25_index():
 
 def retrieve_documents(query: str, k: int = 4) -> List[Document]:
     """Hybrid Dense-Sparse search using ChromaDB and BM25 with Reciprocal Rank Fusion & Exact Match Boosting."""
+    if settings.vector_backend == "neon":
+        from app.rag.neon_store import search
+        return search(query, k)
     # 1. Dense Query (vector search)
     embeddings = get_embeddings()
     query_vector = embeddings.embed_query(query)
     
-    # We fetch a larger pool for RRF ranking
+    collection = _get_collection()
+    # Start with one vector query. If Chroma rejects a request that is larger
+    # than a small collection, retry once with its actual size.
     pool_size = max(k * 4, 20)
     
     dense_docs = []
     try:
-        result = _get_collection().query(
-            query_embeddings=[query_vector],
-            n_results=pool_size,
-            include=["documents", "metadatas"],
-        )
+        try:
+            result = collection.query(
+                query_embeddings=[query_vector],
+                n_results=pool_size,
+                include=["documents", "metadatas"],
+            )
+        except Exception:
+            collection_size = collection.count()
+            if collection_size == 0:
+                return []
+            if collection_size >= pool_size:
+                raise
+            result = collection.query(
+                query_embeddings=[query_vector],
+                n_results=collection_size,
+                include=["documents", "metadatas"],
+            )
         if result and result.get("documents") and result["documents"][0]:
             metadatas = result.get("metadatas") or [[]]
             for i, content in enumerate(result["documents"][0]):
@@ -245,12 +268,19 @@ def add_documents(documents: List[Document]) -> None:
     """Batch add for local indexing scripts."""
     if not documents:
         return
+    if settings.vector_backend == "neon":
+        from app.rag.neon_store import ingest
+        return ingest(documents)
     clear_bm25_cache()  # Clear cache on new bulk ingest
     texts = [d.page_content for d in documents]
     metadatas = [d.metadata for d in documents]
     vectors = get_embeddings().embed_documents(texts)
-    _get_collection().add(
-        ids=[str(uuid.uuid4()) for _ in texts],
+    ids = [
+        hashlib.sha256(f"{metadata.get('source', '')}\0{text}".encode("utf-8")).hexdigest()
+        for text, metadata in zip(texts, metadatas)
+    ]
+    _get_collection().upsert(
+        ids=ids,
         documents=texts,
         metadatas=cast(Any, metadatas),
         embeddings=cast(Any, vectors),
@@ -312,5 +342,3 @@ async def rerank_documents(query: str, docs: List[Document], top_n: int = 5) -> 
         
     # Fail-safe local fallback
     return docs[:top_n]
-
-
