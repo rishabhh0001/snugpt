@@ -8,6 +8,7 @@ import Image from 'next/image';
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import styles from './login.module.css';
 
 export default function AuthPage() {
 	const [email, setEmail] = useState('');
@@ -15,18 +16,6 @@ export default function AuthPage() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState<string | null>(null);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-	const handleOAuthSignIn = async (provider: string) => {
-		setIsLoading(provider);
-		setErrorMessage(null);
-		try {
-			await signIn(provider, { callbackUrl: '/chat' });
-		} catch (error) {
-			console.error("Sign in error:", error);
-			setErrorMessage(`Failed to sign in with ${provider}. Please try again.`);
-			setIsLoading(null);
-		}
-	};
 
 	const handleEmailSignIn = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -157,39 +146,27 @@ export default function AuthPage() {
 						</div>
 					)}
 
-					{/* OAuth login providers */}
-					<div className="space-y-2">
-						<Button
-							type="button"
-							size="lg"
-							variant="outline"
-							className="w-full bg-white/5 hover:bg-white/10 border-white/20 text-white font-semibold cursor-pointer active:scale-98 transition-all"
-							disabled={isLoading !== null}
-							onClick={() => handleOAuthSignIn('google')}
-						>
-							{isLoading === 'google' ? (
-								<div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent me-2" />
-							) : (
-								<GoogleIcon className='size-4 me-2 text-white' />
-							)}
-							Continue with Google
-						</Button>
-
-						<Button
-							type="button"
-							size="lg"
-							variant="outline"
-							className="w-full bg-white/5 hover:bg-white/10 border-white/20 text-white font-semibold cursor-pointer active:scale-98 transition-all"
-							disabled={isLoading !== null}
-							onClick={() => handleOAuthSignIn('github')}
-						>
-							{isLoading === 'github' ? (
-								<div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent me-2" />
-							) : (
-								<Github className='size-4 me-2 text-white' />
-							)}
-							Continue with GitHub
-						</Button>
+					<div>
+						<div className="relative space-y-2 overflow-hidden rounded-xl" role="group" aria-label="Social sign-in" aria-describedby="social-maintenance">
+							<Button type="button" size="lg" variant="outline" className="w-full border-white/20 bg-white/5 text-white" disabled>
+								<GoogleIcon aria-hidden="true" className="size-4" />
+								Continue with Google
+							</Button>
+							<Button type="button" size="lg" variant="outline" className="w-full border-white/20 bg-white/5 text-white" disabled>
+								<Github aria-hidden="true" className="size-4" />
+								Continue with GitHub
+							</Button>
+							<div aria-hidden="true" className={styles.tape}>
+								<div className={styles.track}>
+									{Array.from({ length: 6 }, (_, index) => (
+										<span key={index}>Under maintenance <b>///</b></span>
+									))}
+								</div>
+							</div>
+						</div>
+						<p id="social-maintenance" className="mt-2 text-center text-xs text-amber-200/85">
+							Google and GitHub sign-in are under maintenance. Use email or your user ID below.
+						</p>
 					</div>
 
 					<AuthSeparator />

@@ -1,0 +1,37 @@
+.tape {
+  position: absolute;
+  inset-inline: -14%;
+  top: calc(50% - 13px);
+  overflow: hidden;
+  pointer-events: none;
+  transform: rotate(-8deg);
+  background: #facc15;
+  color: #201900;
+  box-shadow: 0 2px 14px #0008;
+  border-block: 3px solid transparent;
+  border-image: repeating-linear-gradient(135deg, #201900 0 5px, #facc15 5px 10px) 3;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: tape-flow 13s linear infinite;
+  font: 800 0.625rem/1.25rem ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.track span {
+  display: flex;
+  width: 11.5rem;
+  justify-content: space-around;
+  white-space: nowrap;
+}
+
+@keyframes tape-flow {
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track { animation: none; }
+}
