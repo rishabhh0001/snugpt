@@ -141,10 +141,10 @@ export default function UpdatesPage() {
       date: "24 November 2026",
       badge: "Latest release",
       badgeColor: "bg-amber-500/10 border-amber-500/30 text-amber-400",
-      description: "A new homepage and chat workspace, backed by an expanded SNU knowledge base in Neon.",
+      description: "An improved chat workspace backed by an expanded SNU knowledge base in Neon.",
       features: [
         { title: "Find the right university material", description: "Search handbooks, academic policies, program prospectuses, admissions pages, wiki guides, and the September and October CDC newsletters. Answers name the document and PDF page.", icon: BookOpen },
-        { title: "Start with a campus topic", description: "Browse six topic areas from the homepage, open an editable question, and find sources and chat tools in the conversation.", icon: Search },
+        { title: "Start with a campus topic", description: "Choose from six topics in chat, inspect named source excerpts, and jump back to the latest message.", icon: Search },
         { title: "Export, report, and plan", description: "Report incorrect answers, export local history, print a chat to PDF, or download a calendar event.", icon: Calendar },
         { title: "Sign-in and game improvements", description: "Social sign-in shows a maintenance notice. The paper plane game has quicker flight controls and faster scrolling.", icon: Zap },
         { title: "Updated site information", description: "About, Privacy, Terms, and License explain the current service and how it uses source material.", icon: Info },

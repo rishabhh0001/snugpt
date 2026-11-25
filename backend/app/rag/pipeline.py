@@ -364,9 +364,15 @@ async def generate_streaming_response(
 
     try:
         try:
-            enhanced_query = preprocess_temporal_query(query)
-            logger.info("[Temporal Query Expansion] Query: '%s' -> Enhanced: '%s'", query, enhanced_query)
-            docs = await asyncio.to_thread(retrieve_documents, enhanced_query, k=8)
+            retrieval_query = query
+            if re.match(r"^\s*(?:and\b|what about\b|how about\b|does (?:that|it)\b|where is (?:that|it)\b)", query, re.I):
+                prior = next((m.get("content", "") for m in reversed(history)
+                              if m.get("role") == "user"), "")
+                if prior:
+                    retrieval_query = f"{query}\nEarlier question: {prior[:450]}"
+            if settings.vector_backend != "neon":
+                retrieval_query = preprocess_temporal_query(retrieval_query)
+            docs = await asyncio.to_thread(retrieve_documents, retrieval_query, k=8)
         except Exception as e:
             logger.error("Retriever error: %s", e)
             docs = []
@@ -449,7 +455,7 @@ async def generate_streaming_response(
             if src and key not in seen_sources and len(sources_data) < 5:
                 seen_sources.add(key)
                 sources_data.append({
-                    "content": doc.page_content[:120],
+                    "content": doc.page_content[:260],
                     "metadata": source_metadata(doc),
                     "source_type": "db",
                 })

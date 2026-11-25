@@ -95,9 +95,22 @@ def search(query, k):
     vector = str(embed([query], "query")[0])
     match = re.search(r'"([^"]+)"|\b([A-Za-z]{2,4}\d{3,4})\b', query)
     phrase = next((s for s in match.groups() if s), "") if match else ""
+    query_lower = query.lower()
+    policy_sources = (
+        (r"\b(cgpa|sgpa|grading|grade points?)\b", "policy on grading system"),
+        (r"\b(attendance|f\* grade)\b", "policy on attendance requirement"),
+        (r"\b(change of major|switch majors?)\b", "policy on change of major"),
+        (r"\b(credit limit|credit extension)\b", "credit limit and credit extension"),
+        (r"\b(dean.s list)\b", "dean s list criteria"),
+    )
+    preferred = next((title for pattern, title in policy_sources if re.search(pattern, query_lower)), "")
+    historical = bool(re.search(r"\b(archive|archived|2016|2024\s*[-–/]\s*(?:2025|25))\b", query_lower))
     with closing(connect()) as db, db, db.cursor() as cur:
         cur.execute("""SELECT content, metadata FROM snugpt_chunks
             WHERE metadata->>'embedding_version' = %s
             ORDER BY (%s <> '' AND strpos(lower(content),lower(%s)) > 0) DESC,
-            embedding <=> %s::halfvec LIMIT %s""", (EMBEDDING_VERSION, phrase, phrase, vector, k))
+            (embedding <=> %s::halfvec)
+              - CASE WHEN %s <> '' AND strpos(lower(metadata->>'title'), %s) > 0 THEN 0.18 ELSE 0 END
+              + CASE WHEN NOT %s AND lower(metadata->>'title') ~ 'archive|march 2016' THEN 0.20 ELSE 0 END
+            LIMIT %s""", (EMBEDDING_VERSION, phrase, phrase, vector, preferred, preferred, historical, k))
         return [Document(page_content=text, metadata=meta) for text, meta in cur.fetchall()]

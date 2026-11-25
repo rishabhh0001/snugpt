@@ -360,36 +360,28 @@ export default function MessageBubble({
               animate={{ opacity: 1, height: "auto" }}
               className="mt-2 w-full"
             >
-              <details className="group">
-                <summary className="flex items-center gap-1.5 cursor-pointer text-[10px] font-semibold uppercase tracking-widest transition-colors list-none select-none"
+              <details className="group rounded-xl border border-color-border bg-color-surface">
+                <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 text-xs font-semibold select-none"
                   style={{ color: "var(--color-muted)" }}>
                   <BookOpen className="w-3 h-3" />
                   <span className="group-hover:text-color-text transition-colors">
-                    {message.sources.length} source{message.sources.length !== 1 ? "s" : ""}
+                    Source excerpts · {message.sources.length}
                   </span>
                 </summary>
-                <div className="mt-2 flex flex-wrap gap-1.5">
+                <div className="grid gap-3 border-t border-color-border p-3">
                   {message.sources.map((src, i) => {
-                    const isWeb = src.metadata?.source === "Web Search";
                     const name = typeof src.metadata.title === "string" && src.metadata.title
                       ? src.metadata.title : getFilename(src.metadata.source ?? "Source");
-                    const preview = src.content?.slice(0, 60).trim();
+                    const preview = src.content?.trim();
                     return (
-                      <span
-                        key={i}
-                        title={preview}
-                        className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border transition-all cursor-default hover:border-yellow-500/30 hover:text-color-text"
-                        style={{
-                          background: "var(--color-surface)",
-                          borderColor: "var(--color-border)",
-                          color: "var(--color-muted)"
-                        }}
-                      >
-                        <span>{isWeb ? "🌐" : "📄"}</span>
-                        <span className="font-medium">{name}</span>
-                        {typeof src.metadata.page === "number" && <span className="whitespace-nowrap">PDF p. {src.metadata.page}</span>}
-                        {typeof src.metadata.last_checked === "string" && <span>Checked {src.metadata.last_checked}</span>}
-                      </span>
+                      <div key={i} className="min-w-0 border-l-2 border-amber-400/50 pl-3">
+                        <div className="flex flex-wrap items-baseline gap-x-2 text-xs">
+                          <span className="font-semibold text-color-text">{name}</span>
+                          {typeof src.metadata.page === "number" && <span className="whitespace-nowrap text-color-muted">PDF p. {src.metadata.page}</span>}
+                          {typeof src.metadata.last_checked === "string" && <span className="text-color-muted">Checked {src.metadata.last_checked}</span>}
+                        </div>
+                        {preview && <p className="mt-1 break-words text-xs leading-5 text-color-muted">{preview}{preview.length >= 120 ? "…" : ""}</p>}
+                      </div>
                     );
                   })}
                 </div>
