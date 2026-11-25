@@ -227,12 +227,12 @@ export default function EasterEggPage() {
   // Restart Game
   const restartGame = useCallback(() => {
     birdY.current = 260;
-    birdVelocity.current = 0;
+    birdVelocity.current = -325;
     obstacles.current = [];
     particles.current = [];
     scoreRef.current = 0;
     gameOverRef.current = false;
-    lastSpawn.current = Date.now();
+    lastSpawn.current = Date.now() - 1150;
     lastGapCenter.current = 260;
     setScore(0);
     setBannerMessage(null);
@@ -243,9 +243,9 @@ export default function EasterEggPage() {
   const jump = useCallback(() => {
     if (gameState === "ready") {
       gameOverRef.current = false;
-      lastSpawn.current = Date.now();
+      lastSpawn.current = Date.now() - 1150;
       setGameState("playing");
-      birdVelocity.current = -390;
+      birdVelocity.current = -325;
       soundRef.current.jump();
       return;
     }
@@ -254,7 +254,7 @@ export default function EasterEggPage() {
       return;
     }
     // Playing
-    birdVelocity.current = -390;
+    birdVelocity.current = -325;
     soundRef.current.jump();
 
     // Spawn tiny paper trails
@@ -293,7 +293,7 @@ export default function EasterEggPage() {
     if (!ctx) return;
 
     // High DPI scaling
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const logicalWidth = 420;
     const logicalHeight = 560;
 
@@ -316,6 +316,10 @@ export default function EasterEggPage() {
     let isRunning = true;
     let previousFrameTime = 0;
 
+    const gradient = ctx.createLinearGradient(0, 0, 0, logicalHeight);
+    gradient.addColorStop(0, "#090d16");
+    gradient.addColorStop(0.5, "#0d1322");
+    gradient.addColorStop(1, "#111827");
     const gameLoop = (frameTime: number) => {
       if (!isRunning) return;
       const deltaSeconds = previousFrameTime === 0
@@ -324,10 +328,6 @@ export default function EasterEggPage() {
       previousFrameTime = frameTime;
 
       // 1. CLEAR & BACKGROUND
-      const gradient = ctx.createLinearGradient(0, 0, 0, logicalHeight);
-      gradient.addColorStop(0, "#090d16");
-      gradient.addColorStop(0.5, "#0d1322");
-      gradient.addColorStop(1, "#111827");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
@@ -360,7 +360,7 @@ export default function EasterEggPage() {
       // 2. GAME STATE: PLAYING
       if (gameState === "playing") {
         // Apply Gravity
-        birdVelocity.current = Math.min(birdVelocity.current + 700 * deltaSeconds, 460);
+        birdVelocity.current = Math.min(birdVelocity.current + 1080 * deltaSeconds, 560);
         birdY.current += birdVelocity.current * deltaSeconds;
 
         // Ground / Ceiling bounds
@@ -380,9 +380,9 @@ export default function EasterEggPage() {
 
         // Spawn obstacles
         const now = Date.now();
-        if (now - lastSpawn.current > 1900) {
+        if (now - lastSpawn.current > 1750) {
           lastSpawn.current = now;
-          const gap = 175;
+          const gap = 166;
           const minH = 60;
           const maxH = logicalHeight - 35 - gap - minH;
           const minCenter = minH + gap / 2;
@@ -416,7 +416,7 @@ export default function EasterEggPage() {
         }
 
         // Update & Render Obstacles
-        const speed = 120;
+        const speed = 174;
         const birdX = 80;
         const birdRadius = 14;
 
@@ -582,7 +582,7 @@ export default function EasterEggPage() {
       // 4. DRAW PAPER PLANE (Bird)
       const bX = 80;
       const bY = gameState === "ready" ? 240 + Math.sin(Date.now() / 250) * 8 : birdY.current;
-      const tilt = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (birdVelocity.current * 3.5 * Math.PI) / 180));
+      const tilt = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (birdVelocity.current * Math.PI) / 4600));
 
       ctx.save();
       ctx.translate(bX, bY);
@@ -711,7 +711,9 @@ export default function EasterEggPage() {
           {/* Canvas Viewport */}
           <canvas
             ref={canvasRef}
-            onClick={jump}
+            onPointerDown={(event) => {
+              if (event.isPrimary && event.button === 0) jump();
+            }}
             className="w-full h-full block cursor-pointer touch-none"
             style={{ touchAction: "none" }}
           />
@@ -802,14 +804,10 @@ export default function EasterEggPage() {
         {/* Mobile Fast-Tap Button for touch devices */}
         <div className="w-full max-w-[420px] mt-3 md:hidden">
           <button
-            onTouchStart={(e) => {
-              e.preventDefault();
-              jump();
+            onPointerDown={(event) => {
+              if (event.isPrimary && event.button === 0) jump();
             }}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              jump();
-            }}
+            onClick={(event) => { if (event.detail === 0) jump(); }}
             className="w-full py-3.5 rounded-xl bg-white/[0.05] active:bg-orange-500/30 border border-white/10 text-neutral-300 active:text-white font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 select-none touch-manipulation"
           >
             <Zap className="w-4 h-4 text-orange-400" />

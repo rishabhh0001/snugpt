@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { SquarePen, ShieldCheck, UploadCloud, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Menu, SquarePen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MessageBubble, { MessageProps } from "./MessageBubble";
 import { useConversations } from "./useConversations";
@@ -10,9 +10,10 @@ import Sidebar from "./Sidebar";
 import { PureMultimodalInput } from "@/components/ui/multimodal-ai-chat-input";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { campusTopics } from "@/lib/campusTopics";
 
 
-export default function ChatInterface() {
+export default function ChatInterface({ initialDraft = "" }: { initialDraft?: string }) {
   const { conversations, activeId, activeConversation, setActiveId, createNew, updateMessages, deleteConversation } =
     useConversations();
 
@@ -21,6 +22,9 @@ export default function ChatInterface() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagePaneRef = useRef<HTMLDivElement>(null);
+  const followScroll = useRef(true);
+  const [showLatest, setShowLatest] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const { data: session } = useSession();
@@ -32,7 +36,7 @@ export default function ChatInterface() {
   };
   
   useEffect(() => {
-    scrollToBottom(isLoading ? "auto" : "smooth");
+    if (followScroll.current) scrollToBottom("auto");
   }, [messages, isLoading]);
 
   // Online / Offline Status Detection
@@ -342,6 +346,8 @@ export default function ChatInterface() {
   };
 
   const handleNew = () => {
+    followScroll.current = true;
+    setShowLatest(false);
     createNew();
     setSidebarOpen(false);
   };
@@ -351,6 +357,8 @@ export default function ChatInterface() {
   };
 
   const handleSelect = (id: string) => {
+    followScroll.current = true;
+    setShowLatest(false);
     setActiveId(id);
     setSidebarOpen(false);
   };
@@ -402,16 +410,16 @@ export default function ChatInterface() {
       <div className="flex flex-col flex-1 min-w-0">
 
         {/* Topbar */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b flex-shrink-0"
+        <div className="flex min-h-16 items-center gap-3 px-4 border-b flex-shrink-0 sm:px-6"
           style={{ borderColor: "var(--color-border)" }}>
           {/* Mobile hamburger */}
           <button
+            type="button"
+            aria-label="Open conversation history"
             className="md:hidden p-1.5 rounded-lg hover:bg-color-surface-hover transition-all active:scale-90 text-color-muted hover:text-color-text"
             onClick={() => setSidebarOpen(true)}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <Menu className="size-5" aria-hidden="true" />
           </button>
 
           {/* Mobile logo (visible when sidebar hidden) */}
@@ -444,11 +452,17 @@ export default function ChatInterface() {
             </motion.div>
           )}
 
-          <div className="flex-1" /><ChatTools messages={messages} />
+          <div className="hidden min-w-0 md:block">
+            <p className="truncate text-sm font-semibold">{activeConversation?.title || "Campus chat"}</p>
+            <p className="text-xs text-color-muted">Shiv Nadar University · Delhi NCR</p>
+          </div>
+          <div className="flex-1" />
+          <ChatTools messages={messages} />
 
           <button
             onClick={handleNew}
             title="New chat"
+            aria-label="New chat"
             className="p-1.5 rounded-lg transition-all active:scale-90 hover:bg-color-surface-hover text-color-muted hover:text-color-text"
           >
             <SquarePen className="w-4 h-4" />
@@ -456,8 +470,13 @@ export default function ChatInterface() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto w-full px-3 md:px-4 pb-8 md:pb-12">
+        <div ref={messagePaneRef} className="flex-1 overflow-y-auto" onScroll={() => {
+          const pane = messagePaneRef.current;
+          if (!pane) return;
+          followScroll.current = pane.scrollHeight - pane.scrollTop - pane.clientHeight < 100;
+          setShowLatest(!followScroll.current);
+        }}>
+          <div className="max-w-4xl mx-auto w-full px-4 sm:px-8 pb-8 md:pb-12">
             <AnimatePresence mode="wait">
               {messages.length === 0 ? (
                 <motion.div
@@ -465,25 +484,28 @@ export default function ChatInterface() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8 pt-10 md:pt-20"
+                  className="mx-auto max-w-3xl py-8 sm:py-14"
                 >
-                  {/* SNU Logo large */}
-                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden mb-4 md:mb-6 border-2 shadow-xl"
-                    style={{ borderColor: "rgba(242,169,0,0.3)", background: "#fff" }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/avatar.svg"
-                      alt="SNUGPT logo"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <h2 className="text-xl md:text-3xl font-bold text-color-text mb-1 md:mb-2">
-                    How can I assist your SNU journey today?
+                  <h2 className="font-serif text-4xl tracking-tight sm:text-6xl">
+                    What do you need to find?
                   </h2>
-                  <p className="text-xs md:text-sm mb-6 md:mb-10" style={{ color: "var(--color-muted)" }}>
-                    Query university student handbooks, policy manuals, and ERP guides in real-time.
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-color-muted">
+                    Ask about a campus rule or find the right document. Include your program and cohort if they affect the answer.
                   </p>
+                  <ul className="mt-7 grid border-t border-color-border sm:grid-cols-2 sm:gap-x-5">
+                    {campusTopics.map(topic => (
+                      <li key={topic.name} className="border-b border-color-border">
+                        <button type="button" disabled={isLoading} onClick={() => handleSendMessage({ input: topic.question, webSearch: webSearchActive })}
+                          className="group flex w-full items-center justify-between gap-3 py-3 text-left hover:bg-color-surface-hover sm:py-4">
+                          <span>
+                            <span className="block text-sm font-semibold">{topic.name}</span>
+                            <span className="mt-0.5 block text-xs text-color-muted">{topic.detail}</span>
+                          </span>
+                          <ArrowUpRight className="size-4 shrink-0 text-color-muted group-hover:text-color-text" aria-hidden="true" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 </motion.div>
               ) : (
                 <motion.div key="messages" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -519,8 +541,16 @@ export default function ChatInterface() {
         {/* ── Input bar ── */}
         <div className="flex-shrink-0 px-2 sm:px-4 pb-3 sm:pb-4 pt-1.5 sm:pt-2 relative"
           style={{ background: "linear-gradient(to top, var(--color-bg) 70%, transparent)" }}>
-          <div className="max-w-3xl mx-auto relative">
+          <div className="max-w-4xl mx-auto relative sm:px-4">
+            {showLatest && messages.length > 0 && (
+              <button type="button" className="absolute -top-10 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-color-border bg-color-surface px-3 py-1.5 text-xs shadow"
+                onClick={() => { followScroll.current = true; setShowLatest(false); scrollToBottom("auto"); }}>
+                <ArrowDown className="size-3.5" aria-hidden="true" /> Latest message
+              </button>
+            )}
             <PureMultimodalInput
+              initialDraft={initialDraft}
+              hideSuggestions
               chatId={activeId || "new-chat"}
               messages={messages.map((m, i) => ({ id: `${i}`, content: m.content, role: m.role }))}
               webSearchActive={webSearchActive}

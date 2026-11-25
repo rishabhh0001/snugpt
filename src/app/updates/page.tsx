@@ -110,7 +110,7 @@ interface Milestone {
 
 export default function UpdatesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState<'commits' | 'milestones'>('commits');
+  const [activeTab, setActiveTab] = useState<'commits' | 'milestones'>('milestones');
   const [commits, setCommits] = useState<Commit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -136,10 +136,25 @@ export default function UpdatesPage() {
 
   const milestones: Milestone[] = [
     {
+      version: "v1.5",
+      title: "Campus search, with sources",
+      date: "24 November 2026",
+      badge: "Latest release",
+      badgeColor: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+      description: "A new homepage and chat workspace, backed by an expanded SNU knowledge base in Neon.",
+      features: [
+        { title: "Find the right university material", description: "Search handbooks, academic policies, program prospectuses, admissions pages, wiki guides, and the September and October CDC newsletters. Answers name the document and PDF page.", icon: BookOpen },
+        { title: "Start with a campus topic", description: "Browse six topic areas from the homepage, open an editable question, and find sources and chat tools in the conversation.", icon: Search },
+        { title: "Export, report, and plan", description: "Report incorrect answers, export local history, print a chat to PDF, or download a calendar event.", icon: Calendar },
+        { title: "Sign-in and game improvements", description: "Social sign-in shows a maintenance notice. The paper plane game has quicker flight controls and faster scrolling.", icon: Zap },
+        { title: "Updated site information", description: "About, Privacy, Terms, and License explain the current service and how it uses source material.", icon: Info },
+      ]
+    },
+    {
       version: "v1.3.2",
       title: "Alphanumeric Error Telemetry & Automated Diagnostic Reporting",
       date: "May 30, 2026",
-      badge: "Latest Release",
+      badge: "Past release",
       badgeColor: "bg-amber-500/10 border-amber-500/30 text-amber-400",
       description: "A premium stability and telemetry upgrade. Uncaught exceptions are now caught, logged as a 6-character Error ID, persisted to the database, and dispatched asynchronously via direct SMTP and webhook fallbacks to engineering. Reference links have also been corrected to use SNUxplore casing.",
       features: [
@@ -924,7 +939,7 @@ export default function UpdatesPage() {
               © {new Date().getFullYear()} Rishabh Joshi. Apache License 2.0.
             </span>
             <span className="text-[8px] font-mono tracking-widest text-white/10 uppercase">
-              BUILD_ID: V1.3.2 &bull; Build 194 &bull; Delhi-NCR
+              SNUGPT v1.5 &bull; Delhi NCR
             </span>
           </div>
         </div>

@@ -1,7 +1,7 @@
 # <img src="./public/avatar.svg" width="48" align="center" style="vertical-align: middle;" /> SNUGPT — Delhi-NCR
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Release-v1.3.1%20(%2B192)-indigo?style=for-the-badge&logo=rocket" />
+  <img src="https://img.shields.io/badge/Release-v1.5-yellow?style=for-the-badge&logo=rocket" />
   <img src="https://img.shields.io/badge/Architecture-RAG-indigo?style=for-the-badge&logo=ai" />
   <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge&logo=fastapi" />
   <img src="https://img.shields.io/badge/Frontend-Next.js_16.2-black?style=for-the-badge&logo=nextdotjs" />
@@ -16,7 +16,11 @@
 
 ---
 
-## ⚡ The SNUGPT Overhaul (v1.3)
+## v1.5 milestone · 24 November 2026
+
+See the [v1.5 release notes](RELEASE_NOTES.md) for the new campus search and chat experience.
+
+## Previous releases
 
 SNUGPT is an open-source, high-density, conversational intelligence layer built exclusively for the Shiv Nadar University student body. It bridges the gap between fragmented ERP portals, university handbooks, hostel policies, and course prerequisites by consolidating all campus data into a unified, instant-response system.
 

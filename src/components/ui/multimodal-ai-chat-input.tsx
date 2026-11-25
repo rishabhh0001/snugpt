@@ -387,6 +387,8 @@ const SendButton = memo(PureSendButton, (prevProps, nextProps) => {
 // Main Component
 
 export interface MultimodalInputProps {
+  initialDraft?: string;
+  hideSuggestions?: boolean;
   chatId: string;
   messages: Array<UIMessage>;
   webSearchActive: boolean;
@@ -400,6 +402,8 @@ export interface MultimodalInputProps {
 }
 
 function PureMultimodalInput({
+  initialDraft = "",
+  hideSuggestions = false,
   chatId,
   messages,
   webSearchActive,
@@ -413,7 +417,7 @@ function PureMultimodalInput({
 }: MultimodalInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialDraft);
 
   const adjustHeight = () => {
     const textarea = textareaRef.current;
@@ -463,7 +467,7 @@ function PureMultimodalInput({
     resetHeight,
   ]);
 
-  const showSuggestedActions = messages.length === 0;
+  const showSuggestedActions = !hideSuggestions && messages.length === 0;
 
   return (
     <div className={cn("relative w-full flex flex-col gap-4", className)}>
@@ -495,7 +499,8 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Message SNUGPT..."
+        aria-label="Ask about SNU"
+        placeholder="Ask about SNU…"
         value={input}
         onChange={handleInput}
         className={cn(
@@ -504,7 +509,6 @@ function PureMultimodalInput({
           className,
         )}
         rows={1}
-        autoFocus
         disabled={!canSend || isGenerating}
         onKeyDown={(event) => {
           if (
