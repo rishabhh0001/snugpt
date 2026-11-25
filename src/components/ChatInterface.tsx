@@ -276,7 +276,10 @@ export default function ChatInterface({ initialDraft = "" }: { initialDraft?: st
               if (data.type === "message_id") last.id = data.id;
               else if (data.type === "sources") last.sources = data.data;
               else if (data.type === "chunk" && data.text) last.content += data.text;
-              else if (data.type === "follow_ups") last.follow_ups = data.data;
+              else if (data.type === "follow_ups") {
+                last.follow_ups = data.data;
+                last.groundedFollowups = data.grounded === true;
+              }
 
               current = updated;
               shouldUpdate = true;

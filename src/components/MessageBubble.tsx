@@ -7,57 +7,6 @@ import { BookOpen, ThumbsUp, ThumbsDown, Copy, Check, RotateCw, Sparkles } from 
 import { motion, AnimatePresence } from "framer-motion";
 import { ShiningText } from "@/components/ui/shining-text";
 
-function getSmartQuestionsForMessage(content: string): string[] {
-  const text = content.toLowerCase();
-  if (text.includes("attendance") || text.includes("present") || text.includes("absent") || text.includes("partha")) {
-    return [
-      "What is the official minimum attendance requirement?",
-      "How do duty leave and medical certificates get approved?",
-      "Can course coordinators grant attendance relaxations?"
-    ];
-  }
-  if (text.includes("hostel") || text.includes("room") || text.includes("mess") || text.includes("dining")) {
-    return [
-      "What are the hostel gate timings and in-time rules?",
-      "How do I apply for a night-out pass on the hostel portal?",
-      "Where can I report room maintenance or mess complaints?"
-    ];
-  }
-  if (text.includes("exam") || text.includes("grade") || text.includes("gpa") || text.includes("ccc") || text.includes("clearance")) {
-    return [
-      "What is the procedure for clearing an I-grade?",
-      "When is the deadline to drop 1st half CCC courses?",
-      "How is the CGPA and relative grading curve calculated?"
-    ];
-  }
-  if (text.includes("club") || text.includes("breeze") || text.includes("surge") || text.includes("fest")) {
-    return [
-      "When are Breeze and Surge festivals scheduled?",
-      "How can I join or apply for student club positions?",
-      "Where can I find the directory of all campus clubs?"
-    ];
-  }
-  if (text.includes("library") || text.includes("lasc") || text.includes("tutor") || text.includes("book")) {
-    return [
-      "What are the Central Library opening and closing hours?",
-      "How can I join the LASC peer tutorial groups?",
-      "How do I reserve discussion rooms in the library?"
-    ];
-  }
-  if (text.includes("admission") || text.includes("apply") || text.includes("eligibility") || text.includes("fee")) {
-    return [
-      "What are the eligibility criteria and fees for SNU programs?",
-      "Where can I fill out the official SNU online application form?",
-      "What scholarships are available for new admissions?"
-    ];
-  }
-  return [
-    "Can you provide more specific details on this?",
-    "Where can I find the official student handbook policy?",
-    "Who is the point of contact on campus for this?"
-  ];
-}
-
 export interface SourceDocument {
   content: string;
   metadata: { source?: string;[key: string]: unknown };
@@ -70,6 +19,7 @@ export interface MessageProps {
   sources?: SourceDocument[];
   feedback?: "up" | "down" | null;
   follow_ups?: string[];
+  groundedFollowups?: boolean;
 }
 
 function getFilename(src: string): string {
@@ -436,12 +386,7 @@ export default function MessageBubble({
         
         {/* Smart Follow-up Questions (Shown after each AI answer) */}
         {!isUser && isLast && !isTyping && (() => {
-          const followUps =
-            message.follow_ups && message.follow_ups.length > 0
-              ? message.follow_ups
-              : message.content.length > 15
-              ? getSmartQuestionsForMessage(message.content)
-              : [];
+          const followUps = message.groundedFollowups ? message.follow_ups ?? [] : [];
 
           if (followUps.length === 0) return null;
 
@@ -454,7 +399,7 @@ export default function MessageBubble({
             >
               <div className="flex items-center gap-1.5 text-[11px] font-medium tracking-wide uppercase select-none opacity-80" style={{ color: "var(--color-text-warning, #f2a900)" }}>
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Smart Questions</span>
+                <span>Ask about these sources</span>
               </div>
               <div className="flex flex-col gap-1.5">
                 {followUps.map((q, idx) => (
