@@ -371,7 +371,8 @@ export default function MessageBubble({
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {message.sources.map((src, i) => {
                     const isWeb = src.metadata?.source === "Web Search";
-                    const name = isWeb ? "Web Search" : getFilename(src.metadata?.source ?? "Source");
+                    const name = typeof src.metadata.title === "string" && src.metadata.title
+                      ? src.metadata.title : getFilename(src.metadata.source ?? "Source");
                     const preview = src.content?.slice(0, 60).trim();
                     return (
                       <span
@@ -385,7 +386,8 @@ export default function MessageBubble({
                         }}
                       >
                         <span>{isWeb ? "🌐" : "📄"}</span>
-                        <span className="truncate font-medium" style={{ maxWidth: "140px" }}>{name}</span>
+                        <span className="font-medium">{name}</span>
+                        {typeof src.metadata.page === "number" && <span className="whitespace-nowrap">PDF p. {src.metadata.page}</span>}
                         {typeof src.metadata.last_checked === "string" && <span>Checked {src.metadata.last_checked}</span>}
                       </span>
                     );

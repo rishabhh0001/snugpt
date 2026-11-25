@@ -108,8 +108,36 @@ def preprocess_temporal_query(query: str) -> str:
     return enhanced_query
 
 
+DOCUMENT_TITLES = {
+    "UGStudentHandbookNew.pdf": "Undergraduate Student Handbook",
+    "student_handbook_2026_final_1.pdf": "Student Handbook 2026",
+    "prospectus_ece_ug_20222026_20232027_20242028.pdf": "ECE Prospectus (2022–2026, 2023–2027, 2024–2028 cohorts)",
+    "prospectus_ece_ug_2025_2029.pdf": "ECE Prospectus (2025–2029 cohort)",
+    "prospectus_b_tech__-_cse_2022onwards.pdf": "CSE Prospectus (2022 onwards)",
+    "prospectus_bsc_research_biotechnology_snioe_2024.pdf": "B.Sc. (Research) Biotechnology Prospectus 2024",
+    "20250519-credit_limit_and_credit_extension_1_.pdf": "Credit Limit and Credit Extension Policy",
+    "ST204_Policy_on_Change_of_Major_for_UG_Students_V1.0.pdf": "Policy on Change of Major for UG Students",
+    "SummerTermNote.pdf": "Summer Term Note",
+    "Policy_on_Grading_System.pdf": "Policy on Grading System",
+    "Dean_s_List_Criteria.pdf": "Dean’s List Criteria",
+    "Examination_Manual.pdf": "Examination Manual",
+    "Policy_on_Academic_Standards.pdf": "Policy on Academic Standards",
+    "CollationOfMinorProgramsNewCurriculum190826.pdf": "Minor Programs under the New Curriculum",
+    "20250623-policy_on_attendance_requirement.pdf": "Policy on Attendance Requirement",
+    "SNU_Minors_Revised_Summary_for_AC_March_2016.pdf": "SNU Minors Revised Summary, March 2016 (historical)",
+}
+
+
+def source_metadata(doc):
+    metadata = doc.metadata.copy()
+    title = DOCUMENT_TITLES.get(metadata.get("source"))
+    if title:
+        metadata["title"] = title
+    return metadata
+
+
 def format_docs(docs):
-    return "\n\n".join(f"Source: {json.dumps(doc.metadata, default=str)}\n{doc.page_content}" for doc in docs)
+    return "\n\n".join(f"Source: {json.dumps(source_metadata(doc), default=str)}\n{doc.page_content}" for doc in docs)
 
 
 def save_qa_to_vectorstore(query: str, answer: str):
@@ -318,7 +346,7 @@ async def generate_streaming_response(
     yield f'data: {{"type": "message_id", "id": "{log_id}"}}\n\n'
 
     # ── Layer 2: Semantic Cache Check (Redis + GPTCache) ──────────────────────
-    if not regenerate:
+    if not regenerate and settings.vector_backend != "neon":
         cached_response = search_cache(query)
         if cached_response:
             yield f'data: {{"type": "sources", "data": []}}\n\n'
@@ -417,12 +445,12 @@ async def generate_streaming_response(
         sources_data = []
         for doc in positive_docs:
             src = doc.metadata.get("source", "")
-            key = src.split("/")[-1].split("\\")[-1]
-            if key and key not in seen_sources and len(sources_data) < 5:
+            key = (src, doc.metadata.get("page"))
+            if src and key not in seen_sources and len(sources_data) < 5:
                 seen_sources.add(key)
                 sources_data.append({
                     "content": doc.page_content[:120],
-                    "metadata": doc.metadata,
+                    "metadata": source_metadata(doc),
                     "source_type": "db",
                 })
 
@@ -488,7 +516,7 @@ async def generate_streaming_response(
 
             asyncio.create_task(_log_chat())
             
-            if full_response.strip() and not regenerate:
+            if full_response.strip() and not regenerate and settings.vector_backend != "neon":
                 asyncio.create_task(save_to_cache(query, full_response.strip()))
 
             followups = get_fallback_smart_questions(query, full_response)
